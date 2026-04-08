@@ -21,7 +21,7 @@ const siteData = {
       { label: 'Scopus', href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
       { label: 'ORCID', href: 'https://orcid.org/0009-0008-0325-6809' },
       { label: 'GitHub', href: 'https://github.com/vancv43' },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/vanchauerpax/' },
+      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/citi-van-2a7251353/' },
     ],
     cvLink: '#',
     heroImage: '/images/profile-photo.jpg',
