@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tìm kiếm chim cúc cu (CS)" data-title-en="Cuckoo Search (CS)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tìm kiếm chim cúc cu (CS)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 13 · Mục 13.2</span><span class="en">Chapter 13 · Section 13.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Tìm kiếm chim cúc cu</span><span class="en">Cuckoo Search</span><span class="sub"><span class="vi">Cuckoo Search — CS</span><span class="en">CS — brood parasitism with Lévy flights</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả tập tính đẻ trứng ký sinh của chim cúc cu và ba quy tắc lý tưởng hóa.</span><span class="en">Describe cuckoo brood parasitism and the three idealized rules.</span></li>
+        <li class="reveal d3"><span class="vi">Viết bước Lévy để tạo trứng mới và bước bỏ tổ với xác suất <span class="m">p<sub>a</sub></span>.</span><span class="en">Write the Lévy step for new eggs and the nest-abandonment step with probability <span class="m">p<sub>a</sub></span>.</span></li>
+        <li class="reveal d4"><span class="vi">Sinh bước Lévy bằng thuật toán Mantegna (chương 2).</span><span class="en">Generate Lévy steps with Mantegna's algorithm (chapter 2).</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả thực nghiệm và hiểu vì sao CS hội tụ chậm ở ngân sách nhỏ.</span><span class="en">Read the experiments and see why CS converges slowly on small budgets.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Chim cúc cu đẻ nhờ vào tổ chim khác</span><span class="en">Cuckoos lay eggs in other birds' nests</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Xin-She Yang và Suash Deb</strong> đề xuất năm 2009 (NaBIC 2009).</span><span class="en">Proposed by <strong>Xin-She Yang and Suash Deb</strong> in 2009 (NaBIC 2009).</span></li>
+          <li class="reveal d3"><span class="vi">Nhiều loài cúc cu đẻ trứng vào tổ của loài chim khác; trứng có thể giống trứng của chủ tổ.</span><span class="en">Many cuckoo species lay eggs in other birds' nests; the eggs may mimic the host's.</span></li>
+          <li class="reveal d4"><span class="vi">Nếu chủ tổ phát hiện trứng lạ, nó vứt trứng hoặc bỏ tổ để làm tổ mới.</span><span class="en">If the host spots an alien egg, it throws it out or abandons the nest to build a new one.</span></li>
+          <li class="reveal d5"><span class="vi">Đường bay tìm tổ của nhiều loài động vật có dạng <strong>bước Lévy</strong>: nhiều bước ngắn, thỉnh thoảng một bước rất dài.</span><span class="en">Many animals search along <strong>Lévy flights</strong>: many short steps with the occasional very long one.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 230" role="img" aria-label="Tổ chim với trứng cúc cu"><g fill="#d9b382" stroke="#8a6a3f"><ellipse cx="100" cy="150" rx="60" ry="24"/><ellipse cx="270" cy="120" rx="60" ry="24"/></g><g><ellipse cx="85" cy="140" rx="10" ry="13" fill="#d5e7e6"/><ellipse cx="108" cy="140" rx="10" ry="13" fill="#d5e7e6"/><ellipse cx="260" cy="110" rx="10" ry="13" fill="#d5e7e6"/><ellipse cx="283" cy="110" rx="11" ry="14" fill="#f6d8cb" stroke="#d9562f"/></g><text x="230" y="70" font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#d9562f"><tspan class="vi">trứng cúc cu</tspan><tspan class="en">cuckoo egg</tspan></text></svg>
+        <figcaption><span class="vi">Mỗi tổ là một lời giải; trứng cúc cu là lời giải mới</span><span class="en">Each nest is a solution; a cuckoo egg is a new solution</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi con cúc cu <span class="hl c-soc">bay kiểu Lévy</span> rồi đẻ một trứng vào một tổ ngẫu nhiên; trứng tốt hơn thì thay trứng cũ. Một phần <span class="hl c-sea">p<sub>a</sub></span> số tổ bị chủ phát hiện và <span class="hl c-cog">làm lại</span>.</span><span class="en">Each cuckoo <span class="hl c-soc">flies along a Lévy path</span> and lays one egg in a random nest; a better egg replaces the old one. A fraction <span class="hl c-sea">p<sub>a</sub></span> of nests are discovered and <span class="hl c-cog">rebuilt</span>.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Quy tắc 1</span><span class="en">Rule 1</span></b><span><span class="vi">mỗi cúc cu đẻ một trứng vào tổ ngẫu nhiên</span><span class="en">each cuckoo lays one egg in a random nest</span></span></div>
+      <div class="force reveal d4" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Quy tắc 2</span><span class="en">Rule 2</span></b><span><span class="vi">tổ tốt nhất được giữ cho thế hệ sau</span><span class="en">the best nests carry over</span></span></div>
+      <div class="force reveal d5" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Quy tắc 3</span><span class="en">Rule 3</span></b><span><span class="vi">số tổ cố định; tỉ lệ <span class="m">p<sub>a</sub></span> bị phát hiện</span><span class="en">fixed number of nests; a fraction <span class="m">p<sub>a</sub></span> discovered</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Tổ, trứng và bước Lévy</span><span class="en">Nests, eggs and Lévy steps</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Tổ</span><span class="en">Nest</span></span><span class="en"><span class="vi">Tổ</span><span class="en">Nest</span></span></dt><dd><span class="vi">Một lời giải <span class="m">x<sub>i</sub></span></span><span class="en">A solution <span class="m">x<sub>i</sub></span></span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Trứng mới</span><span class="en">New egg</span></span><span class="en"><span class="vi">Trứng mới</span><span class="en">New egg</span></span></dt><dd><span class="vi">Lời giải tạo bằng bước Lévy</span><span class="en">A solution built by a Lévy step</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Phát hiện</span><span class="en">Discovery</span></span><span class="en"><span class="vi">Phát hiện</span><span class="en">Discovery</span></span></dt><dd><span class="vi">Mỗi chiều bị đổi với xác suất <span class="m">p<sub>a</sub></span></span><span class="en">Each dimension changed with probability <span class="m">p<sub>a</sub></span></span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Bước Lévy</span><span class="en">Lévy step</span></h3><span class="m">L(s) ~ s<sup>−1−β</sup>, &nbsp; β = 1.5</span></div>
+        <div class="card ember mathcard reveal d4"><h3><span class="vi">Chi phí</span><span class="en">Cost</span></h3><span class="vi">2n lần đánh giá / vòng</span><span class="en">2n evaluations / iteration</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của CS</span><span class="en">CS step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Hai bước, mỗi bước đánh giá cả quần thể.</span><span class="en">Two steps, each evaluating the whole population.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> tổ ngẫu nhiên.</span><span class="en">Initialize <span class="m">n</span> random nests.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Mỗi cúc cu bay Lévy từ tổ của nó, tạo trứng mới.</span><span class="en">Each cuckoo flies a Lévy step from its nest, making a new egg.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Giữ trứng mới nếu tốt hơn trứng trong tổ.</span><span class="en">Keep the new egg if it beats the one in the nest.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Phát hiện: với xác suất <span class="m">p<sub>a</sub></span>, đổi chiều đó bằng bước vi phân ngẫu nhiên.</span><span class="en">Discovery: with probability <span class="m">p<sub>a</sub></span>, change that dimension by a random differential step.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Giữ tổ mới nếu tốt hơn; ghi nhận tổ tốt nhất; lặp lại.</span><span class="en">Keep the rebuilt nest if better; record the best; repeat.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n tổ</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n nests</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="67">Bay Lévy,</text><text x="375" y="89">đẻ trứng</text></g><g class="en"><text x="375" y="67">Lévy flight,</text><text x="375" y="89">lay eggs</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Giữ trứng</text><text x="625" y="89">tốt hơn</text></g><g class="en"><text x="625" y="67">Keep better</text><text x="625" y="89">eggs</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Phát hiện</text><text x="875" y="89">tỉ lệ pa</text></g><g class="en"><text x="875" y="67">Discover</text><text x="875" y="89">fraction pa</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Làm lại tổ;</text><text x="875" y="259">giữ nếu tốt hơn</text></g><g class="en"><text x="875" y="237">Rebuild;</text><text x="875" y="259">keep if better</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Cập nhật</text><text x="625" y="259">tổ tốt nhất</text></g><g class="en"><text x="625" y="237">Update</text><text x="625" y="259">best nest</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">t < T ?</text></g><g class="en"><text x="385" y="248" font-size="15">t < T ?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="237">Trả về</text><text x="125" y="259">tổ tốt nhất</text></g><g class="en"><text x="125" y="237">Return</text><text x="125" y="259">best nest</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Bay Lévy" data-label-en="Lévy flight">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Trứng mới bằng bước Lévy</span><span class="en">New eggs by Lévy steps</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">x<span class="ss"><i>t+1</i><i>i</i></span> = x<span class="ss"><i>t</i><i>i</i></span> + α ⊕ Lévy(β)</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">α ⊕ Lévy = 0.01 · L ⊗ (x<sub>i</sub> − x<sub>best</sub>) ⊗ N(0, 1)</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">L = u / |v|<sup>1/β</sup>, &nbsp; u ~ N(0, σ²), v ~ N(0, 1)</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Dòng thứ hai là cách mã minh họa của Yang & Deb chọn <span class="m">α</span>: bước tỉ lệ với khoảng cách tới tổ tốt nhất.</span><span class="en">The second line is how Yang & Deb's demo code sets <span class="m">α</span>: steps scale with the distance to the best nest.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">σ</span> tính bằng hàm Gamma theo thuật toán Mantegna (chương 2).</span><span class="en"><span class="m">σ</span> comes from the Gamma function via Mantegna's algorithm (chapter 2).</span></li>
+          <li class="reveal d5"><span class="vi">Tổ tốt nhất có <span class="m">x<sub>i</sub> − x<sub>best</sub> = 0</span> nên đứng yên ở bước này.</span><span class="en">The best nest has <span class="m">x<sub>i</sub> − x<sub>best</sub> = 0</span>, so it stays put in this step.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Bỏ tổ" data-label-en="Nest abandonment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Một phần tổ bị phát hiện và làm lại</span><span class="en">A fraction of nests are discovered and rebuilt</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">x<sub>i</sub> ← x<sub>i</sub> + r · (x<sub>p1</sub> − x<sub>p2</sub>) ⊗ K</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">K<sub>ij</sub> = 1 <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &gt; p<sub>a</sub>, &nbsp; 0 <span class="up"><span class="vi">ngược lại</span><span class="en">otherwise</span></span></span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi"><span class="m">p1, p2</span>: hai hoán vị ngẫu nhiên của các tổ; <span class="m">r ~ U(0, 1)</span>.</span><span class="en"><span class="m">p1, p2</span>: two random permutations of the nests; <span class="m">r ~ U(0, 1)</span>.</span></li>
+          <li class="reveal d4"><span class="vi">Đây là cách mã của Yang & Deb hiện thực “làm tổ mới”: một bước vi phân giống DE.</span><span class="en">This is how Yang & Deb's code realizes “building a new nest”: a DE-like differential step.</span></li>
+          <li class="reveal d5"><span class="vi">Sau mỗi bước, chỉ nhận tổ mới khi tốt hơn (chọn tham lam).</span><span class="en">After each step, a new nest is kept only if better (greedy selection).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của CS</span><span class="en">CS parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">n</span></td><td><span class="vi">Số tổ</span><span class="en">Number of nests</span></td><td>15 – 25</td></tr>
+        <tr><td><span class="m">p<sub>a</sub></span></td><td><span class="vi">Tỉ lệ bị phát hiện</span><span class="en">Discovery rate</span></td><td>0.25</td></tr>
+        <tr><td><span class="m">β</span></td><td><span class="vi">Số mũ Lévy</span><span class="en">Lévy exponent</span></td><td>1.5</td></tr>
+        <tr><td><span class="m">α<sub>0</sub></span></td><td><span class="vi">Hệ số bước</span><span class="en">Step scale</span></td><td>0.01</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Chỉ hai tham số cần chọn: <span class="m">n</span> và <span class="m">p<sub>a</sub></span>. Yang & Deb nhận thấy kết quả ít nhạy với <span class="m">p<sub>a</sub></span>.</span><span class="en">Only two parameters: <span class="m">n</span> and <span class="m">p<sub>a</sub></span>. Yang & Deb found results insensitive to <span class="m">p<sub>a</sub></span>.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">15 tổ trên địa hình chung</span><span class="en">15 nests on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Vệt cam là bước Lévy vừa được nhận; vệt xanh là tổ vừa được làm lại. Để ý thỉnh thoảng có một bước rất dài.</span><span class="en">Orange trails are accepted Lévy steps; blue ones rebuilt nests. Watch for the occasional very long jump.</span></p>
+        <p class="note"><span class="vi">Theo mã của Yang & Deb: <span class="m">p<sub>a</sub> = 0.25</span>, bước 0.01.</span><span class="en">As in Yang & Deb's code: <span class="m">p<sub>a</sub> = 0.25</span>, step 0.01.</span></p>
+        <div class="key">
+          <span><i style="background:#e6904f"></i><span class="vi">bước Lévy</span><span class="en">Lévy step</span></span>
+          <span><i style="background:#3a7fc1"></i><span class="vi">tổ làm lại</span><span class="en">rebuilt nest</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">tổ tốt nhất</span><span class="en">best nest</span></span>
+        </div>
+      </div>
+      <div class="field" id="cs-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một trứng Lévy và một lần làm tổ</span><span class="en">One Lévy egg and one rebuilt nest</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">x = (2, 3), &nbsp; x<sub>best</sub> = (1, 1)</span></div>
+          <div class="eq"><span class="m">L = (0.4, −1.2), &nbsp; N(0, 1) = (1, 0.5)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Bước Lévy: <span class="m">0.01 · L ⊗ (x − x<sub>best</sub>) ⊗ N = 0.01 · (0.4·1·1, −1.2·2·0.5) = (0.004, −0.012)</span>.</span><span class="en">Lévy step: <span class="m">0.01 · L ⊗ (x − x<sub>best</sub>) ⊗ N = 0.01 · (0.4·1·1, −1.2·2·0.5) = (0.004, −0.012)</span>.</span></li>
+          <li><span class="vi">Trứng mới: <span class="m">(2.004, 2.988)</span>; giữ nếu tốt hơn.</span><span class="en">New egg: <span class="m">(2.004, 2.988)</span>; kept if better.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Làm lại tổ</span><span class="en">Rebuilding</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">K = (1, 0)</span> (chỉ chiều 1 bị đổi), <span class="m">r = 0.6</span>, <span class="m">x<sub>p1</sub> − x<sub>p2</sub> = (3, −1)</span>.</span><span class="en"><span class="m">K = (1, 0)</span> (only dim 1 changes), <span class="m">r = 0.6</span>, <span class="m">x<sub>p1</sub> − x<sub>p2</sub> = (3, −1)</span>.</span></li>
+          <li><span class="vi">Tổ mới: <span class="m">(2 + 0.6·3, 3) = (3.8, 3)</span>.</span><span class="en">New nest: <span class="m">(2 + 0.6·3, 3) = (3.8, 3)</span>.</span></li>
+          <li><span class="vi">Bước Lévy ở đây rất ngắn vì hệ số 0.01; bước dài chỉ xuất hiện khi <span class="m">|L|</span> rất lớn.</span><span class="en">The Lévy step is tiny because of the 0.01 factor; long jumps appear only when <span class="m">|L|</span> is very large.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng cải tiến</span><span class="en">Directions of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">CS cải tiến</span><span class="en">Modified CS</span></h3><p><span class="vi">Cho <span class="m">α</span> giảm theo thế hệ và trao đổi thông tin giữa tổ tốt (Walton và cs., 2011).</span><span class="en">Decrease <span class="m">α</span> over generations and exchange information among top nests (Walton et al., 2011).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">CS đa mục tiêu</span><span class="en">Multi-objective CS</span></h3><p><span class="vi">Yang & Deb (2013) mở rộng cho nhiều mục tiêu.</span><span class="en">Yang & Deb (2013) extended it to many objectives.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">CS nhị phân</span><span class="en">Binary CS</span></h3><p><span class="vi">Hàm chuyển S/V cho bài toán 0/1.</span><span class="en">S/V transfer functions for 0/1 problems.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">CS lai</span><span class="en">Hybrid CS</span></h3><p><span class="vi">Kết hợp với PSO hoặc DE.</span><span class="en">Combined with PSO or DE.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của CS</span><span class="en">CS applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">CS được dùng rộng rãi nhờ ít tham số và bước Lévy khám phá tốt.</span><span class="en">CS is widely used thanks to few parameters and exploratory Lévy steps.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế kỹ thuật</span><span class="en">Engineering design</span></h3><p><span class="vi">Lò xo, dầm hàn (Yang & Deb, 2010).</span><span class="en">Springs, welded beams (Yang & Deb, 2010).</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Lập lịch công việc, flow shop.</span><span class="en">Job and flow-shop scheduling.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Xử lý ảnh</span><span class="en">Image processing</span></h3><p><span class="vi">Phân ngưỡng đa mức.</span><span class="en">Multilevel thresholding.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Huấn luyện mạng, chọn đặc trưng.</span><span class="en">Network training, feature selection.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · CS</span><span class="en">Experiment · CS</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">9.56e−3</td><td class="num">4.65e−3</td><td class="num">8.23e−3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.92e+1</td><td class="num">1.16e+1</td><td class="num">1.35e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">1.52e+1</td><td class="num">3.27e+0</td><td class="num">1.57e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">2.50e+0</td><td class="num">7.32e−1</td><td class="num">2.45e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">1.55e−1</td><td class="num">3.65e−2</td><td class="num">1.53e−1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">1.33e−2</td><td class="num">1.02e−2</td><td class="num">1.06e−2</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">1.71e+1</td><td class="num">4.72e+0</td><td class="num">1.59e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>12.14</b>, đứng thứ <b>14/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>12.14</b>, position <b>14/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Với hệ số bước 0.01, CS tiến chậm: thứ hạng Friedman 12.14, kém PSO trên cả 7 hàm ở ngân sách 20 000 lần đánh giá.</span><span class="en">With the 0.01 step factor CS progresses slowly: Friedman rank 12.14, worse than PSO on all 7 functions within 20,000 evaluations.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · CS</span><span class="en">Experiment · CS</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/CS.svg" alt="convergence CS" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/cs.py" class="c-sea">code/si/algorithms/cs.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        best = prob.best_x.copy()
+        Y = X + 0.01 * levy(rng, X.shape) * (X - best) * rng.normal(size=X.shape)
+        Y = prob.clip(Y); fy = prob(Y)
+        keep = fy &lt; fx; X[keep], fx[keep] = Y[keep], fy[keep]
+        K = rng.random(X.shape) &gt; pa
+        Y = X + rng.random() * (X[rng.permutation(n)] - X[rng.permutation(n)]) * K
+        Y = prob.clip(Y); fy = prob(Y)
+        keep = fy &lt; fx; X[keep], fx[keep] = Y[keep], fy[keep]
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Ít tham số, khám phá tốt, khai thác chậm</span><span class="en">Few parameters, good exploration, slow exploitation</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Chỉ hai tham số <span class="m">n, p<sub>a</sub></span>; ít nhạy.</span><span class="en">Only two parameters <span class="m">n, p<sub>a</sub></span>; low sensitivity.</span></li>
+          <li><span class="vi">Bước Lévy cho cả bước ngắn lẫn bước nhảy xa.</span><span class="en">Lévy steps give both short moves and long jumps.</span></li>
+          <li><span class="vi">Chọn tham lam giữ lời giải tốt.</span><span class="en">Greedy selection keeps good solutions.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Hệ số 0.01 làm khai thác chậm; với ngân sách nhỏ, CS kém PSO trên mọi hàm của bộ thử.</span><span class="en">The 0.01 factor slows exploitation; on a small budget CS loses to PSO on every test function.</span></li>
+          <li><span class="vi">Mỗi vòng tốn <span class="m">2n</span> lần đánh giá.</span><span class="en">Each iteration costs <span class="m">2n</span> evaluations.</span></li>
+          <li><span class="vi">Kết quả phụ thuộc nhiều vào cách chọn <span class="m">α</span> trong cài đặt.</span><span class="en">Results depend strongly on how <span class="m">α</span> is set in the implementation.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">σ</span> của thuật toán Mantegna với <span class="m">β = 1.5</span>.</span><span class="en">Compute Mantegna's <span class="m">σ</span> for <span class="m">β = 1.5</span>.</span></li>
+          <li><span class="vi">Lặp lại ví dụ tính tay với <span class="m">L = (3, 0.1)</span>.</span><span class="en">Redo the worked example with <span class="m">L = (3, 0.1)</span>.</span></li>
+          <li><span class="vi">Kỳ vọng có bao nhiêu chiều bị đổi trong bước bỏ tổ khi <span class="m">D = 10, p<sub>a</sub> = 0.25</span>?</span><span class="en">How many dimensions change on average in the abandonment step with <span class="m">D = 10, p<sub>a</sub> = 0.25</span>?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Thay 0.01 bằng 0.1 và 1; đo trên F1, F3.</span><span class="en">Replace 0.01 by 0.1 and 1; measure on F1, F3.</span></li>
+          <li><span class="vi">Khảo sát <span class="m">p<sub>a</sub> ∈ {0.1, 0.25, 0.5}</span>.</span><span class="en">Study <span class="m">p<sub>a</sub> ∈ {0.1, 0.25, 0.5}</span>.</span></li>
+          <li><span class="vi">Cài CS cải tiến của Walton và so sánh.</span><span class="en">Implement Walton's modified CS and compare.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>K. M. Passino, “Biomimicry of bacterial foraging for distributed optimization and control,” <em>IEEE Control Syst.</em>, vol. 22, no. 3, pp. 52–67, 2002, doi: <a href="https://doi.org/10.1109/MCS.2002.1004010">10.1109/MCS.2002.1004010</a>.</li>
+        <li>X.-S. Yang and S. Deb, “Cuckoo Search via Lévy flights,” in <em>2009 World Congress on Nature & Biologically Inspired Computing (NaBIC)</em>, 2009, pp. 210–214, doi: <a href="https://doi.org/10.1109/NABIC.2009.5393690">10.1109/NABIC.2009.5393690</a>.</li>
+        <li>X. S. Yang and S. Deb, “Engineering optimisation by cuckoo search,” <em>IJMMNO</em>, vol. 1, no. 4, pp. 330, 2010, doi: <a href="https://doi.org/10.1504/IJMMNO.2010.035430">10.1504/IJMMNO.2010.035430</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Trứng mới bằng bước Lévy</span><span class="en">New eggs by Lévy steps</span></span>
+      <span><span class="vi">Tỉ lệ <span class="m">p<sub>a</sub></span> tổ bị làm lại</span><span class="en">A fraction <span class="m">p<sub>a</sub></span> of nests rebuilt</span></span>
+      <span><span class="vi">Ít tham số, khai thác chậm</span><span class="en">Few parameters, slow exploitation</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Yang &amp; Deb, NaBIC 2009</span><span class="en">Original paper: Yang &amp; Deb, NaBIC 2009</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+new SI.Field2D(document.getElementById('cs-field'), {
+  n: 15, T: 60, seed: 10, pa: 0.25,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), mode: 0 }); },
+  step(S) {
+    const b = S.best.slice(), P = S.pop, rnd = S.rnd;
+    P.forEach((a) => { a.mode = 0; const y = a.x.map((v, d) => SI.clamp(v + SI.levy(rnd) * (v - b[d]) * SI.gauss(rnd))); if (SI.f(y) < SI.f(a.x)) { a.x = y; a.mode = 1; } });
+    const r = rnd();
+    P.forEach((a) => { const p = P[Math.floor(rnd() * P.length)].x, q = P[Math.floor(rnd() * P.length)].x; const y = a.x.map((v, d) => SI.clamp(v + (rnd() > this.pa ? r * (p[d] - q[d]) : 0))); if (SI.f(y) < SI.f(a.x)) { a.x = y; a.mode = 2; } });
+  },
+  draw(g, S, P) {
+    for (const a of S.pop) { g.lineWidth = 2; SI.trail(g, P, a, a.mode === 1 ? '#e6904f' : a.mode === 2 ? '#3a7fc1' : 'rgba(28,42,46,0.2)'); }
+    for (const a of S.pop) { const [x, y] = P.at(a); SI.dot(g, x, y, 5, '#f5f0e6'); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return ''; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

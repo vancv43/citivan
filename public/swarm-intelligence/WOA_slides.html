@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu đàn cá voi (WOA)" data-title-en="Whale Optimization Algorithm (WOA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu đàn cá voi (WOA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 10 · Mục 10.1</span><span class="en">Chapter 10 · Section 10.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu đàn cá voi</span><span class="en">Whale Optimization Algorithm</span><span class="sub"><span class="vi">Whale Optimization Algorithm — WOA</span><span class="en">WOA — catching prey with a net of bubbles</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Mô tả ba hành vi: vây bắt, lưới bong bóng xoắn ốc, tìm mồi.</span><span class="en">Describe the three behaviours: encircling, spiral bubble net, search.</span></li>
+          <li class="reveal d3"><span class="vi">Viết phương trình xoắn ốc logarit và quy tắc chọn theo <span class="m">p</span> và <span class="m">|A|</span>.</span><span class="en">Write the logarithmic spiral and the choice rule by <span class="m">p</span> and <span class="m">|A|</span>.</span></li>
+          <li class="reveal d4"><span class="vi">Tính xác suất mỗi hành vi theo thời gian.</span><span class="en">Compute how likely each behaviour is over time.</span></li>
+          <li class="reveal d5"><span class="vi">So sánh động lực học WOA với GWO và BA (mục 10.4).</span><span class="en">Compare WOA dynamics with GWO and BA (section 10.4).</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Cá voi lưng gù săn mồi bằng lưới bong bóng</span><span class="en">Humpback whales hunt with a bubble net</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Mirjalili và Lewis</strong> đề xuất năm 2016.</span><span class="en">Proposed by <strong>Mirjalili and Lewis</strong> in 2016.</span></li>
+          <li class="reveal d3"><span class="vi">Cá voi lặn xuống bên dưới đàn cá nhỏ, rồi vừa bơi lên theo đường xoắn ốc vừa thả bong bóng.</span><span class="en">The whale dives below a school of small fish, then swims upward along a spiral while releasing bubbles.</span></li>
+          <li class="reveal d4"><span class="vi">Vòng bong bóng khép dần thành một “tấm lưới” dồn con mồi lên mặt nước. Dữ liệu gắn thẻ trên 9 con cá voi (300 lần săn) cho thấy chúng lặn khoảng 12 m rồi dùng hai kiểu: <em>xoắn ốc đi lên</em> và <em>vòng đôi</em>.</span><span class="en">The ring of bubbles tightens into a “net” that herds the prey to the surface. Tag data from 9 whales (300 bubble-net events) show dives of about 12 m followed by two patterns: <em>upward spirals</em> and <em>double loops</em>.</span></li>
+          <li class="reveal d5"><span class="vi">WOA mô phỏng ba hành vi: <strong>vây bắt</strong>, <strong>tấn công bằng lưới bong bóng</strong> và <strong>đi tìm mồi</strong>.</span><span class="en">WOA models three behaviours: <strong>encircling</strong>, the <strong>bubble-net attack</strong> and <strong>searching for prey</strong>.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3 hide-phone">
+        <svg viewBox="0 0 360 330" role="img" aria-label="Đường xoắn ốc bong bóng quanh đàn cá" id="woa-spiral-art"></svg>
+        <figcaption><span class="vi">Đường bơi xoắn ốc và vệt bong bóng quanh đàn cá</span><span class="en">The spiral swim path and its trail of bubbles around the fish</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CORE IDEA -->
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Con cá voi đang ở chỗ tốt nhất được coi là <span class="hl c-soc">con mồi</span>. Mỗi con khác tung đồng xu: hoặc <span class="hl c-in">khép vòng vây</span> thẳng về phía nó, hoặc <span class="hl c-cog">bơi xoắn ốc</span> quanh nó.</span><span class="en">The whale at the best spot is treated as the <span class="hl c-soc">prey</span>. Every other whale flips a coin: either <span class="hl c-in">tighten the circle</span> straight toward it, or <span class="hl c-cog">spiral</span> around it.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: var(--sky)"><b class="c-in"><span class="vi">Vây bắt</span><span class="en">Encircling</span></b><span><span class="vi">thu hẹp vòng tròn quanh con mồi</span><span class="en">shrink a circle around the prey</span></span></div>
+      <div class="force reveal d4" style="border-color: var(--moss)"><b class="c-cog"><span class="vi">Xoắn ốc</span><span class="en">Spiral</span></b><span><span class="vi">bơi lên theo đường xoắn logarit</span><span class="en">swim up along a logarithmic spiral</span></span></div>
+      <div class="force reveal d5" style="border-color: var(--ember)"><b class="c-soc"><span class="vi">Tìm mồi</span><span class="en">Search</span></b><span><span class="vi">đi theo một con ngẫu nhiên để khám phá</span><span class="en">follow a random whale to explore</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. ENCIRCLING -->
+<section class="slide" aria-label="Vây bắt" data-label-en="Encircling">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Vây bắt: con tốt nhất đóng vai con mồi</span><span class="en">Encircling: the best whale plays the prey</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">D = | C · X*(t) − X(t) |</span></div>
+          <div class="eq" style="margin-top:0.35em"><span class="m">X(t+1) = X*(t) − A · D</span></div>
+        </div>
+        <div class="eq-box sand reveal d3"><div class="eq"><span class="m">A = 2a · r − a, &nbsp;&nbsp; C = 2 · r</span></div></div>
+      </div>
+      <ul class="bullets">
+        <li class="reveal d3"><span class="m">X*</span><span class="vi">: vị trí tốt nhất tìm được tới lúc này.</span><span class="en">: the best position found so far.</span></li>
+        <li class="reveal d4"><span class="m">a</span><span class="vi"> giảm tuyến tính từ 2 về 0; </span><span class="en"> decreases linearly from 2 to 0; </span><span class="m">r ~ U(0, 1)</span>.</li>
+        <li class="reveal d5"><span class="vi">Công thức giống hệt bước vây bắt của GWO (chương 9); khác biệt nằm ở hai hành vi còn lại.</span><span class="en">This is the same encircling rule as GWO (chapter 9); the difference lies in the other two behaviours.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5. BUBBLE-NET -->
+<section class="slide" aria-label="Tấn công bằng lưới bong bóng" data-label-en="Bubble-net attack">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưới bong bóng: khép vòng hoặc bơi xoắn ốc, mỗi cách 50%</span><span class="en">Bubble net: shrink or spiral, each with 50% chance</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <p class="reveal d2"><span class="vi"><strong>Đường xoắn ốc</strong> nối cá voi với con mồi:</span><span class="en">The <strong>spiral</strong> linking the whale to its prey:</span></p>
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">X(t+1) = D′ · e<sup>bl</sup> · cos(2πl) + X*(t)</span></div>
+          <div class="eq" style="margin-top:0.3em"><span class="m">D′ = | X*(t) − X(t) |</span></div>
+        </div>
+        <p class="note reveal d3"><span class="m">b</span><span class="vi">: hằng số quy định hình dạng xoắn logarit; </span><span class="en">: constant shaping the logarithmic spiral; </span><span class="m">l ~ U(−1, 1)</span>.</p>
+        <div class="eq-box sand reveal d4">
+          <div class="m" style="font-size: calc(var(--eq-size)*0.85); text-align:center; line-height:1.7; white-space:normal">
+            <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> p &lt; 0.5: <span class="up"><span class="vi">vây bắt</span><span class="en">encircle</span></span> &nbsp;·&nbsp; <span class="up"><span class="vi">ngược lại</span><span class="en">otherwise</span></span>: <span class="up"><span class="vi">xoắn ốc</span><span class="en">spiral</span></span>
+          </div>
+        </div>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 360 300" role="img" aria-label="Quỹ đạo xoắn ốc quanh X sao" id="woa-spiral-path"></svg>
+        <figcaption><span class="vi">Các điểm có thể đến theo đường xoắn, với <span class="m">l</span> từ −1 đến 1</span><span class="en">Reachable points along the spiral as <span class="m">l</span> goes from −1 to 1</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 6. SEARCH FOR PREY / DECISION -->
+<section class="slide" aria-label="Tìm mồi và quy tắc chọn hành vi" data-label-en="Searching and choosing a behaviour">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Khám phá</span><span class="en">Exploration</span></p>
+      <h2 class="reveal d1"><span class="vi">Tìm mồi: khi <span class="m">|A| ≥ 1</span>, đi theo một con ngẫu nhiên</span><span class="en">Search: when <span class="m">|A| ≥ 1</span>, follow a random whale</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">D = | C · X<sub>rand</sub> − X |</span></div>
+          <div class="eq" style="margin-top:0.3em"><span class="m">X(t+1) = X<sub>rand</sub> − A · D</span></div>
+        </div>
+        <p class="reveal d3"><span class="vi">Thay con mồi bằng một con cá voi chọn ngẫu nhiên, nên cá voi bị kéo ra khỏi vùng đang tập trung. Điều này chỉ xảy ra khi <span class="m">|A| ≥ 1</span>, tức chủ yếu ở nửa đầu quá trình.</span><span class="en">Replacing the prey with a randomly chosen whale pulls the whale away from the crowded region. It only happens when <span class="m">|A| ≥ 1</span>, which is mostly during the first half of the run.</span></p>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 400 250" role="img" aria-label="Cây quyết định chọn hành vi">
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="14" text-anchor="middle" fill="#1c2a2e">
+            <rect x="140" y="10" width="120" height="44" rx="10" fill="#f6e6b8"/><text x="200" y="38" font-family="STIX Two Text, serif" font-style="italic" font-size="17">p &lt; 0.5 ?</text>
+            <rect x="30" y="100" width="120" height="44" rx="10" fill="#f6e6b8"/><text x="90" y="128" font-family="STIX Two Text, serif" font-style="italic" font-size="17">|A| &lt; 1 ?</text>
+            <rect x="260" y="100" width="130" height="44" rx="10" fill="#dcefc8"/><text x="325" y="127"><tspan class="vi">Xoắn ốc</tspan><tspan class="en">Spiral</tspan></text>
+            <rect x="0" y="195" width="125" height="44" rx="10" fill="#d6e5f3"/><text x="62" y="222"><tspan class="vi">Vây bắt X*</tspan><tspan class="en">Encircle X*</tspan></text>
+            <rect x="140" y="195" width="140" height="44" rx="10" fill="#f6d8cb"/><text x="210" y="222"><tspan class="vi">Theo X</tspan><tspan class="en">Follow X</tspan><tspan font-size="10" dy="4">rand</tspan></text>
+            <g stroke="#1c2a2e" stroke-width="1.6" fill="none"><path d="M170,54 L110,100"/><path d="M230,54 L310,100"/><path d="M75,144 L62,195"/><path d="M110,144 L195,195"/></g>
+            <g font-size="12" fill="#56676a"><text x="125" y="78"><tspan class="vi">có</tspan><tspan class="en">yes</tspan></text><text x="285" y="78"><tspan class="vi">không</tspan><tspan class="en">no</tspan></text><text x="52" y="172"><tspan class="vi">có</tspan><tspan class="en">yes</tspan></text><text x="170" y="172"><tspan class="vi">không</tspan><tspan class="en">no</tspan></text></g>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Mỗi cá voi, mỗi vòng lặp, chọn một trong ba hành vi</span><span class="en">Every whale picks one of three behaviours at every iteration</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 7. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của WOA</span><span class="en">WOA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Mirjalili &amp; Lewis (2016); <span class="m">b = 1</span>, <span class="m">a</span>: 2 → 0.</span><span class="en">Mirjalili &amp; Lewis (2016); <span class="m">b = 1</span>, <span class="m">a</span>: 2 → 0.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> cá voi; <span class="m">X*</span> = lời giải tốt nhất.</span><span class="en">Initialize <span class="m">n</span> whales; <span class="m">X*</span> = best solution.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính <span class="m">a, A, C</span>; rút <span class="m">p ~ U(0, 1)</span>, <span class="m">l ~ U(−1, 1)</span>.</span><span class="en">Compute <span class="m">a, A, C</span>; draw <span class="m">p ~ U(0, 1)</span>, <span class="m">l ~ U(−1, 1)</span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi"><span class="m">p &lt; 0.5, |A| &lt; 1</span>: vây bắt quanh <span class="m">X*</span>; <span class="m">|A| ≥ 1</span>: bơi theo một cá voi ngẫu nhiên.</span><span class="en"><span class="m">p &lt; 0.5, |A| &lt; 1</span>: encircle <span class="m">X*</span>; <span class="m">|A| ≥ 1</span>: follow a random whale.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi"><span class="m">p ≥ 0.5</span>: bơi xoắn ốc (lưới bong bóng) quanh <span class="m">X*</span>.</span><span class="en"><span class="m">p ≥ 0.5</span>: spiral (bubble net) around <span class="m">X*</span>.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật <span class="m">X*</span>; lặp đến hết ngân sách.</span><span class="en">Update <span class="m">X*</span>; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n cá voi</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n whales</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">X* ←</text><text x="875" y="89">tốt nhất</text></g><g class="en"><text x="875" y="67">X* ←</text><text x="875" y="89">best</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Tính a, A, C;</text><text x="875" y="259">rút p, l</text></g><g class="en"><text x="875" y="237">Compute a, A, C;</text><text x="875" y="259">draw p, l</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Vây, tìm mồi</text><text x="625" y="259">hoặc xoắn ốc</text></g><g class="en"><text x="625" y="237">Encircle, search</text><text x="625" y="259">or spiral</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về X*</text></g><g class="en"><text x="125" y="248">Return X*</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của WOA</span><span class="en">WOA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">a</span></td><td><span class="vi">Giảm tuyến tính</span><span class="en">Linearly decreasing</span></td><td>2 → 0</td></tr>
+        <tr><td><span class="m">b</span></td><td><span class="vi">Hình dạng xoắn ốc</span><span class="en">Spiral shape</span></td><td>1</td></tr>
+        <tr><td><span class="m">p</span></td><td><span class="vi">Chọn vây bắt hay xoắn ốc</span><span class="en">Choose encircling or spiral</span></td><td>0.5 (xác suất)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán WOA</span><span class="en">The WOA algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ngoài <span class="m">n</span> và <span class="m">T</span>, chỉ thêm hằng số xoắn <span class="m">b</span>, thường lấy bằng 1.</span><span class="en">Besides <span class="m">n</span> and <span class="m">T</span>, the only extra constant is the spiral shape <span class="m">b</span>, usually 1.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">n</span> cá voi; <span class="m">X*</span> ← con tốt nhất</span><span class="en">Initialize <span class="m">n</span> whales; <span class="m">X*</span> ← the best one</span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span>, <span class="m">a = 2 − 2t / T</span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi cá voi</span><span class="en">each whale</span>:</span> <span class="vi">tính <span class="m">A, C, l, p</span></span><span class="en">draw <span class="m">A, C, l, p</span></span></li>
+        <li style="--ind:2"><span><span class="kw">if</span> <span class="m">p &lt; 0.5</span></span></li>
+        <li style="--ind:3"><span><span class="kw">if</span> <span class="m">|A| &lt; 1</span>:</span> <span class="vi">vây bắt quanh <span class="m">X*</span></span><span class="en">encircle <span class="m">X*</span></span></li>
+        <li style="--ind:3"><span><span class="kw">else</span>:</span> <span class="vi">đi theo <span class="m">X<sub>rand</sub></span></span><span class="en">follow <span class="m">X<sub>rand</sub></span></span></li>
+        <li style="--ind:2"><span><span class="kw">else</span>:</span> <span class="vi">bơi xoắn ốc quanh <span class="m">X*</span></span><span class="en">spiral around <span class="m">X*</span></span></li>
+        <li style="--ind:1"><span class="vi">Kẹp trong miền, đánh giá, cập nhật <span class="m">X*</span></span><span class="en">Clamp, evaluate, update <span class="m">X*</span></span></li>
+        <li><span><span class="kw">return</span> <span class="m">X*</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 cá voi trên cùng địa hình</span><span class="en">12 whales on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Cùng địa hình với các chương khác: vùng đậm là tốt, dấu <strong>+</strong> là cực tiểu toàn cục. Màu vệt cho biết hành vi vừa chọn.</span><span class="en">Same landscape as the other chapters: darker is better, <strong>+</strong> is the global minimum. Trail colours show the behaviour just chosen.</span></p>
+        <p class="note"><span class="vi">Với cấu hình này, bầy dừng ở một hố <strong>cục bộ</strong> phía trên bên trái: đúng hạn chế “đa dạng giảm nhanh” nêu ở slide Đánh giá.</span><span class="en">With this setup the pod settles in a <strong>local</strong> basin at the upper left: exactly the “diversity drops fast” limitation in the Assessment slide.</span></p>
+        <div class="key">
+          <span><i style="background:#d9562f"></i><span class="vi">X* (con mồi)</span><span class="en">X* (prey)</span></span>
+          <span><i style="background:#3a7fc1"></i><span class="vi">vây bắt</span><span class="en">encircling</span></span>
+          <span><i style="background:#4b8f45"></i><span class="vi">xoắn ốc</span><span class="en">spiral</span></span>
+          <span><i style="background:#e6904f"></i><span class="vi">tìm mồi (theo X<sub>rand</sub>)</span><span class="en">search (follow X<sub>rand</sub>)</span></span>
+        </div>
+      </div>
+      <div class="field" id="woa-field">
+        <canvas aria-label="WOA simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. VARIANTS & APPLICATIONS -->
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Vây bắt và xoắn ốc trong một chiều</span><span class="en">Encircling and spiral in one dimension</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">A = 2ar<sub>1</sub> − a, &nbsp; C = 2r<sub>2</sub>, &nbsp; D = |C X* − X|</span></div>
+          <div class="eq"><span class="m">X ← X* − A D</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">a = 1, r<sub>1</sub> = 0.75, r<sub>2</sub> = 0.5</span>: <span class="m">A = 0.5, C = 1</span>.</span><span class="en"><span class="m">a = 1, r<sub>1</sub> = 0.75, r<sub>2</sub> = 0.5</span>: <span class="m">A = 0.5, C = 1</span>.</span></li>
+          <li><span class="vi"><span class="m">X* = 4, X = 2</span>: <span class="m">D = 2</span>, <span class="m">X ← 4 − 0.5 · 2 = 3</span>.</span><span class="en"><span class="m">X* = 4, X = 2</span>: <span class="m">D = 2</span>, <span class="m">X ← 4 − 0.5 · 2 = 3</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Xoắn ốc</span><span class="en">Spiral</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">X ← D′ e<sup>bl</sup> cos(2πl) + X*</span>, <span class="m">D′ = |X* − X| = 2</span>.</span><span class="en"><span class="m">X ← D′ e<sup>bl</sup> cos(2πl) + X*</span>, <span class="m">D′ = |X* − X| = 2</span>.</span></li>
+          <li><span class="vi"><span class="m">l = −0.5</span>: <span class="m">X ← 2 e<sup>−0.5</sup>(−1) + 4 = 2.787</span>.</span><span class="en"><span class="m">l = −0.5</span>: <span class="m">X ← 2 e<sup>−0.5</sup>(−1) + 4 = 2.787</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · WOA</span><span class="en">Experiment · WOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">9.75e−1</td><td class="num">2.39e+0</td><td class="num">1.27e−1</td><td><span class="sg-plus">+</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">3.98e−2</td><td class="num">1.22e−1</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">1.58e+3</td><td class="num">8.83e+2</td><td class="num">1.32e+3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">5.80e+1</td><td class="num">1.38e+1</td><td class="num">5.55e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>7.64</b>, đứng thứ <b>8/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>7.64</b>, position <b>8/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Thiên lệch gốc tọa độ: trung vị F1 = 0 nhưng F6 (cùng hàm, dịch tâm) = 1.32e+3. Kết quả tốt trên F1 phần lớn do tối ưu nằm tại 0.</span><span class="en">Origin bias: median F1 = 0 but F6 (same function, shifted) = 1.32e+3. The good F1 result is largely due to the optimum lying at 0.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · WOA</span><span class="en">Experiment · WOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/WOA.svg" alt="convergence WOA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/woa.py" class="c-sea">code/si/algorithms/woa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        a = 2 - 2 * t / T
+        Xs = prob.best_x.copy()
+        old = X.copy()
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            A = 2 * a * rng.random() - a
+            C = 2 * rng.random()
+            l = rng.uniform(-1, 1)
+            <span class="k">if</span> rng.random() &lt; 0.5:
+                ref = Xs <span class="k">if</span> abs(A) &lt; 1 <span class="k">else</span> old[rng.integers(n)]
+                X[i] = ref - A * np.abs(C * ref - X[i])
+            <span class="k">else</span>:
+                X[i] = np.abs(Xs - X[i]) * np.exp(b * l) * np.cos(2 * np.pi * l) + Xs
+        X = prob.clip(X)
+        prob(X)
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Biến thể và ứng dụng" data-label-en="Variants and applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Biến thể và ứng dụng</span><span class="en">Variants and applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Những hướng mở rộng phổ biến</span><span class="en">Common extensions</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">WOA hỗn loạn</span><span class="en">Chaotic WOA</span></h3><p><span class="vi">Thay số ngẫu nhiên đều bằng ánh xạ hỗn loạn để tăng đa dạng.</span><span class="en">Replaces uniform random numbers with chaotic maps to boost diversity.</span></p></div>
+      <div class="card reveal d3"><h3>Binary WOA</h3><p><span class="vi">Dùng hàm chuyển đổi để chạy trên không gian nhị phân, ví dụ chọn đặc trưng.</span><span class="en">Uses transfer functions to work in binary spaces such as feature selection.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Lai ghép</span><span class="en">Hybrids</span></h3><p><span class="vi">Ghép với mô phỏng luyện kim (WOA-SA) hoặc tiến hóa vi phân để tinh chỉnh cục bộ.</span><span class="en">Combined with simulated annealing (WOA-SA) or differential evolution for local refinement.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Ứng dụng</span><span class="en">Applications</span></h3><p><span class="vi">Thiết kế kết cấu, điều phối năng lượng, tinh chỉnh siêu tham số học máy.</span><span class="en">Structural design, energy dispatch, machine-learning hyperparameter tuning.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. STRENGTHS & LIMITATIONS -->
+<section class="slide" aria-label="Ưu và nhược điểm" data-label-en="Strengths and limitations">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường xoắn ốc là điểm khác biệt chính</span><span class="en">The spiral is the main difference</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Ít tham số: chỉ <span class="m">n</span>, <span class="m">T</span> và <span class="m">b</span>.</span><span class="en">Few parameters: just <span class="m">n</span>, <span class="m">T</span> and <span class="m">b</span>.</span></li>
+          <li><span class="vi">Bước xoắn ốc cho phép tìm kỹ quanh lời giải tốt theo nhiều khoảng cách khác nhau.</span><span class="en">The spiral step probes around good solutions at many distances.</span></li>
+          <li><span class="vi">Bước theo <span class="m">X<sub>rand</sub></span> giữ khả năng khám phá ở giai đoạn đầu.</span><span class="en">Following <span class="m">X<sub>rand</sub></span> keeps exploration alive early on.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế</span><span class="en">Limitations</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Một nửa số bước luôn là xoắn ốc quanh <span class="m">X*</span>, nên đa dạng giảm nhanh và dễ kẹt cục bộ.</span><span class="en">Half of all moves spiral around <span class="m">X*</span>, so diversity drops fast and the swarm can get stuck.</span></li>
+          <li><span class="vi">Giống GWO, phép |·| và lịch giảm <span class="m">a</span> cố định có thể tạo thiên lệch theo hướng tọa độ.</span><span class="en">Like GWO, the |·| operator and the fixed schedule for <span class="m">a</span> can introduce coordinate-wise bias.</span></li>
+          <li><span class="vi">Hội tụ chậm ở giai đoạn cuối khi cần độ chính xác cao.</span><span class="en">Slow final convergence when high precision is needed.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">X* = 0, X = 1, b = 1, l = −0.5</span>, tính vị trí mới theo đường xoắn.</span><span class="en">With <span class="m">X* = 0, X = 1, b = 1, l = −0.5</span>, compute the new spiral position.</span></li>
+          <li><span class="vi">Khi <span class="m">a = 2</span>, xác suất một cá voi đi theo <span class="m">X<sub>rand</sub></span> là bao nhiêu? Khi <span class="m">a &lt; 1</span>?</span><span class="en">With <span class="m">a = 2</span>, how likely is a whale to follow <span class="m">X<sub>rand</sub></span>? And with <span class="m">a &lt; 1</span>?</span></li>
+          <li><span class="vi">WOA và GWO dùng chung phương trình nào, khác nhau ở đâu?</span><span class="en">Which equation do WOA and GWO share, and where do they differ?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài WOA và ghi tỉ lệ ba hành vi theo từng vòng lặp.</span><span class="en">Implement WOA and log the share of each behaviour per iteration.</span></li>
+          <li><span class="vi">So sánh WOA và GWO trên Rastrigin, Ackley cùng ngân sách, 30 lần chạy, kiểm định Friedman.</span><span class="en">Compare WOA and GWO on Rastrigin and Ackley under one budget, 30 runs, Friedman test.</span></li>
+          <li><span class="vi">Thử <span class="m">b ∈ {0.5, 1, 2}</span> và nhận xét hình dạng xoắn.</span><span class="en">Try <span class="m">b ∈ {0.5, 1, 2}</span> and comment on the spiral shape.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>X.-S. Yang, “A New Metaheuristic Bat-Inspired Algorithm,” in <em>Studies in Computational Intelligence</em>, Springer Berlin Heidelberg, 2010, pp. 65–74, doi: <a href="https://doi.org/10.1007/978-3-642-12538-6_6">10.1007/978-3-642-12538-6_6</a>.</li>
+        <li>J. A. Goldbogen, A. S. Friedlaender, J. Calambokidis, M. F. McKenna, M. Simon, and D. P. Nowacek, “Integrative Approaches to the Study of Baleen Whale Diving Behavior, Feeding Performance, and Foraging Ecology,” <em>BioScience</em>, vol. 63, no. 2, pp. 90–100, 2013, doi: <a href="https://doi.org/10.1525/bio.2013.63.2.5">10.1525/bio.2013.63.2.5</a>.</li>
+        <li>S. Mirjalili and A. Lewis, “The Whale Optimization Algorithm,” <em>Advances in Engineering Software</em>, vol. 95, pp. 51–67, 2016, doi: <a href="https://doi.org/10.1016/j.advengsoft.2016.01.008">10.1016/j.advengsoft.2016.01.008</a>.</li>
+        <li>M. M. Mafarja and S. Mirjalili, “Hybrid Whale Optimization Algorithm with simulated annealing for feature selection,” <em>Neurocomputing</em>, vol. 260, pp. 302–312, 2017, doi: <a href="https://doi.org/10.1016/j.neucom.2017.04.053">10.1016/j.neucom.2017.04.053</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+        <li>J. Kang and Z. Ma, “Red-Crowned Crane Optimization: A Novel Biomimetic Metaheuristic Algorithm for Engineering Applications,” <em>Biomimetics</em>, vol. 10, no. 9, pp. 565, 2025, doi: <a href="https://doi.org/10.3390/biomimetics10090565">10.3390/biomimetics10090565</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Vây bắt · xoắn ốc · tìm mồi</span><span class="en">Encircle · spiral · search</span></span>
+      <span><span class="vi"><span class="m">p</span> chọn vây bắt hay xoắn ốc</span><span class="en"><span class="m">p</span> picks encircling or spiral</span></span>
+      <span><span class="vi"><span class="m">|A| ≥ 1</span> thì khám phá</span><span class="en"><span class="m">|A| ≥ 1</span> means explore</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili &amp; Lewis, <em>Advances in Engineering Software</em> 95, 2016</span><span class="en">Original paper: Mirjalili &amp; Lewis, <em>Advances in Engineering Software</em> 95, 2016</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* Hình minh họa xoắn ốc (slide 2 và 5) */
+(function spiralArt() {
+  const NS = 'http://www.w3.org/2000/svg';
+  // slide 2: vệt bong bóng theo xoắn logarit quanh đàn cá
+  const a = document.getElementById('woa-spiral-art');
+  let h = '';
+  for (let i = 0; i < 70; i++) { const fx = 180 + (Math.cos(i * 2.4) * 22) * ((i % 7) / 7), fy = 150 + (Math.sin(i * 2.4) * 18) * ((i % 5) / 5); if (i < 26) h += `<circle cx="${fx.toFixed(1)}" cy="${fy.toFixed(1)}" r="2.6" fill="#1c2a2e" opacity="0.7"/>`; }
+  for (let k = 0; k < 46; k++) {
+    const th = k * 0.32, r = 130 * Math.exp(-0.06 * th);
+    const x = 180 + r * Math.cos(th), y = 150 + r * Math.sin(th) * 0.92;
+    h += `<circle class="reveal d${1 + (k % 5)}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(3 + (k % 4) * 1.6).toFixed(1)}" fill="none" stroke="#1f6f78" stroke-width="1.4"/>`;
+  }
+  h += `<path d="M180,315 C140,290 60,250 60,170" stroke="#56676a" stroke-dasharray="3 5" fill="none"/><ellipse cx="62" cy="168" rx="16" ry="9" fill="#1f6f78" transform="rotate(-70 62 168)"/>`;
+  a.innerHTML = h;
+  // slide 5: quỹ đạo xoắn với b = 1, l từ −1 đến 1
+  const s = document.getElementById('woa-spiral-path');
+  const cx = 180, cy = 150, D = 95;
+  let d = '';
+  for (let i = 0; i <= 200; i++) { const l = -1 + i / 100, R = D * Math.exp(l) / Math.E * 1.15; const x = cx + R * Math.cos(2 * Math.PI * l), y = cy - R * Math.sin(2 * Math.PI * l) * 0.85; d += `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`; }
+  s.innerHTML = `<path class="draw d2" style="--len:1400" d="${d}" fill="none" stroke="#4b8f45" stroke-width="2.5"/>
+    <rect x="${cx - 8}" y="${cy - 8}" width="16" height="16" fill="#d9562f"/>
+    <text x="${cx + 14}" y="${cy - 10}" font-family="STIX Two Text, serif" font-style="italic" font-size="20" fill="#d9562f">X*</text>
+    <circle cx="${cx + D * 1.15}" cy="${cy}" r="8" fill="#1c2a2e"/>
+    <text x="${cx + D * 1.15 - 8}" y="${cy + 28}" font-family="STIX Two Text, serif" font-style="italic" font-size="18" fill="#1c2a2e">X</text>
+    <line x1="${cx}" y1="${cy}" x2="${cx + D * 1.15}" y2="${cy}" stroke="#56676a" stroke-dasharray="4 4"/>
+    <text x="${cx + 40}" y="${cy + 18}" font-family="STIX Two Text, serif" font-style="italic" font-size="16" fill="#56676a">D′</text>`;
+})();
+
+/* WOA trên địa hình chung (cực tiểu), b = 1; A và C là vô hướng cho từng cá voi như mã gốc */
+new SI.Field2D(document.getElementById('woa-field'), {
+  n: 12, T: 60, seed: 3, b: 1,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), mode: 0 }); S.a = 2; },
+  step(S) {
+    S.a = 2 - 2 * S.t / S.T;
+    const Xs = S.best.slice(), old = S.pop.map((w) => w.x.slice());
+    for (const w of S.pop) {
+      const A = 2 * S.a * S.rnd() - S.a, C = 2 * S.rnd(), l = 2 * S.rnd() - 1, p = S.rnd();
+      if (p < 0.5) {
+        if (Math.abs(A) < 1) { w.mode = 1; for (let d = 0; d < 2; d++) w.x[d] = Xs[d] - A * Math.abs(C * Xs[d] - w.x[d]); }
+        else { w.mode = 3; const R = old[Math.floor(S.rnd() * old.length)]; for (let d = 0; d < 2; d++) w.x[d] = R[d] - A * Math.abs(C * R[d] - w.x[d]); }
+      } else {
+        w.mode = 2;
+        for (let d = 0; d < 2; d++) w.x[d] = Math.abs(Xs[d] - w.x[d]) * Math.exp(this.b * l) * Math.cos(2 * Math.PI * l) + Xs[d];
+      }
+      w.x = w.x.map(SI.clamp);
+    }
+  },
+  draw(g, S, P) {
+    const col = ['rgba(28,42,46,0.35)', '#3a7fc1', '#4b8f45', '#e6904f'];
+    for (const w of S.pop) { g.lineWidth = 2; SI.trail(g, P, w, col[w.mode]); }
+    for (const w of S.pop) { const [x, y] = P.at(w); SI.dot(g, x, y, 5.5, '#f5f0e6', col[w.mode] === col[0] ? 'rgba(28,42,46,0.85)' : col[w.mode]); }
+    const [bx, by] = P.pt(S.best);
+    g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.5; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S, en) { return `<span><b>a</b> = ${S.a.toFixed(2)}</span>`; },
+});
+SI.boot();
+</script>
+</body>
+</html>

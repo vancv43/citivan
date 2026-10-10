@@ -1,0 +1,3 @@
+distribution,median_abs,p99_abs,max_abs,pct_over_10x_median
+Levy(1.5),0.6285,11.576,1404.4,2.468
+Gauss,0.6746,2.57,4.2,0.0

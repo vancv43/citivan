@@ -1,0 +1,533 @@
+{
+ "1": [
+  {
+   "text": "I. Rechenberg, <em>Evolutionsstrategie: Optimierung technischer Systeme nach Prinzipien der biologischen Evolution</em>. Stuttgart, Germany: Frommann-Holzboog, 1973.",
+   "doi": null,
+   "year": 1973
+  },
+  {
+   "text": "D. Wolpert and W. Macready, “No free lunch theorems for optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 1, no. 1, pp. 67–82, 1997, doi: 10.1109/4235.585893.",
+   "doi": "10.1109/4235.585893",
+   "year": 1997
+  },
+  {
+   "text": "E. Bonabeau, M. Dorigo, and G. Theraulaz, <em>Swarm Intelligence: From Natural to Artificial Systems</em>. New York, NY, USA: Oxford Univ. Press, 1999.",
+   "doi": null,
+   "year": 1999
+  },
+  {
+   "text": "C. Blum and A. Roli, “Metaheuristics in combinatorial optimization,” <em>ACM Comput. Surv.</em>, vol. 35, no. 3, pp. 268–308, 2003, doi: 10.1145/937503.937505.",
+   "doi": "10.1145/937503.937505",
+   "year": 2003
+  },
+  {
+   "text": "T. G. Kolda, R. M. Lewis, and V. Torczon, “Optimization by Direct Search: New Perspectives on Some Classical and Modern Methods,” <em>SIAM Rev.</em>, vol. 45, no. 3, pp. 385–482, 2003, doi: 10.1137/S003614450242889.",
+   "doi": "10.1137/S003614450242889",
+   "year": 2003
+  },
+  {
+   "text": "M. Črepinšek, S.-H. Liu, and M. Mernik, “Exploration and exploitation in evolutionary algorithms,” <em>ACM Comput. Surv.</em>, vol. 45, no. 3, pp. 1–33, 2013, doi: 10.1145/2480741.2480752.",
+   "doi": "10.1145/2480741.2480752",
+   "year": 2013
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "2": [
+  {
+   "text": "R. N. Mantegna, “Fast, accurate algorithm for numerical simulation of Lévy stable stochastic processes,” <em>Phys. Rev. E</em>, vol. 49, no. 5, pp. 4677–4683, 1994, doi: 10.1103/PhysRevE.49.4677.",
+   "doi": "10.1103/PhysRevE.49.4677",
+   "year": 1994
+  },
+  {
+   "text": "G. M. Viswanathan, S. V. Buldyrev, S. Havlin, M. G. E. da Luz, E. P. Raposo, and H. E. Stanley, “Optimizing the success of random searches,” <em>Nature</em>, vol. 401, no. 6756, pp. 911–914, 1999, doi: 10.1038/44831.",
+   "doi": "10.1038/44831",
+   "year": 1999
+  },
+  {
+   "text": "X. Yao, Y. Liu, and G. Lin, “Evolutionary programming made faster,” <em>IEEE Trans. Evol. Computat.</em>, vol. 3, no. 2, pp. 82–102, 1999, doi: 10.1109/4235.771163.",
+   "doi": "10.1109/4235.771163",
+   "year": 1999
+  },
+  {
+   "text": "J. Derrac, S. García, D. Molina, and F. Herrera, “A practical tutorial on the use of nonparametric statistical tests as a methodology for comparing evolutionary and swarm intelligence algorithms,” <em>Swarm and Evolutionary Computation</em>, vol. 1, no. 1, pp. 3–18, 2011, doi: 10.1016/j.swevo.2011.02.002.",
+   "doi": "10.1016/j.swevo.2011.02.002",
+   "year": 2011
+  },
+  {
+   "text": "M. Jamil and X. S. Yang, “A literature survey of benchmark functions for global optimisation problems,” <em>IJMMNO</em>, vol. 4, no. 2, pp. 150, 2013, doi: 10.1504/IJMMNO.2013.055204.",
+   "doi": "10.1504/IJMMNO.2013.055204",
+   "year": 2013
+  }
+ ],
+ "3": [
+  {
+   "text": "J. Kennedy and R. Eberhart, “Particle swarm optimization,” in <em>Proceedings of ICNN'95 - International Conference on Neural Networks</em>, 1995, pp. 1942–1948, doi: 10.1109/ICNN.1995.488968.",
+   "doi": "10.1109/ICNN.1995.488968",
+   "year": 1995
+  },
+  {
+   "text": "J. Kennedy and R. Eberhart, “A discrete binary version of the particle swarm algorithm,” in <em>1997 IEEE International Conference on Systems, Man, and Cybernetics. Computational Cybernetics and Simulation</em>, 1997, pp. 4104–4108, doi: 10.1109/ICSMC.1997.637339.",
+   "doi": "10.1109/ICSMC.1997.637339",
+   "year": 1997
+  },
+  {
+   "text": "Y. Shi and R. Eberhart, “A modified particle swarm optimizer,” in <em>1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)</em>, 1998, pp. 69–73, doi: 10.1109/ICEC.1998.699146.",
+   "doi": "10.1109/ICEC.1998.699146",
+   "year": 1998
+  },
+  {
+   "text": "J. Kennedy, R. C. Eberhart, and Y. Shi, <em>Swarm Intelligence</em>. San Francisco, CA, USA: Morgan Kaufmann, 2001.",
+   "doi": null,
+   "year": 2001
+  },
+  {
+   "text": "M. Clerc and J. Kennedy, “The particle swarm - explosion, stability, and convergence in a multidimensional complex space,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 1, pp. 58–73, 2002, doi: 10.1109/4235.985692.",
+   "doi": "10.1109/4235.985692",
+   "year": 2002
+  },
+  {
+   "text": "V. Miranda and N. Fonseca, “EPSO - best-of-two-worlds meta-heuristic applied to power system problems,” in <em>Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)</em>, 2002, pp. 1080–1085, doi: 10.1109/CEC.2002.1004393.",
+   "doi": "10.1109/CEC.2002.1004393",
+   "year": 2002
+  },
+  {
+   "text": "W.-J. Zhang and X.-F. Xie, “DEPSO: hybrid particle swarm with differential evolution operator,” in <em>SMC'03 Conference Proceedings. 2003 IEEE International Conference on Systems, Man and Cybernetics. Conference Theme - System Security and Assurance (Cat. No.03CH37483)</em>, 2003, pp. 3816–3821, doi: 10.1109/ICSMC.2003.1244483.",
+   "doi": "10.1109/ICSMC.2003.1244483",
+   "year": 2003
+  },
+  {
+   "text": "R. Poli, J. Kennedy, and T. Blackwell, “Particle swarm optimization,” <em>Swarm Intell</em>, vol. 1, no. 1, pp. 33–57, 2007, doi: 10.1007/s11721-007-0002-0.",
+   "doi": "10.1007/s11721-007-0002-0",
+   "year": 2007
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "4": [
+  {
+   "text": "J. L. Deneubourg, S. Aron, S. Goss, and J. M. Pasteels, “The self-organizing exploratory pattern of the argentine ant,” <em>J Insect Behav</em>, vol. 3, no. 2, pp. 159–168, 1990, doi: 10.1007/BF01417909.",
+   "doi": "10.1007/BF01417909",
+   "year": 1990
+  },
+  {
+   "text": "M. Dorigo, V. Maniezzo, and A. Colorni, “Ant system: optimization by a colony of cooperating agents,” <em>IEEE Trans. Syst., Man, Cybern. B</em>, vol. 26, no. 1, pp. 29–41, 1996, doi: 10.1109/3477.484436.",
+   "doi": "10.1109/3477.484436",
+   "year": 1996
+  },
+  {
+   "text": "M. Dorigo and L. Gambardella, “Ant colony system: a cooperative learning approach to the traveling salesman problem,” <em>IEEE Trans. Evol. Computat.</em>, vol. 1, no. 1, pp. 53–66, 1997, doi: 10.1109/4235.585892.",
+   "doi": "10.1109/4235.585892",
+   "year": 1997
+  },
+  {
+   "text": "B. Bullnheimer, R. Hartl, and C. Strauss, “An improved Ant System algorithm for theVehicle Routing Problem,” <em>Annals of Operations Research</em>, vol. 89, no. 0, pp. 319–328, 1999, doi: 10.1023/A:1018940026670.",
+   "doi": "10.1023/A:1018940026670",
+   "year": 1999
+  },
+  {
+   "text": "T. Stützle and H. H. Hoos, “MAX–MIN Ant System,” <em>Future Generation Computer Systems</em>, vol. 16, no. 8, pp. 889–914, 2000, doi: 10.1016/S0167-739X(00)00043-1.",
+   "doi": "10.1016/S0167-739X(00)00043-1",
+   "year": 2000
+  },
+  {
+   "text": "M. Dorigo and T. Stützle, <em>Ant Colony Optimization</em>. Cambridge, MA, USA: MIT Press, 2004.",
+   "doi": null,
+   "year": 2004
+  },
+  {
+   "text": "K. Socha and M. Dorigo, “Ant colony optimization for continuous domains,” <em>European Journal of Operational Research</em>, vol. 185, no. 3, pp. 1155–1173, 2008, doi: 10.1016/j.ejor.2006.06.046.",
+   "doi": "10.1016/j.ejor.2006.06.046",
+   "year": 2008
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "5": [
+  {
+   "text": "D. Karaboga, “An idea based on honey bee swarm for numerical optimization,” Erciyes Univ., Kayseri, Turkey, Tech. Rep. TR06, 2005.",
+   "doi": null,
+   "year": 2005
+  },
+  {
+   "text": "D. Pham, A. Ghanbarzadeh, E. Koç, S. Otri, S. Rahim, and M. Zaidi, “The Bees Algorithm — A Novel Tool for Complex Optimisation Problems,” in <em>Intelligent Production Machines and Systems</em>, Elsevier, 2006, pp. 454–459, doi: 10.1016/B978-008045157-2/50081-X.",
+   "doi": "10.1016/B978-008045157-2/50081-X",
+   "year": 2006
+  },
+  {
+   "text": "D. Karaboga and B. Basturk, “A powerful and efficient algorithm for numerical function optimization: artificial bee colony (ABC) algorithm,” <em>J Glob Optim</em>, vol. 39, no. 3, pp. 459–471, 2007, doi: 10.1007/s10898-007-9149-x.",
+   "doi": "10.1007/s10898-007-9149-x",
+   "year": 2007
+  },
+  {
+   "text": "X.-S. Yang, <em>Nature-Inspired Metaheuristic Algorithms</em>. Frome, U.K.: Luniver Press, 2008.",
+   "doi": null,
+   "year": 2008
+  },
+  {
+   "text": "X.-S. Yang, “Firefly Algorithms for Multimodal Optimization,” in <em>Lecture Notes in Computer Science</em>, Springer Berlin Heidelberg, 2009, pp. 169–178, doi: 10.1007/978-3-642-04944-6_14.",
+   "doi": "10.1007/978-3-642-04944-6_14",
+   "year": 2009
+  },
+  {
+   "text": "G. Zhu and S. Kwong, “Gbest-guided artificial bee colony algorithm for numerical function optimization,” <em>Applied Mathematics and Computation</em>, vol. 217, no. 7, pp. 3166–3173, 2010, doi: 10.1016/j.amc.2010.08.049.",
+   "doi": "10.1016/j.amc.2010.08.049",
+   "year": 2010
+  },
+  {
+   "text": "D. Karaboga and B. Akay, “A modified Artificial Bee Colony (ABC) algorithm for constrained optimization problems,” <em>Applied Soft Computing</em>, vol. 11, no. 3, pp. 3021–3031, 2011, doi: 10.1016/j.asoc.2010.12.001.",
+   "doi": "10.1016/j.asoc.2010.12.001",
+   "year": 2011
+  },
+  {
+   "text": "X. S. Yang and X. He, “Firefly algorithm: recent advances and applications,” <em>IJSI</em>, vol. 1, no. 1, pp. 36, 2013, doi: 10.1504/IJSI.2013.055801.",
+   "doi": "10.1504/IJSI.2013.055801",
+   "year": 2013
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "6": [
+  {
+   "text": "S. Mirjalili, “The Ant Lion Optimizer,” <em>Advances in Engineering Software</em>, vol. 83, pp. 80–98, 2015, doi: 10.1016/j.advengsoft.2015.01.010.",
+   "doi": "10.1016/j.advengsoft.2015.01.010",
+   "year": 2015
+  },
+  {
+   "text": "S. Mirjalili, “Moth-flame optimization algorithm: A novel nature-inspired heuristic paradigm,” <em>Knowledge-Based Systems</em>, vol. 89, pp. 228–249, 2015, doi: 10.1016/j.knosys.2015.07.006.",
+   "doi": "10.1016/j.knosys.2015.07.006",
+   "year": 2015
+  },
+  {
+   "text": "E. Emary, H. M. Zawbaa, and A. E. Hassanien, “Binary ant lion approaches for feature selection,” <em>Neurocomputing</em>, vol. 213, pp. 54–65, 2016, doi: 10.1016/j.neucom.2016.03.101.",
+   "doi": "10.1016/j.neucom.2016.03.101",
+   "year": 2016
+  },
+  {
+   "text": "M. Shehab, L. Abualigah, H. Al Hamad, H. Alabool, M. Alshinwan, and A. M. Khasawneh, “Moth–flame optimization algorithm: variants and applications,” <em>Neural Comput & Applic</em>, vol. 32, no. 14, pp. 9859–9884, 2020, doi: 10.1007/s00521-019-04570-6.",
+   "doi": "10.1007/s00521-019-04570-6",
+   "year": 2020
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "7": [
+  {
+   "text": "S. Saremi, S. Mirjalili, and A. Lewis, “Grasshopper Optimisation Algorithm: Theory and application,” <em>Advances in Engineering Software</em>, vol. 105, pp. 30–47, 2017, doi: 10.1016/j.advengsoft.2017.01.004.",
+   "doi": "10.1016/j.advengsoft.2017.01.004",
+   "year": 2017
+  },
+  {
+   "text": "S. Z. Mirjalili, S. Mirjalili, S. Saremi, H. Faris, and I. Aljarah, “Grasshopper optimization algorithm for multi-objective optimization problems,” <em>Appl Intell</em>, vol. 48, no. 4, pp. 805–820, 2018, doi: 10.1007/s10489-017-1019-8.",
+   "doi": "10.1007/s10489-017-1019-8",
+   "year": 2018
+  },
+  {
+   "text": "S. Arora and S. Singh, “Butterfly optimization algorithm: a novel approach for global optimization,” <em>Soft Comput</em>, vol. 23, no. 3, pp. 715–734, 2019, doi: 10.1007/s00500-018-3102-4.",
+   "doi": "10.1007/s00500-018-3102-4",
+   "year": 2019
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "8": [
+  {
+   "text": "J. C. Bednarz, “Cooperative Hunting Harris' Hawks (Parabuteo unicinctus),” <em>Science</em>, vol. 239, no. 4847, pp. 1525–1527, 1988, doi: 10.1126/science.239.4847.1525.",
+   "doi": "10.1126/science.239.4847.1525",
+   "year": 1988
+  },
+  {
+   "text": "A. A. Heidari, S. Mirjalili, H. Faris, I. Aljarah, M. Mafarja, and H. Chen, “Harris hawks optimization: Algorithm and applications,” <em>Future Generation Computer Systems</em>, vol. 97, pp. 849–872, 2019, doi: 10.1016/j.future.2019.02.028.",
+   "doi": "10.1016/j.future.2019.02.028",
+   "year": 2019
+  }
+ ],
+ "9": [
+  {
+   "text": "S. Mirjalili, S. M. Mirjalili, and A. Lewis, “Grey Wolf Optimizer,” <em>Advances in Engineering Software</em>, vol. 69, pp. 46–61, 2014, doi: 10.1016/j.advengsoft.2013.12.007.",
+   "doi": "10.1016/j.advengsoft.2013.12.007",
+   "year": 2014
+  },
+  {
+   "text": "S. Mirjalili, S. Saremi, S. M. Mirjalili, and L. d. S. Coelho, “Multi-objective grey wolf optimizer: A novel algorithm for multi-criterion optimization,” <em>Expert Systems with Applications</em>, vol. 47, pp. 106–119, 2016, doi: 10.1016/j.eswa.2015.10.039.",
+   "doi": "10.1016/j.eswa.2015.10.039",
+   "year": 2016
+  },
+  {
+   "text": "E. Emary, H. M. Zawbaa, and A. E. Hassanien, “Binary grey wolf optimization approaches for feature selection,” <em>Neurocomputing</em>, vol. 172, pp. 371–381, 2016, doi: 10.1016/j.neucom.2015.06.083.",
+   "doi": "10.1016/j.neucom.2015.06.083",
+   "year": 2016
+  },
+  {
+   "text": "P. Niu, S. Niu, N. liu, and L. Chang, “The defect of the Grey Wolf optimization algorithm and its verification method,” <em>Knowledge-Based Systems</em>, vol. 171, pp. 37–43, 2019, doi: 10.1016/j.knosys.2019.01.018.",
+   "doi": "10.1016/j.knosys.2019.01.018",
+   "year": 2019
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "10": [
+  {
+   "text": "X.-S. Yang, “A New Metaheuristic Bat-Inspired Algorithm,” in <em>Studies in Computational Intelligence</em>, Springer Berlin Heidelberg, 2010, pp. 65–74, doi: 10.1007/978-3-642-12538-6_6.",
+   "doi": "10.1007/978-3-642-12538-6_6",
+   "year": 2010
+  },
+  {
+   "text": "J. A. Goldbogen, A. S. Friedlaender, J. Calambokidis, M. F. McKenna, M. Simon, and D. P. Nowacek, “Integrative Approaches to the Study of Baleen Whale Diving Behavior, Feeding Performance, and Foraging Ecology,” <em>BioScience</em>, vol. 63, no. 2, pp. 90–100, 2013, doi: 10.1525/bio.2013.63.2.5.",
+   "doi": "10.1525/bio.2013.63.2.5",
+   "year": 2013
+  },
+  {
+   "text": "S. Mirjalili and A. Lewis, “The Whale Optimization Algorithm,” <em>Advances in Engineering Software</em>, vol. 95, pp. 51–67, 2016, doi: 10.1016/j.advengsoft.2016.01.008.",
+   "doi": "10.1016/j.advengsoft.2016.01.008",
+   "year": 2016
+  },
+  {
+   "text": "M. M. Mafarja and S. Mirjalili, “Hybrid Whale Optimization Algorithm with simulated annealing for feature selection,” <em>Neurocomputing</em>, vol. 260, pp. 302–312, 2017, doi: 10.1016/j.neucom.2017.04.053.",
+   "doi": "10.1016/j.neucom.2017.04.053",
+   "year": 2017
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  },
+  {
+   "text": "J. Kang and Z. Ma, “Red-Crowned Crane Optimization: A Novel Biomimetic Metaheuristic Algorithm for Engineering Applications,” <em>Biomimetics</em>, vol. 10, no. 9, pp. 565, 2025, doi: 10.3390/biomimetics10090565.",
+   "doi": "10.3390/biomimetics10090565",
+   "year": 2025
+  }
+ ],
+ "11": [
+  {
+   "text": "N. E. Humphries et al., “Environmental context explains Lévy and Brownian movement patterns of marine predators,” <em>Nature</em>, vol. 465, no. 7301, pp. 1066–1069, 2010, doi: 10.1038/nature09116.",
+   "doi": "10.1038/nature09116",
+   "year": 2010
+  },
+  {
+   "text": "A. Faramarzi, M. Heidarinejad, S. Mirjalili, and A. H. Gandomi, “Marine Predators Algorithm: A nature-inspired metaheuristic,” <em>Expert Systems with Applications</em>, vol. 152, pp. 113377, 2020, doi: 10.1016/j.eswa.2020.113377.",
+   "doi": "10.1016/j.eswa.2020.113377",
+   "year": 2020
+  }
+ ],
+ "12": [
+  {
+   "text": "S. A. Uymaz, G. Tezel, and E. Yel, “Artificial algae algorithm (AAA) for nonlinear global optimization,” <em>Applied Soft Computing</em>, vol. 31, pp. 153–171, 2015, doi: 10.1016/j.asoc.2015.03.003.",
+   "doi": "10.1016/j.asoc.2015.03.003",
+   "year": 2015
+  },
+  {
+   "text": "S. Mirjalili, A. H. Gandomi, S. Z. Mirjalili, S. Saremi, H. Faris, and S. M. Mirjalili, “Salp Swarm Algorithm: A bio-inspired optimizer for engineering design problems,” <em>Advances in Engineering Software</em>, vol. 114, pp. 163–191, 2017, doi: 10.1016/j.advengsoft.2017.07.002.",
+   "doi": "10.1016/j.advengsoft.2017.07.002",
+   "year": 2017
+  }
+ ],
+ "13": [
+  {
+   "text": "K. M. Passino, “Biomimicry of bacterial foraging for distributed optimization and control,” <em>IEEE Control Syst.</em>, vol. 22, no. 3, pp. 52–67, 2002, doi: 10.1109/MCS.2002.1004010.",
+   "doi": "10.1109/MCS.2002.1004010",
+   "year": 2002
+  },
+  {
+   "text": "X.-S. Yang and S. Deb, “Cuckoo Search via Lévy flights,” in <em>2009 World Congress on Nature & Biologically Inspired Computing (NaBIC)</em>, 2009, pp. 210–214, doi: 10.1109/NABIC.2009.5393690.",
+   "doi": "10.1109/NABIC.2009.5393690",
+   "year": 2009
+  },
+  {
+   "text": "X. S. Yang and S. Deb, “Engineering optimisation by cuckoo search,” <em>IJMMNO</em>, vol. 1, no. 4, pp. 330, 2010, doi: 10.1504/IJMMNO.2010.035430.",
+   "doi": "10.1504/IJMMNO.2010.035430",
+   "year": 2010
+  }
+ ],
+ "14": [
+  {
+   "text": "E. Zitzler, K. Deb, and L. Thiele, “Comparison of Multiobjective Evolutionary Algorithms: Empirical Results,” <em>Evolutionary Computation</em>, vol. 8, no. 2, pp. 173–195, 2000, doi: 10.1162/106365600568202.",
+   "doi": "10.1162/106365600568202",
+   "year": 2000
+  },
+  {
+   "text": "K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 2, pp. 182–197, 2002, doi: 10.1109/4235.996017.",
+   "doi": "10.1109/4235.996017",
+   "year": 2002
+  },
+  {
+   "text": "C. Coello, G. Pulido, and M. Lechuga, “Handling multiple objectives with particle swarm optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 8, no. 3, pp. 256–279, 2004, doi: 10.1109/TEVC.2004.826067.",
+   "doi": "10.1109/TEVC.2004.826067",
+   "year": 2004
+  },
+  {
+   "text": "C. R. Raquel and P. C. Naval, “An effective use of crowding distance in multiobjective particle swarm optimization,” in <em>Proceedings of the 7th annual conference on Genetic and evolutionary computation</em>, 2005, pp. 257–264, doi: 10.1145/1068009.1068047.",
+   "doi": "10.1145/1068009.1068047",
+   "year": 2005
+  },
+  {
+   "text": "J. Blank and K. Deb, “Pymoo: Multi-Objective Optimization in Python,” <em>IEEE Access</em>, vol. 8, pp. 89497–89509, 2020, doi: 10.1109/ACCESS.2020.2990567.",
+   "doi": "10.1109/ACCESS.2020.2990567",
+   "year": 2020
+  }
+ ],
+ "15": [
+  {
+   "text": "S. Mirjalili and A. Lewis, “S-shaped versus V-shaped transfer functions for binary Particle Swarm Optimization,” <em>Swarm and Evolutionary Computation</em>, vol. 9, pp. 1–14, 2013, doi: 10.1016/j.swevo.2012.09.002.",
+   "doi": "10.1016/j.swevo.2012.09.002",
+   "year": 2013
+  }
+ ],
+ "16": [
+  {
+   "text": "J. H. Holland, <em>Adaptation in Natural and Artificial Systems</em>. Ann Arbor, MI, USA: Univ. Michigan Press, 1975.",
+   "doi": null,
+   "year": 1975
+  },
+  {
+   "text": "F. Glover, “Tabu Search—Part I,” <em>ORSA Journal on Computing</em>, vol. 1, no. 3, pp. 190–206, 1989, doi: 10.1287/ijoc.1.3.190.",
+   "doi": "10.1287/ijoc.1.3.190",
+   "year": 1989
+  },
+  {
+   "text": "K. Deb and R. B. Agrawal, “Simulated binary crossover for continuous search space,” <em>Complex Syst.</em>, vol. 9, no. 2, pp. 115–148, 1995.",
+   "doi": null,
+   "year": 1995
+  },
+  {
+   "text": "P. Angeline, “Using selection to improve particle swarm optimization,” in <em>1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)</em>, 1998, pp. 84–89, doi: 10.1109/ICEC.1998.699327.",
+   "doi": "10.1109/ICEC.1998.699327",
+   "year": 1998
+  },
+  {
+   "text": "K.-H. Han and J.-H. Kim, “Quantum-inspired evolutionary algorithm for a class of combinatorial optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 6, pp. 580–593, 2002, doi: 10.1109/TEVC.2002.804320.",
+   "doi": "10.1109/TEVC.2002.804320",
+   "year": 2002
+  },
+  {
+   "text": "E.-G. Talbi, “A Taxonomy of Hybrid Metaheuristics,” <em>Journal of Heuristics</em>, vol. 8, no. 5, pp. 541–564, 2002, doi: 10.1023/A:1016540724870.",
+   "doi": "10.1023/A:1016540724870",
+   "year": 2002
+  },
+  {
+   "text": "C.-F. Juang, “A Hybrid of Genetic Algorithm and Particle Swarm Optimization for Recurrent Network Design,” <em>IEEE Trans. Syst., Man, Cybern. B</em>, vol. 34, no. 2, pp. 997–1006, 2004, doi: 10.1109/TSMCB.2003.818557.",
+   "doi": "10.1109/TSMCB.2003.818557",
+   "year": 2004
+  },
+  {
+   "text": "J. Sun, B. Feng, and W. Xu, “Particle swarm optimization with particles having quantum behavior,” in <em>Proceedings of the 2004 Congress on Evolutionary Computation (IEEE Cat. No.04TH8753)</em>, 2004, pp. 325–331, doi: 10.1109/CEC.2004.1330875.",
+   "doi": "10.1109/CEC.2004.1330875",
+   "year": 2004
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "17": [
+  {
+   "text": "N. Otsu, “A Threshold Selection Method from Gray-Level Histograms,” <em>IEEE Trans. Syst., Man, Cybern.</em>, vol. 9, no. 1, pp. 62–66, 1979, doi: 10.1109/TSMC.1979.4310076.",
+   "doi": "10.1109/TSMC.1979.4310076",
+   "year": 1979
+  },
+  {
+   "text": "L. Breiman, “Random Forests,” <em>Machine Learning</em>, vol. 45, no. 1, pp. 5–32, 2001, doi: 10.1023/A:1010933404324.",
+   "doi": "10.1023/A:1010933404324",
+   "year": 2001
+  },
+  {
+   "text": "F. Pedregosa et al., “Scikit-learn: Machine learning in Python,” <em>J. Mach. Learn. Res.</em>, vol. 12, pp. 2825–2830, 2011.",
+   "doi": null,
+   "year": 2011
+  },
+  {
+   "text": "J. Bergstra and Y. Bengio, “Random search for hyper-parameter optimization,” <em>J. Mach. Learn. Res.</em>, vol. 13, pp. 281–305, 2012.",
+   "doi": null,
+   "year": 2012
+  },
+  {
+   "text": "S. Mirjalili, “How effective is the Grey Wolf optimizer in training multi-layer perceptrons,” <em>Appl Intell</em>, vol. 43, no. 1, pp. 150–161, 2015, doi: 10.1007/s10489-014-0645-7.",
+   "doi": "10.1007/s10489-014-0645-7",
+   "year": 2015
+  },
+  {
+   "text": "D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in <em>Proc. Int. Conf. Learn. Represent. (ICLR)</em>, 2015, arXiv:1412.6980.",
+   "doi": null,
+   "year": 2015
+  },
+  {
+   "text": "P. R. Lorenzo, J. Nalepa, M. Kawulok, L. S. Ramos, and J. R. Pastor, “Particle swarm optimization for hyper-parameter selection in deep neural networks,” in <em>Proceedings of the Genetic and Evolutionary Computation Conference</em>, 2017, pp. 481–488, doi: 10.1145/3071178.3071208.",
+   "doi": "10.1145/3071178.3071208",
+   "year": 2017
+  },
+  {
+   "text": "M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: 10.1007/978-3-030-61111-8.",
+   "doi": "10.1007/978-3-030-61111-8",
+   "year": 2021
+  }
+ ],
+ "18": [
+  {
+   "text": "G. Clarke and J. W. Wright, “Scheduling of Vehicles from a Central Depot to a Number of Delivery Points,” <em>Operations Research</em>, vol. 12, no. 4, pp. 568–581, 1964, doi: 10.1287/opre.12.4.568.",
+   "doi": "10.1287/opre.12.4.568",
+   "year": 1964
+  },
+  {
+   "text": "S. Kirkpatrick, C. D. Gelatt, and M. P. Vecchi, “Optimization by Simulated Annealing,” <em>Science</em>, vol. 220, no. 4598, pp. 671–680, 1983, doi: 10.1126/science.220.4598.671.",
+   "doi": "10.1126/science.220.4598.671",
+   "year": 1983
+  },
+  {
+   "text": "C. W. Reynolds, “Flocks, herds and schools: A distributed behavioral model,” <em>SIGGRAPH Comput. Graph.</em>, vol. 21, no. 4, pp. 25–34, 1987, doi: 10.1145/37402.37406.",
+   "doi": "10.1145/37402.37406",
+   "year": 1987
+  },
+  {
+   "text": "J. Branke, “Memory enhanced evolutionary algorithms for changing optimization problems,” in <em>Proceedings of the 1999 Congress on Evolutionary Computation-CEC99 (Cat. No. 99TH8406)</em>, 1999, pp. 1875–1882, doi: 10.1109/CEC.1999.785502.",
+   "doi": "10.1109/CEC.1999.785502",
+   "year": 1999
+  },
+  {
+   "text": "X. Hu and R. Eberhart, “Adaptive particle swarm optimization: detection and response to dynamic systems,” in <em>Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)</em>, 2002, pp. 1666–1670, doi: 10.1109/CEC.2002.1004492.",
+   "doi": "10.1109/CEC.2002.1004492",
+   "year": 2002
+  },
+  {
+   "text": "E. Şahin, “Swarm Robotics: From Sources of Inspiration to Domains of Application,” in <em>Lecture Notes in Computer Science</em>, Springer Berlin Heidelberg, 2005, pp. 10–20, doi: 10.1007/978-3-540-30552-1_2.",
+   "doi": "10.1007/978-3-540-30552-1_2",
+   "year": 2005
+  },
+  {
+   "text": "E. Rashedi, H. Nezamabadi-pour, and S. Saryazdi, “GSA: A Gravitational Search Algorithm,” <em>Information Sciences</em>, vol. 179, no. 13, pp. 2232–2248, 2009, doi: 10.1016/j.ins.2009.03.004.",
+   "doi": "10.1016/j.ins.2009.03.004",
+   "year": 2009
+  },
+  {
+   "text": "M. Brambilla, E. Ferrante, M. Birattari, and M. Dorigo, “Swarm robotics: a review from the swarm engineering perspective,” <em>Swarm Intell</em>, vol. 7, no. 1, pp. 1–41, 2013, doi: 10.1007/s11721-012-0075-2.",
+   "doi": "10.1007/s11721-012-0075-2",
+   "year": 2013
+  },
+  {
+   "text": "M. N. Omidvar, X. Li, Y. Mei, and X. Yao, “Cooperative Co-Evolution With Differential Grouping for Large Scale Optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 18, no. 3, pp. 378–393, 2014, doi: 10.1109/TEVC.2013.2281543.",
+   "doi": "10.1109/TEVC.2013.2281543",
+   "year": 2014
+  }
+ ]
+}

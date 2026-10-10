@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 14: Tối ưu đa mục tiêu" data-title-en="Chapter 14: Multi-objective swarm intelligence">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 14: Tối ưu đa mục tiêu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 14 · Phần V</span><span class="en">Chapter 14 · Part V</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu đa mục tiêu dựa trên bầy đàn</span><span class="en">Multi-objective swarm intelligence</span><span class="sub"><span class="vi">Pareto, kho lưu trữ và MOPSO</span><span class="en">Pareto, archives and MOPSO</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Định nghĩa quan hệ trội Pareto, tập và biên Pareto.</span><span class="en">Define Pareto dominance, the Pareto set and the Pareto front.</span></li>
+        <li class="reveal d3"><span class="vi">Giải thích kho lưu trữ ngoài và khoảng cách đông đúc.</span><span class="en">Explain external archives and crowding distance.</span></li>
+        <li class="reveal d4"><span class="vi">Mô tả MOPSO và cách chọn lãnh đạo từ kho.</span><span class="en">Describe MOPSO and how leaders are chosen from the archive.</span></li>
+        <li class="reveal d5"><span class="vi">Đánh giá bằng IGD và hypervolume; so MOPSO với NSGA-II.</span><span class="en">Evaluate with IGD and hypervolume; compare MOPSO with NSGA-II.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Vì sao đa mục tiêu?" data-label-en="Why many objectives?">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đặt vấn đề</span><span class="en">Motivation</span></p>
+      <h2 class="reveal d1"><span class="vi">Nhiều mục tiêu mâu thuẫn nhau</span><span class="en">Several conflicting objectives</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Thiết kế thực tế hiếm khi có một mục tiêu: chi phí và chất lượng, độ chính xác và số đặc trưng, năng lượng và tốc độ.</span><span class="en">Real designs rarely have one goal: cost vs quality, accuracy vs feature count, energy vs speed.</span></li>
+          <li class="reveal d3"><span class="vi">Không có một nghiệm tốt nhất, mà có một <strong>tập</strong> nghiệm thỏa hiệp.</span><span class="en">There is no single best solution but a <strong>set</strong> of trade-offs.</span></li>
+          <li class="reveal d4"><span class="vi">Người ra quyết định chọn sau khi thấy toàn bộ biên thỏa hiệp.</span><span class="en">The decision maker chooses after seeing the whole trade-off front.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 360 240" role="img" aria-label="Biên Pareto" id="c14-art"></svg>
+        <figcaption><span class="vi">Điểm cam không bị trội: chúng tạo thành biên Pareto</span><span class="en">Orange points are non-dominated: they form the Pareto front</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Khái niệm Pareto</span><span class="en">Pareto concepts</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Trội</span><span class="en">Dominance</span></span><span class="en"><span class="vi">Trội</span><span class="en">Dominance</span></span></dt><dd><span class="vi"><span class="m">a ≺ b</span> nếu <span class="m">a</span> không kém <span class="m">b</span> ở mục tiêu nào và tốt hơn ở ít nhất một</span><span class="en"><span class="m">a ≺ b</span> if <span class="m">a</span> is no worse in every objective and better in at least one</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Tập Pareto</span><span class="en">Pareto set</span></span><span class="en"><span class="vi">Tập Pareto</span><span class="en">Pareto set</span></span></dt><dd><span class="vi">Các nghiệm không bị nghiệm nào trội</span><span class="en">Solutions dominated by no other</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Biên Pareto</span><span class="en">Pareto front</span></span><span class="en"><span class="vi">Biên Pareto</span><span class="en">Pareto front</span></span></dt><dd><span class="vi">Ảnh của tập Pareto trong không gian mục tiêu</span><span class="en">The image of the Pareto set in objective space</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="vi">Đa dạng</span><span class="en">Diversity</span></span><span class="en"><span class="vi">Đa dạng</span><span class="en">Diversity</span></span></dt><dd><span class="vi">Các nghiệm cần trải đều dọc biên</span><span class="en">Solutions should spread evenly along the front</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Khoảng cách đông đúc</span><span class="en">Crowding distance</span></h3><span class="m">cd<sub>i</sub> = Σ<sub>k</sub> (f<sub>k</sub><sup>i+1</sup> − f<sub>k</sub><sup>i−1</sup>) / (f<sub>k</sub><sup>max</sup> − f<sub>k</sub><sup>min</sup>)</span></div>
+        <div class="card sea mathcard reveal d4"><h3><span class="vi">Chỉ số IGD</span><span class="en">IGD metric</span></h3><span class="m">IGD = (1/|R|) Σ<sub>r∈R</sub> min<sub>a∈A</sub> ‖r − a‖</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của MOPSO</span><span class="en">MOPSO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">MOPSO (Coello, Pulido &amp; Lechuga, 2004) với kho cắt theo khoảng cách đông đúc (Raquel &amp; Naval, 2005).</span><span class="en">MOPSO (Coello, Pulido &amp; Lechuga, 2004) with crowding-distance archive pruning (Raquel &amp; Naval, 2005).</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo bầy; đưa các nghiệm không bị trội vào kho.</span><span class="en">Initialize the swarm; put non-dominated solutions into the archive.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Mỗi cá thể chọn một lãnh đạo trong 10% kho ít đông đúc nhất.</span><span class="en">Each particle picks a leader from the least crowded 10% of the archive.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Cập nhật vận tốc, vị trí như PSO; đột biến với xác suất giảm dần.</span><span class="en">Update velocity and position as in PSO; mutate with a decreasing probability.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Cập nhật pbest theo quan hệ trội (hòa thì chọn ngẫu nhiên).</span><span class="en">Update pbest by dominance (ties broken at random).</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Thêm nghiệm mới vào kho, loại nghiệm bị trội; nếu đầy, bỏ nghiệm đông đúc nhất.</span><span class="en">Add new solutions to the archive, drop dominated ones; if full, drop the most crowded.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">bầy</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">swarm</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="67">Kho ←</text><text x="375" y="89">không bị trội</text></g><g class="en"><text x="375" y="67">Archive ←</text><text x="375" y="89">non-dominated</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Chọn lãnh đạo</text><text x="625" y="89">ít đông đúc</text></g><g class="en"><text x="625" y="67">Pick a leader</text><text x="625" y="89">(least crowded)</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Cập nhật</text><text x="875" y="89">như PSO</text></g><g class="en"><text x="875" y="67">PSO-style</text><text x="875" y="89">update</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Đột biến;</text><text x="875" y="259">cập nhật pbest</text></g><g class="en"><text x="875" y="237">Mutate;</text><text x="875" y="259">update pbest</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Cập nhật kho;</text><text x="625" y="259">cắt theo cd</text></g><g class="en"><text x="625" y="237">Update archive;</text><text x="625" y="259">prune by cd</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về kho</text></g><g class="en"><text x="125" y="248">Return archive</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">MOPSO trên ZDT1 (10 biến)</span><span class="en">MOPSO on ZDT1 (10 variables)</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Không gian mục tiêu <span class="m">(f<sub>1</sub>, f<sub>2</sub>)</span>. Đường xanh là biên Pareto thật; chấm cam là kho lưu trữ; chấm xám là bầy hiện tại.</span><span class="en">Objective space <span class="m">(f<sub>1</sub>, f<sub>2</sub>)</span>. The teal curve is the true front; orange dots are the archive; grey dots the current swarm.</span></p>
+        <p class="note"><span class="vi">Bản thu nhỏ: 40 cá thể, kho 60. Hệ số <span class="m">w = 0.4, c<sub>1</sub> = c<sub>2</sub> = 1</span> giống thực nghiệm (thực nghiệm dùng 100 cá thể, kho 100, 30 biến).</span><span class="en">A scaled-down run: 40 particles, archive 60. Coefficients <span class="m">w = 0.4, c<sub>1</sub> = c<sub>2</sub> = 1</span> match the experiment (which uses 100 particles, archive 100, 30 variables).</span></p>
+      </div>
+      <div class="field" id="c14-field"><canvas aria-label="MOPSO"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Quan hệ trội và khoảng cách đông đúc</span><span class="en">Dominance and crowding distance</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">a = (1, 4), &nbsp; b = (2, 2), &nbsp; c = (3, 3), &nbsp; d = (4, 1)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">b ≺ c</span> vì <span class="m">2 ≤ 3, 2 ≤ 3</span> và tốt hơn hẳn; <span class="m">a, b, d</span> không trội lẫn nhau.</span><span class="en"><span class="m">b ≺ c</span> since <span class="m">2 ≤ 3, 2 ≤ 3</span> with strict improvement; <span class="m">a, b, d</span> do not dominate one another.</span></li>
+          <li><span class="vi">Biên Pareto: <span class="m">{a, b, d}</span>.</span><span class="en">Pareto front: <span class="m">{a, b, d}</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Khoảng cách đông đúc</span><span class="en">Crowding distance</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Hai đầu <span class="m">a, d</span> nhận <span class="m">cd = ∞</span> để luôn được giữ.</span><span class="en">Endpoints <span class="m">a, d</span> get <span class="m">cd = ∞</span> and are always kept.</span></li>
+          <li><span class="vi"><span class="m">cd(b) = (4 − 1)/(4 − 1) + (4 − 1)/(4 − 1) = 2</span>.</span><span class="en"><span class="m">cd(b) = (4 − 1)/(4 − 1) + (4 − 1)/(4 − 1) = 2</span>.</span></li>
+          <li><span class="vi">Khi kho đầy, nghiệm có <span class="m">cd</span> nhỏ nhất (vùng đông nhất) bị loại trước.</span><span class="en">When the archive is full, the smallest <span class="m">cd</span> (most crowded) is dropped first.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ZDT</span><span class="en">Experiment · ZDT</span></p>
+      <h2 class="reveal d1"><span class="vi">MOPSO và NSGA-II, 30 biến, 25 000 lần đánh giá, 10 lần chạy</span><span class="en">MOPSO vs NSGA-II, 30 variables, 25,000 evaluations, 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Bài</span><span class="en">Problem</span></th><th><span class="vi">IGD · MOPSO</span><span class="en">IGD · MOPSO</span></th><th><span class="vi">IGD · NSGA-II</span><span class="en">IGD · NSGA-II</span></th><th><span class="vi">HV · MOPSO</span><span class="en">HV · MOPSO</span></th><th><span class="vi">HV · NSGA-II</span><span class="en">HV · NSGA-II</span></th><th><span class="vi">HV biên thật</span><span class="en">True-front HV</span></th><th><span class="vi">p (IGD)</span><span class="en">p (IGD)</span></th></tr></thead>
+      <tbody>
+        <tr><td>ZDT1</td><td>0.0059 ± 0.0009</td><td>0.0048 ± 0.0002</td><td>0.8674</td><td>0.8697</td><td>0.8762</td><td>1.6e-04</td></tr>
+        <tr><td>ZDT2</td><td>0.0057 ± 0.0011</td><td>0.0048 ± 0.0001</td><td>0.5348</td><td>0.5363</td><td>0.5428</td><td>5.2e-03</td></tr>
+        <tr><td>ZDT3</td><td>0.0072 ± 0.0013</td><td>0.0054 ± 0.0002</td><td>1.3157</td><td>1.3275</td><td>1.3309</td><td>1.9e-03</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Cả hai gần biên thật (HV sát giá trị lý tưởng). NSGA-II (pymoo 0.6.2) có IGD nhỏ hơn MOPSO một chút nhưng có ý nghĩa thống kê trên cả ba bài. Bản NSGA-II tự viết ban đầu của giáo trình hội tụ kém nên đã được thay bằng bản pymoo đã kiểm chứng.</span><span class="en">Both get close to the true front (HV near the ideal). NSGA-II (pymoo 0.6.2) has a slightly but significantly lower IGD on all three problems. The textbook's first own NSGA-II converged poorly and was replaced by the verified pymoo version.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Thuật toán bầy đàn đa mục tiêu</span><span class="en">Multi-objective swarm algorithms</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">MOPSO</span><span class="en">MOPSO</span></h3><p><span class="vi">Kho ngoài + lưới thích nghi (Coello và cs., 2004).</span><span class="en">External archive + adaptive grid (Coello et al., 2004).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">MOGWO</span><span class="en">MOGWO</span></h3><p><span class="vi">Kho + chọn α, β, δ từ kho (Mirjalili và cs., 2016).</span><span class="en">Archive + α, β, δ chosen from it (Mirjalili et al., 2016).</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">MOHHO, MOALO, MOGOA</span><span class="en">MOHHO, MOALO, MOGOA</span></h3><p><span class="vi">Cùng khuôn: thay một lời giải tốt nhất bằng kho Pareto.</span><span class="en">Same template: replace the single best with a Pareto archive.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">NSGA-II</span><span class="en">NSGA-II</span></h3><p><span class="vi">Mốc so sánh tiến hóa: xếp tầng không trội + khoảng cách đông đúc (Deb và cs., 2002).</span><span class="en">The evolutionary baseline: non-dominated sorting + crowding distance (Deb et al., 2002).</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng</span><span class="en">Applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đa mục tiêu xuất hiện ở hầu hết bài toán kỹ thuật và học máy.</span><span class="en">Multiple objectives appear in most engineering and ML problems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">Độ chính xác và số đặc trưng.</span><span class="en">Accuracy vs number of features.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Chi phí và phát thải trong điều độ.</span><span class="en">Cost vs emissions in dispatch.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Thiết kế</span><span class="en">Design</span></h3><p><span class="vi">Khối lượng và độ bền.</span><span class="en">Mass vs strength.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Mạng nơ-ron</span><span class="en">Neural networks</span></h3><p><span class="vi">Độ chính xác và kích thước mô hình.</span><span class="en">Accuracy vs model size.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/multiobjective.py" class="c-sea">code/si/multiobjective.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> fes &lt; budget:
+        it += 1
+        cd = crowding(AF); cd = np.where(np.isinf(cd), cd[np.isfinite(cd)].max(initial=1) * 2 + 1, cd)
+        top = np.argsort(-cd)[:max(1, len(A) // 10)]
+        L = A[rng.choice(top, n)]
+        V = w * V + c1 * rng.random((n, D)) * (P - X) + c2 * rng.random((n, D)) * (L - X)
+        X = np.clip(X + V, 0, 1)
+        mr = (1 - it / T) ** (1 / pm)                  <span class="c"># đột biến giảm dần như MOPSO gốc</span>
+        mut = rng.random(n) &lt; mr
+        <span class="k">if</span> mut.any():
+            j = rng.integers(D, size=int(mut.sum()))
+            X[np.flatnonzero(mut), j] = rng.random(int(mut.sum()))
+        F = fun(X); fes += n
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            <span class="k">if</span> dominates(F[i], PF[i]) or (<span class="k">not</span> dominates(PF[i], F[i]) <span class="k">and</span> rng.random() &lt; 0.5):
+                P[i], PF[i] = X[i], F[i]
+        A = np.vstack([A, X]); AF = np.vstack([AF, F])
+        nd = nondominated(AF); A, AF = A[nd], AF[nd]</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">MOPSO: nhanh, đơn giản, cạnh tranh</span><span class="en">MOPSO: fast, simple, competitive</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Hội tụ nhanh về biên trên ZDT (IGD ≈ 0.006).</span><span class="en">Converges quickly to the ZDT fronts (IGD ≈ 0.006).</span></li>
+          <li><span class="vi">Cập nhật đơn giản như PSO, ít tham số hơn thuật toán di truyền.</span><span class="en">A simple PSO-style update with fewer parameters than a genetic algorithm.</span></li>
+          <li><span class="vi">Khung kho lưu trữ dùng lại được cho mọi thuật toán bầy đàn.</span><span class="en">The archive framework works for any swarm algorithm.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Vẫn kém NSGA-II một chút về IGD trong thực nghiệm này.</span><span class="en">Still slightly behind NSGA-II in IGD in this experiment.</span></li>
+          <li><span class="vi">Chọn lãnh đạo và cắt kho có nhiều biến thể; kết quả nhạy với lựa chọn này.</span><span class="en">Leader selection and archive pruning have many variants; results are sensitive to them.</span></li>
+          <li><span class="vi">Với 3+ mục tiêu, khoảng cách đông đúc kém hiệu quả; cần tham chiếu (NSGA-III, MOEA/D).</span><span class="en">With 3+ objectives crowding distance degrades; reference-based methods (NSGA-III, MOEA/D) help.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cho 6 điểm hai mục tiêu, tìm tất cả các tầng không trội.</span><span class="en">Given 6 bi-objective points, find all non-dominated fronts.</span></li>
+          <li><span class="vi">Tính hypervolume của <span class="m">{(1, 4), (2, 2), (4, 1)}</span> với điểm tham chiếu <span class="m">(5, 5)</span>.</span><span class="en">Compute the hypervolume of <span class="m">{(1, 4), (2, 2), (4, 1)}</span> with reference <span class="m">(5, 5)</span>.</span></li>
+          <li><span class="vi">Vì sao hai đầu biên luôn được gán <span class="m">cd = ∞</span>?</span><span class="en">Why are front endpoints always given <span class="m">cd = ∞</span>?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy <span class="m">experiments.run_chapters ch14</span> với ZDT4, ZDT6.</span><span class="en">Run <span class="m">experiments.run_chapters ch14</span> with ZDT4, ZDT6.</span></li>
+          <li><span class="vi">Thay chọn lãnh đạo bằng lưới thích nghi như MOPSO gốc.</span><span class="en">Replace leader selection with the original adaptive grid.</span></li>
+          <li><span class="vi">Cài MOGWO trên cùng khung kho lưu trữ.</span><span class="en">Implement MOGWO on the same archive framework.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>E. Zitzler, K. Deb, and L. Thiele, “Comparison of Multiobjective Evolutionary Algorithms: Empirical Results,” <em>Evolutionary Computation</em>, vol. 8, no. 2, pp. 173–195, 2000, doi: <a href="https://doi.org/10.1162/106365600568202">10.1162/106365600568202</a>.</li>
+        <li>K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 2, pp. 182–197, 2002, doi: <a href="https://doi.org/10.1109/4235.996017">10.1109/4235.996017</a>.</li>
+        <li>C. Coello, G. Pulido, and M. Lechuga, “Handling multiple objectives with particle swarm optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 8, no. 3, pp. 256–279, 2004, doi: <a href="https://doi.org/10.1109/TEVC.2004.826067">10.1109/TEVC.2004.826067</a>.</li>
+        <li>C. R. Raquel and P. C. Naval, “An effective use of crowding distance in multiobjective particle swarm optimization,” in <em>Proceedings of the 7th annual conference on Genetic and evolutionary computation</em>, 2005, pp. 257–264, doi: <a href="https://doi.org/10.1145/1068009.1068047">10.1145/1068009.1068047</a>.</li>
+        <li>J. Blank and K. Deb, “Pymoo: Multi-Objective Optimization in Python,” <em>IEEE Access</em>, vol. 8, pp. 89497–89509, 2020, doi: <a href="https://doi.org/10.1109/ACCESS.2020.2990567">10.1109/ACCESS.2020.2990567</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Trội Pareto và biên thỏa hiệp</span><span class="en">Pareto dominance and trade-off fronts</span></span>
+      <span><span class="vi">Kho lưu trữ + khoảng cách đông đúc</span><span class="en">Archive + crowding distance</span></span>
+      <span><span class="vi">IGD và hypervolume</span><span class="en">IGD and hypervolume</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Coello Coello, Pulido &amp; Lechuga, <em>IEEE TEC</em> 8(3), 2004</span><span class="en">Original paper: Coello Coello, Pulido &amp; Lechuga, <em>IEEE TEC</em> 8(3), 2004</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () { const rnd = SI.rng(2); let h = '<line x1="30" y1="210" x2="340" y2="210" stroke="#1c2a2e"/><line x1="30" y1="210" x2="30" y2="20" stroke="#1c2a2e"/>';
+  const pts = []; for (let i = 0; i < 40; i++) pts.push([rnd(), rnd()]);
+  pts.forEach(([a, b]) => { const nd = !pts.some(([c, d]) => c <= a && d <= b && (c < a || d < b)); h += `<circle cx="${(30 + a * 300).toFixed(1)}" cy="${(210 - b * 180).toFixed(1)}" r="${nd ? 6 : 4}" fill="${nd ? '#d9562f' : '#b8c2c3'}"/>`; });
+  h += '<g font-family="STIX Two Text, serif" font-style="italic" font-size="15"><text x="330" y="228">f₁</text><text x="10" y="28">f₂</text></g>';
+  document.getElementById('c14-art').innerHTML = h; })();
+(function () {
+  const root = document.getElementById('c14-field'), cv = root.querySelector('canvas'), stat = root.querySelector('.field-stat'), playBtn = root.querySelector('[data-act="play"]'), slide = root.closest('.slide');
+  const D = 10, N = 40, AR = 60, f = (x) => { const g = 1 + 9 * x.slice(1).reduce((s, v) => s + v, 0) / (D - 1); return [x[0], g * (1 - Math.sqrt(x[0] / g))]; };
+  const dom = (a, b) => a[0] <= b[0] && a[1] <= b[1] && (a[0] < b[0] || a[1] < b[1]);
+  let S, timer = null, userPaused = false;
+  function cd(F) { const n = F.length, d = new Array(n).fill(0); if (n < 3) return d.fill(Infinity); for (let k = 0; k < 2; k++) { const o = F.map((_, i) => i).sort((p, q) => F[p][k] - F[q][k]); const span = F[o[n - 1]][k] - F[o[0]][k] || 1; d[o[0]] = d[o[n - 1]] = Infinity; for (let t = 1; t < n - 1; t++) d[o[t]] += (F[o[t + 1]][k] - F[o[t - 1]][k]) / span; } return d; }
+  function addArchive(x, F) { if (S.A.some((a) => dom(a.F, F))) return; S.A = S.A.filter((a) => !dom(F, a.F)); S.A.push({ x: x.slice(), F }); if (S.A.length > AR) { const c = cd(S.A.map((a) => a.F)); let m = 0; c.forEach((v, i) => { if (v < c[m]) m = i; }); S.A.splice(m, 1); } }
+  function reset() { const rnd = SI.rng(1); S = { rnd, t: 0, T: 80, X: [], V: [], P: [], PF: [], A: [] }; for (let i = 0; i < N; i++) { const x = Array.from({ length: D }, () => rnd()); S.X.push(x); S.V.push(new Array(D).fill(0)); S.P.push(x.slice()); S.PF.push(f(x)); addArchive(x, f(x)); } render(); upd(); }
+  function step() {
+    if (S.t >= S.T) { pause(); return; } S.t++; const rnd = S.rnd, c = cd(S.A.map((a) => a.F)), order = c.map((v, i) => i).sort((p, q) => c[q] - c[p]), top = order.slice(0, Math.max(1, Math.floor(S.A.length / 10)));
+    const mr = Math.pow(1 - S.t / S.T, 2);
+    S.X.forEach((x, i) => { const L = S.A[top[Math.floor(rnd() * top.length)]].x;
+      for (let d = 0; d < D; d++) { S.V[i][d] = 0.4 * S.V[i][d] + rnd() * (S.P[i][d] - x[d]) + rnd() * (L[d] - x[d]); x[d] = Math.min(1, Math.max(0, x[d] + S.V[i][d])); }
+      if (rnd() < mr) x[Math.floor(rnd() * D)] = rnd();
+      const F = f(x); if (dom(F, S.PF[i]) || (!dom(S.PF[i], F) && rnd() < 0.5)) { S.P[i] = x.slice(); S.PF[i] = F; } addArchive(x, F); });
+    render(); upd();
+  }
+  function render() { const r = cv.getBoundingClientRect(), s = Math.max(120, Math.floor(r.width)), dpr = Math.min(2, devicePixelRatio || 1); cv.width = s * dpr; cv.height = s * dpr; const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.fillStyle = '#fbf8f2'; g.fillRect(0, 0, s, s); const X = (v) => 30 + v * (s - 50), Y = (v) => s - 30 - Math.min(v, 5) / 5 * (s - 50);
+    g.strokeStyle = '#1c2a2e'; g.beginPath(); g.moveTo(30, 10); g.lineTo(30, s - 30); g.lineTo(s - 10, s - 30); g.stroke();
+    g.strokeStyle = '#1f6f78'; g.lineWidth = 2.5; g.beginPath(); for (let i = 0; i <= 100; i++) { const a = i / 100; i ? g.lineTo(X(a), Y(1 - Math.sqrt(a))) : g.moveTo(X(a), Y(1 - Math.sqrt(a))); } g.stroke();
+    S.X.forEach((x) => { const F = f(x); SI.dot(g, X(F[0]), Y(F[1]), 3, '#b8c2c3', 'rgba(28,42,46,0.3)'); });
+    S.A.forEach((a) => SI.dot(g, X(a.F[0]), Y(a.F[1]), 4, '#d9562f'));
+    g.fillStyle = '#56676a'; g.font = '12px "Be Vietnam Pro"'; g.fillText('f₁', s - 24, s - 12); g.fillText('f₂ (≤ 5)', 34, 20); }
+  function upd() { const en = SI.lang() === 'en'; const ref = Array.from({ length: 200 }, (_, i) => [i / 199, 1 - Math.sqrt(i / 199)]); const igd = ref.reduce((s, r) => s + Math.min(...S.A.map((a) => Math.hypot(a.F[0] - r[0], a.F[1] - r[1]))), 0) / ref.length;
+    stat.innerHTML = `<span><b>t</b> = ${S.t} / ${S.T}</span><span><b>${en ? 'archive' : 'kho'}</b> = ${S.A.length}</span><span><b>IGD</b> = ${igd.toFixed(4)}</span>`; playBtn.textContent = timer ? (en ? '❚❚ Pause' : '❚❚ Dừng') : (en ? '▶ Run' : '▶ Chạy'); }
+  function play() { if (S.t >= S.T) reset(); clearInterval(timer); timer = setInterval(step, 260); upd(); }
+  function pause() { clearInterval(timer); timer = null; upd(); }
+  root.querySelector('[data-act="step"]').onclick = () => { userPaused = true; pause(); step(); };
+  root.querySelector('[data-act="reset"]').onclick = () => { reset(); if (!userPaused && !reduceMotion) play(); };
+  playBtn.onclick = () => { if (timer) { userPaused = true; pause(); } else { userPaused = false; play(); } };
+  slide.addEventListener('slideenter', () => { if (!reduceMotion && !userPaused && S.t < S.T) play(); });
+  slide.addEventListener('slideleave', pause); SI.onLang(upd); window.addEventListener('resize', render);
+  reset();
+})();
+
+SI.boot();
+</script>
+</body>
+</html>

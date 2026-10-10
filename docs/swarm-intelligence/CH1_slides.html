@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 1: Giới thiệu trí tuệ bầy đàn" data-title-en="Chapter 1: Introduction to swarm intelligence">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 1: Giới thiệu trí tuệ bầy đàn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 1 · Phần I</span><span class="en">Chapter 1 · Part I</span></p>
+    <h1 class="reveal d1"><span class="vi">Trí tuệ bầy đàn và không gian tìm kiếm</span><span class="en">Swarm intelligence and search spaces</span><span class="sub"><span class="vi">Giới thiệu</span><span class="en">Introduction</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Định nghĩa trí tuệ bầy đàn qua bốn khái niệm: đa tác nhân, tự tổ chức, phối hợp phân tán, hiện tượng trồi.</span><span class="en">Define swarm intelligence through four ideas: multi-agent systems, self-organization, distributed coordination, emergence.</span></li>
+        <li class="reveal d3"><span class="vi">Phân biệt phương pháp cổ điển (dựa gradient, tìm kiếm trực tiếp) với metaheuristic.</span><span class="en">Tell classical methods (gradient-based, direct search) from metaheuristics.</span></li>
+        <li class="reveal d4"><span class="vi">Phân loại bài toán tối ưu và xử lý ràng buộc bằng hàm phạt.</span><span class="en">Classify optimization problems and handle constraints with penalties.</span></li>
+        <li class="reveal d5"><span class="vi">Giải thích khám phá – khai thác và ý nghĩa của định lý No Free Lunch.</span><span class="en">Explain exploration vs exploitation and the meaning of the No Free Lunch theorem.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Không ai chỉ huy, nhưng cả đàn vẫn thông minh</span><span class="en">Nobody is in charge, yet the swarm is smart</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Trí tuệ bầy đàn</strong>: hành vi tập thể thông minh nảy sinh từ nhiều cá thể đơn giản tương tác cục bộ (Bonabeau, Dorigo &amp; Theraulaz, 1999).</span><span class="en"><strong>Swarm intelligence</strong>: intelligent collective behaviour arising from many simple individuals interacting locally (Bonabeau, Dorigo &amp; Theraulaz, 1999).</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Đa tác nhân</strong>: nhiều cá thể tự hành; <strong>phối hợp phân tán</strong>: không có trung tâm điều khiển.</span><span class="en"><strong>Multi-agent</strong>: many autonomous individuals; <strong>distributed coordination</strong>: no central controller.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Tự tổ chức</strong>: trật tự hình thành từ phản hồi dương, phản hồi âm và ngẫu nhiên.</span><span class="en"><strong>Self-organization</strong>: order forms from positive feedback, negative feedback and randomness.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Hiện tượng trồi</strong>: đường kiến ngắn nhất hay đàn chim bay đều là thuộc tính của cả hệ, không của từng cá thể.</span><span class="en"><strong>Emergence</strong>: the shortest ant trail or a coherent flock belongs to the system, not to any individual.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 360 240" role="img" aria-label="Quy tắc cục bộ tạo ra trật tự toàn cục" id="c1-art"></svg>
+        <figcaption><span class="vi">Ba quy tắc cục bộ của Reynolds (1987): tách, căn hướng, gắn kết</span><span class="en">Reynolds' three local rules (1987): separation, alignment, cohesion</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Thay vì một thuật toán thông minh, ta dùng <span class="hl c-sea">nhiều tác tử đơn giản</span>. Mỗi tác tử cân bằng giữa <span class="hl c-in">khám phá</span> vùng mới và <span class="hl c-soc">khai thác</span> vùng đã biết là tốt.</span><span class="en">Instead of one clever algorithm, we use <span class="hl c-sea">many simple agents</span>. Each balances <span class="hl c-in">exploring</span> new regions and <span class="hl c-soc">exploiting</span> regions known to be good.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Khám phá</span><span class="en">Exploration</span></b><span><span class="vi">tìm vùng mới, tránh kẹt cục bộ</span><span class="en">search new regions, avoid local traps</span></span></div>
+      <div class="force reveal d4" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Khai thác</span><span class="en">Exploitation</span></b><span><span class="vi">tinh chỉnh quanh lời giải tốt</span><span class="en">refine around good solutions</span></span></div>
+      <div class="force reveal d5" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Cân bằng</span><span class="en">Balance</span></b><span><span class="vi">thường chuyển dần từ khám phá sang khai thác</span><span class="en">usually shifting from exploration to exploitation</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Phương pháp cổ điển" data-label-en="Classical methods">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Phương pháp cổ điển</span><span class="en">Classical methods</span></p>
+      <h2 class="reveal d1"><span class="vi">Dựa gradient và tìm kiếm trực tiếp</span><span class="en">Gradient-based and direct search</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Dựa gradient</strong>: cần hàm khả vi, liên tục; hội tụ nhanh tới cực trị gần nhất (Newton, quasi-Newton, gradient liên hợp).</span><span class="en"><strong>Gradient-based</strong>: needs a differentiable, continuous function; converges fast to the nearest optimum (Newton, quasi-Newton, conjugate gradient).</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Tìm kiếm trực tiếp</strong>: không dùng đạo hàm (Nelder–Mead, tìm kiếm mẫu); dùng được cho hàm không khả vi (Kolda, Lewis &amp; Torczon, 2003).</span><span class="en"><strong>Direct search</strong>: derivative-free (Nelder–Mead, pattern search); usable on non-differentiable functions (Kolda, Lewis &amp; Torczon, 2003).</span></li>
+          <li class="reveal d4"><span class="vi">Hạn chế chung: kẹt ở cực trị cục bộ, khó với hàm gián đoạn, nhiều đỉnh, hoặc thay đổi theo thời gian.</span><span class="en">Common limits: trapped in local optima, struggle with discontinuous, multimodal or time-varying functions.</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Metaheuristic</span><span class="en">Metaheuristics</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chiến lược cấp cao điều khiển các bước tìm kiếm ngẫu nhiên (Blum &amp; Roli, 2003).</span><span class="en">High-level strategies that steer randomized search steps (Blum &amp; Roli, 2003).</span></li>
+          <li><span class="vi">Không bảo đảm tối ưu toàn cục, nhưng thường cho lời giải đủ tốt trong thời gian chấp nhận được.</span><span class="en">No guarantee of the global optimum, but often good-enough solutions in acceptable time.</span></li>
+          <li><span class="vi">Chỉ cần gọi được hàm mục tiêu: “hộp đen”.</span><span class="en">Only needs to evaluate the objective: a “black box”.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Phân loại bài toán" data-label-en="Problem classes">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Phân loại bài toán tối ưu</span><span class="en">Classes of optimization problems</span></p>
+      <h2 class="reveal d1"><span class="vi">Biến, mục tiêu và ràng buộc</span><span class="en">Variables, objectives and constraints</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tiêu chí</span><span class="en">Criterion</span></th><th><span class="vi">Loại</span><span class="en">Kinds</span></th><th><span class="vi">Ví dụ trong giáo trình</span><span class="en">Example in this book</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Biến</span><span class="en">Variables</span></td><td><span class="vi">Liên tục · rời rạc · nhị phân · hoán vị</span><span class="en">Continuous · discrete · binary · permutation</span></td><td><span class="vi">Bộ hàm F1–F7 · cái túi 0/1 · TSP</span><span class="en">Suite F1–F7 · 0/1 knapsack · TSP</span></td></tr>
+        <tr><td><span class="vi">Hàm mục tiêu</span><span class="en">Objective</span></td><td><span class="vi">Tuyến tính · phi tuyến · đơn đỉnh · đa đỉnh</span><span class="en">Linear · nonlinear · unimodal · multimodal</span></td><td><span class="vi">Sphere (đơn đỉnh), Rastrigin (đa đỉnh)</span><span class="en">Sphere (unimodal), Rastrigin (multimodal)</span></td></tr>
+        <tr><td><span class="vi">Ràng buộc</span><span class="en">Constraints</span></td><td><span class="vi">Không ràng buộc · ràng buộc hộp · ràng buộc tổng quát</span><span class="en">Unconstrained · box · general</span></td><td><span class="vi">Ví dụ PSO có ràng buộc của sách tham khảo</span><span class="en">The reference book's constrained PSO example</span></td></tr>
+        <tr><td><span class="vi">Số mục tiêu</span><span class="en">Objectives</span></td><td><span class="vi">Một mục tiêu · nhiều mục tiêu</span><span class="en">Single · multiple</span></td><td><span class="vi">ZDT1–3 (chương 14)</span><span class="en">ZDT1–3 (chapter 14)</span></td></tr>
+        <tr><td><span class="vi">Thời gian</span><span class="en">Time</span></td><td><span class="vi">Tĩnh · động</span><span class="en">Static · dynamic</span></td><td><span class="vi">Hàm cầu di động (chương 18)</span><span class="en">Moving sphere (chapter 18)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Ràng buộc và hàm phạt" data-label-en="Constraints and penalties">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Biến bài toán có ràng buộc thành không ràng buộc</span><span class="en">Turn a constrained problem into an unconstrained one</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">min f(x) &nbsp; s.t. &nbsp; g<sub>j</sub>(x) ≤ 0, &nbsp; lb ≤ x ≤ ub</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">F(x) = f(x) + λ Σ<sub>j</sub> max(0, g<sub>j</sub>(x))²</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Hàm phạt bậc hai: điểm vi phạm càng nhiều thì càng bị phạt nặng; <span class="m">λ</span> lớn (ví dụ <span class="m">10<sup>6</sup></span>).</span><span class="en">Quadratic penalty: larger violations cost more; <span class="m">λ</span> is large (e.g. <span class="m">10<sup>6</sup></span>).</span></li>
+          <li class="reveal d4"><span class="vi">Ràng buộc hộp <span class="m">lb ≤ x ≤ ub</span> thường xử lý bằng kẹp biên.</span><span class="en">Box constraints <span class="m">lb ≤ x ≤ ub</span> are usually handled by clipping.</span></li>
+          <li class="reveal d5"><span class="vi">Các cách khác: sửa nghiệm, quy tắc khả thi của Deb, ràng buộc như mục tiêu phụ.</span><span class="en">Alternatives: repair, Deb's feasibility rules, constraints as extra objectives.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · hàm phạt</span><span class="en">Worked example · penalty</span></p>
+      <h2 class="reveal d1"><span class="vi">Điểm “gbest” của sách tham khảo bị phạt bao nhiêu?</span><span class="en">How much is the reference book's “gbest” penalized?</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">f(x) = 5(x<sub>1</sub> − 1)² + 10x<sub>1</sub>x<sub>2</sub> + (x<sub>3</sub> − 3)²</span></div>
+          <div class="eq"><span class="m">g<sub>1</sub> = x<sub>1</sub> + x<sub>2</sub> + x<sub>3</sub> − 5 ≤ 0, &nbsp; g<sub>2</sub> = x<sub>1</sub>² + x<sub>2</sub>² − 5 ≤ 0</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tại <span class="m">x = (3, −5, −4)</span>: <span class="m">f = −81</span>, <span class="m">g<sub>1</sub> = −11</span> (thỏa), <span class="m">g<sub>2</sub> = 29</span> (vi phạm).</span><span class="en">At <span class="m">x = (3, −5, −4)</span>: <span class="m">f = −81</span>, <span class="m">g<sub>1</sub> = −11</span> (satisfied), <span class="m">g<sub>2</sub> = 29</span> (violated).</span></li>
+          <li><span class="vi">Với <span class="m">λ = 10<sup>6</sup></span>: <span class="m">F = −81 + 10<sup>6</sup> · 29² = 840 999 919</span>.</span><span class="en">With <span class="m">λ = 10<sup>6</sup></span>: <span class="m">F = −81 + 10<sup>6</sup> · 29² = 840,999,919</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Thực nghiệm: PSO + hàm phạt</span><span class="en">Experiment: PSO + penalty</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">30 lần chạy, 20 000 lần đánh giá: <b>30/30</b> lần đạt <span class="m">f = -23.6698</span>, vi phạm lớn nhất <span class="m">5.00e−6</span>.</span><span class="en">30 runs, 20,000 evaluations: <b>30/30</b> runs reach <span class="m">f = -23.6698</span>, largest violation <span class="m">5.00e−6</span>.</span></li>
+          <li><span class="vi">Nghiệm <span class="m">≈ (1.454, −1.699, 3)</span> nằm đúng trên biên <span class="m">x<sub>1</sub>² + x<sub>2</sub>² = 5</span>.</span><span class="en">The solution <span class="m">≈ (1.454, −1.699, 3)</span> lies exactly on the boundary <span class="m">x<sub>1</sub>² + x<sub>2</sub>² = 5</span>.</span></li>
+          <li><span class="vi">So với “−170” của sách: bỏ qua ràng buộc cho kết quả sai hoàn toàn.</span><span class="en">Compared with the book's “−170”: ignoring constraints gives a completely wrong answer.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Khám phá và khai thác" data-label-en="Exploration and exploitation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Động lực học tìm kiếm</span><span class="en">Search dynamics</span></p>
+      <h2 class="reveal d1"><span class="vi">Hai thái cực và điểm cân bằng</span><span class="en">Two extremes and the balance</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Tìm kiếm ngẫu nhiên</strong>: chỉ khám phá; không bao giờ kẹt nhưng hội tụ rất chậm.</span><span class="en"><strong>Random search</strong>: pure exploration; never trapped but very slow.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Leo đồi (1+1)-ES</strong>: chủ yếu khai thác; nhanh trên hàm đơn đỉnh, dễ kẹt trên hàm đa đỉnh.</span><span class="en"><strong>Hill climbing (1+1)-ES</strong>: mostly exploitation; fast on unimodal functions, trapped on multimodal ones.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Bầy đàn</strong>: nhiều tác tử chia sẻ thông tin, chuyển dần từ khám phá sang khai thác (Črepinšek, Liu &amp; Mernik, 2013).</span><span class="en"><strong>Swarms</strong>: many agents share information and shift from exploration to exploitation (Črepinšek, Liu &amp; Mernik, 2013).</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 200" role="img" aria-label="Trục khám phá – khai thác"><defs><linearGradient id="ee" x1="0" x2="1"><stop offset="0" stop-color="#3a7fc1"/><stop offset="1" stop-color="#d9562f"/></linearGradient></defs><rect x="20" y="90" width="340" height="16" rx="8" fill="url(#ee)"/><g font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600"><text x="20" y="80" fill="#3a7fc1"><tspan class="vi">khám phá</tspan><tspan class="en">exploration</tspan></text><text x="300" y="80" fill="#d9562f"><tspan class="vi">khai thác</tspan><tspan class="en">exploitation</tspan></text></g><g font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#1c2a2e" text-anchor="middle"><circle cx="35" cy="98" r="6" fill="#fff" stroke="#1c2a2e"/><text x="35" y="135">RS</text><circle cx="330" cy="98" r="6" fill="#fff" stroke="#1c2a2e"/><text x="330" y="135">(1+1)-ES</text><circle cx="190" cy="98" r="6" fill="#fff" stroke="#1c2a2e"/><text x="190" y="135"><tspan class="vi">bầy đàn</tspan><tspan class="en">swarms</tspan></text></g></svg>
+        <figcaption><span class="vi">Vị trí của ba chiến lược trên trục khám phá – khai thác</span><span class="en">Three strategies on the exploration–exploitation axis</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba chiến lược trên cùng địa hình</span><span class="en">Three strategies on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Chọn chiến lược rồi nhấn Chạy. Địa hình có một cực tiểu toàn cục (+) và bốn cực tiểu cục bộ.</span><span class="en">Pick a strategy and press Run. The landscape has one global minimum (+) and four local ones.</span></p>
+        <div class="field-ctrl" id="c1-modes"><button class="btn" data-mode="RS" type="button"><span class="vi">Ngẫu nhiên</span><span class="en">Random</span></button><button class="btn" data-mode="HC" type="button">(1+1)-ES</button><button class="btn" data-mode="PSO" type="button">PSO</button></div>
+        <p class="note"><span class="vi">Cùng 12 điểm xuất phát và cùng số lần đánh giá mỗi bước cho cả ba.</span><span class="en">Same 12 starting points and the same evaluations per step for all three.</span></p>
+      </div>
+      <div class="field" id="c1-field"><canvas aria-label="simulation"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · chương 1</span><span class="en">Experiment · chapter 1</span></p>
+      <h2 class="reveal d1"><span class="vi">Trung vị sai số, D = 10, 20 000 lần đánh giá, 30 lần chạy</span><span class="en">Median error, D = 10, 20,000 evaluations, 30 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Chiến lược</span><span class="en">Strategy</span></th><th><span class="vi">F1 Sphere</span><span class="en">F1 Sphere</span></th><th><span class="vi">F3 Rastrigin</span><span class="en">F3 Rastrigin</span></th><th><span class="vi">F6 Sphere dịch</span><span class="en">F6 shifted</span></th><th><span class="vi">F7 Rastrigin dịch</span><span class="en">F7 shifted</span></th><th><span class="vi">Hạng*</span><span class="en">Rank*</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Ngẫu nhiên</span><span class="en">Random</span></td><td>4.38e+3</td><td>6.44e+1</td><td>4.75e+3</td><td>7.04e+1</td><td>22.43</td></tr>
+        <tr><td><span class="vi">(1+1)-ES</span><span class="en">(1+1)-ES</span></td><td>0</td><td>6.87e+1</td><td>0</td><td>7.51e+1</td><td>14.36</td></tr>
+        <tr><td><span class="vi">PSO</span><span class="en">PSO</span></td><td>0</td><td>3.98e+0</td><td>0</td><td>4.01e+0</td><td>8.21</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Tìm kiếm ngẫu nhiên không đạt độ chính xác nào; (1+1)-ES giải được hàm đơn đỉnh nhưng kẹt trên Rastrigin; PSO cân bằng tốt hơn. *Hạng Friedman trong 23 phương pháp của giáo trình.</span><span class="en">Random search reaches no precision; (1+1)-ES solves unimodal functions but gets stuck on Rastrigin; PSO balances better. *Friedman rank among the textbook's 23 methods.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="No Free Lunch" data-label-en="No Free Lunch">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá thuật toán</span><span class="en">Assessing algorithms</span></p>
+      <h2 class="reveal d1"><span class="vi">Không có thuật toán tốt nhất cho mọi bài toán</span><span class="en">No algorithm is best for every problem</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Định lý NFL</strong> (Wolpert &amp; Macready, 1997): tính trung bình trên <em>mọi</em> bài toán, mọi thuật toán tìm kiếm có hiệu năng như nhau.</span><span class="en"><strong>NFL theorem</strong> (Wolpert &amp; Macready, 1997): averaged over <em>all</em> problems, every search algorithm performs the same.</span></li>
+          <li class="reveal d3"><span class="vi">Hệ quả: chỉ có thể nói “A tốt hơn B <em>trên lớp bài toán này</em>”. Mọi kết luận phải kèm bộ thử và giao thức.</span><span class="en">Consequence: one can only say “A beats B <em>on this class of problems</em>”. Every claim needs its test suite and protocol.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Độ phức tạp</strong>: số lần đánh giá hàm thường là chi phí chính; so sánh phải cùng ngân sách đánh giá, không cùng số vòng lặp.</span><span class="en"><strong>Complexity</strong>: function evaluations are usually the main cost; compare under equal evaluation budgets, not equal iterations.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Tốc độ hội tụ</strong>: đo bằng đường sai số theo số lần đánh giá (đường hội tụ).</span><span class="en"><strong>Convergence rate</strong>: measured by error versus evaluations (convergence curves).</span></li>
+      </ul>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Bài học từ thực nghiệm của giáo trình</span><span class="en">Lessons from the textbook's experiments</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">HHO, WOA, BOA rất tốt trên Sphere nhưng kém hẳn trên Sphere dịch tâm: luôn thử bản dịch tâm.</span><span class="en">HHO, WOA, BOA excel on Sphere but fail on shifted Sphere: always test shifted versions.</span></li>
+          <li><span class="vi">Thuật toán mới (RCO) đứng 16/18 trong giao thức độc lập: luôn chạy lại.</span><span class="en">A new algorithm (RCO) ranks 16/18 under an independent protocol: always re-run.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Bầy đàn trong giáo trình</span><span class="en">Swarms in this textbook</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">18 chương đi từ nền tảng tới ứng dụng.</span><span class="en">18 chapters from foundations to applications.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Phần I</span><span class="en">Part I</span></h3><p><span class="vi">Nền tảng: chương 1–2.</span><span class="en">Foundations: chapters 1–2.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Phần II–III</span><span class="en">Parts II–III</span></h3><p><span class="vi">Côn trùng, chim, kẻ săn mồi: PSO, ACO, ABC, FA, ALO, MFO, GOA, BOA, HHO, GWO, WOA, BA, RCO.</span><span class="en">Insects, birds, predators: PSO, ACO, ABC, FA, ALO, MFO, GOA, BOA, HHO, GWO, WOA, BA, RCO.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Phần IV</span><span class="en">Part IV</span></h3><p><span class="vi">Sinh vật biển, vi sinh vật, bước Lévy: MPA, SSA, AAA, BFO, CS.</span><span class="en">Marine life, microbes, Lévy flights: MPA, SSA, AAA, BFO, CS.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Phần V</span><span class="en">Part V</span></h3><p><span class="vi">Đa mục tiêu, nhị phân, lai ghép, ứng dụng AI và kỹ thuật.</span><span class="en">Multi-objective, binary, hybrids, AI and engineering applications.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Lõi dùng chung: đếm số lần đánh giá</span><span class="en">Shared core: counting evaluations</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Mọi thuật toán trong giáo trình dùng lớp Problem này để dừng đúng ngân sách.</span><span class="en">Every algorithm in the book uses this Problem class to stop exactly at the budget.</span> <a href="code/si/core.py" class="c-sea">code/si/core.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">def</span> __call__(self, X):
+        X = np.atleast_2d(X)
+        out = np.full(X.shape[0], math.inf)
+        k = min(X.shape[0], self.budget - self.fes)
+        <span class="k">if</span> k &gt; 0:
+            out[:k] = self.f(X[:k])
+            self.fes += k
+            i = int(np.argmin(out[:k]))
+            <span class="k">if</span> out[i] &lt; self.best_f:
+                self.best_f, self.best_x = float(out[i]), X[i].copy()
+            self.curve.append((self.fes, self.best_f - self.fopt))
+        <span class="k">return</span> out</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Khi nào nên dùng trí tuệ bầy đàn?</span><span class="en">When should we use swarm intelligence?</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Hàm mục tiêu là hộp đen, không có đạo hàm, nhiều đỉnh.</span><span class="en">The objective is a black box, derivative-free, multimodal.</span></li>
+          <li><span class="vi">Không gian lớn, cần lời giải tốt trong thời gian hạn chế.</span><span class="en">The space is large and a good solution is needed in limited time.</span></li>
+          <li><span class="vi">Dễ song song hóa: mỗi tác tử đánh giá độc lập.</span><span class="en">Easy to parallelize: each agent evaluates independently.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Không bảo đảm tối ưu; cần nhiều lần chạy và kiểm định thống kê.</span><span class="en">No optimality guarantee; needs many runs and statistical tests.</span></li>
+          <li><span class="vi">Khi có gradient và hàm lồi, phương pháp cổ điển thường tốt hơn hẳn.</span><span class="en">With gradients and convexity, classical methods usually win clearly.</span></li>
+          <li><span class="vi">Rất nhiều thuật toán “mới” chỉ khác tên gọi; hãy đánh giá theo cơ chế và kết quả độc lập.</span><span class="en">Many “new” algorithms differ only in name; judge them by mechanism and independent results.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cho ví dụ một hiện tượng trồi ngoài tự nhiên và mô tả quy tắc cục bộ tạo ra nó.</span><span class="en">Give a natural example of emergence and the local rules behind it.</span></li>
+          <li><span class="vi">Tính <span class="m">F(x)</span> của ví dụ hàm phạt tại <span class="m">x = (1, 1, 3)</span>.</span><span class="en">Compute the penalty <span class="m">F(x)</span> at <span class="m">x = (1, 1, 3)</span>.</span></li>
+          <li><span class="vi">Giải thích vì sao NFL không có nghĩa là “mọi thuật toán đều như nhau trong thực tế”.</span><span class="en">Explain why NFL does not mean “all algorithms are the same in practice”.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy <span class="m">experiments.run_chapters ch1</span> và đổi <span class="m">λ</span> thành <span class="m">10<sup>2</sup></span>; điều gì xảy ra?</span><span class="en">Run <span class="m">experiments.run_chapters ch1</span> with <span class="m">λ = 10<sup>2</sup></span>; what happens?</span></li>
+          <li><span class="vi">So sánh tìm kiếm ngẫu nhiên, (1+1)-ES và PSO trên Griewank D = 30.</span><span class="en">Compare random search, (1+1)-ES and PSO on Griewank with D = 30.</span></li>
+          <li><span class="vi">Cài quy tắc khả thi của Deb thay cho hàm phạt.</span><span class="en">Implement Deb's feasibility rules instead of the penalty.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>I. Rechenberg, <em>Evolutionsstrategie: Optimierung technischer Systeme nach Prinzipien der biologischen Evolution</em>. Stuttgart, Germany: Frommann-Holzboog, 1973.</li>
+        <li>D. Wolpert and W. Macready, “No free lunch theorems for optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 1, no. 1, pp. 67–82, 1997, doi: <a href="https://doi.org/10.1109/4235.585893">10.1109/4235.585893</a>.</li>
+        <li>E. Bonabeau, M. Dorigo, and G. Theraulaz, <em>Swarm Intelligence: From Natural to Artificial Systems</em>. New York, NY, USA: Oxford Univ. Press, 1999.</li>
+        <li>C. Blum and A. Roli, “Metaheuristics in combinatorial optimization,” <em>ACM Comput. Surv.</em>, vol. 35, no. 3, pp. 268–308, 2003, doi: <a href="https://doi.org/10.1145/937503.937505">10.1145/937503.937505</a>.</li>
+        <li>T. G. Kolda, R. M. Lewis, and V. Torczon, “Optimization by Direct Search: New Perspectives on Some Classical and Modern Methods,” <em>SIAM Rev.</em>, vol. 45, no. 3, pp. 385–482, 2003, doi: <a href="https://doi.org/10.1137/S003614450242889">10.1137/S003614450242889</a>.</li>
+        <li>M. Črepinšek, S.-H. Liu, and M. Mernik, “Exploration and exploitation in evolutionary algorithms,” <em>ACM Comput. Surv.</em>, vol. 45, no. 3, pp. 1–33, 2013, doi: <a href="https://doi.org/10.1145/2480741.2480752">10.1145/2480741.2480752</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Nhiều tác tử đơn giản, hành vi tập thể thông minh</span><span class="en">Many simple agents, smart collective behaviour</span></span>
+      <span><span class="vi">Khám phá ↔ khai thác</span><span class="en">Exploration ↔ exploitation</span></span>
+      <span><span class="vi">No Free Lunch: luôn so sánh trên lớp bài toán cụ thể</span><span class="en">No Free Lunch: compare on a specific problem class</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Bonabeau, Dorigo &amp; Theraulaz, <em>Swarm Intelligence</em>, Oxford Univ. Press, 1999</span><span class="en">Original paper: Bonabeau, Dorigo &amp; Theraulaz, <em>Swarm Intelligence</em>, Oxford Univ. Press, 1999</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () { const rnd = SI.rng(5); let h = '';
+  for (let i = 0; i < 26; i++) { const x = 60 + rnd() * 240, y = 40 + rnd() * 160, a = -0.5 + rnd() * 0.25; h += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${(a * 57).toFixed(1)})"><path d="M8,0 L-6,5 L-3,0 L-6,-5 Z" fill="#1c2a2e"/></g>`; }
+  document.getElementById('c1-art').innerHTML = h; })();
+const c1algo = {
+  n: 12, T: 60, seed: 4, mode: 'PSO',
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), v: [0, 0] }); S.pop.forEach((p) => { p.pb = p.x.slice(); }); S.sig = 2; S.succ = 0; },
+  step(S) {
+    const rnd = S.rnd;
+    if (this.mode === 'RS') { S.pop.forEach((p) => { p.x = SI.randPos(rnd); }); return; }
+    if (this.mode === 'HC') {
+      let s = 0; S.pop.forEach((p) => { const y = p.x.map((v) => SI.clamp(v + S.sig * SI.gauss(rnd))); if (SI.f(y) < SI.f(p.x)) { p.x = y; s++; } });
+      S.sig *= s / this.n > 0.2 ? 1.22 : 0.82; return;
+    }
+    const w = 0.9 - 0.5 * S.t / S.T, g = S.best;
+    S.pop.forEach((p) => { p.v = p.v.map((v, d) => Math.max(-2, Math.min(2, w * v + 2 * rnd() * (p.pb[d] - p.x[d]) + 2 * rnd() * (g[d] - p.x[d])))); p.x = p.x.map((x, d) => SI.clamp(x + p.v[d])); if (SI.f(p.x) < SI.f(p.pb)) p.pb = p.x.slice(); });
+  },
+  draw(g, S, P) {
+    for (const p of S.pop) SI.trail(g, P, p, 'rgba(28,42,46,0.35)');
+    const col = { RS: '#3a7fc1', HC: '#d9562f', PSO: '#1f6f78' }[this.mode];
+    for (const p of S.pop) { const [x, y] = P.at(p); SI.dot(g, x, y, 5, col); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S, en) { return `<span><b>${this.mode === 'HC' ? '(1+1)-ES' : this.mode}</b></span>`; },
+};
+const c1f = new SI.Field2D(document.getElementById('c1-field'), c1algo);
+document.querySelectorAll('#c1-modes [data-mode]').forEach((b) => b.addEventListener('click', () => { c1algo.mode = b.dataset.mode; c1f.userPaused = false; c1f.reset(); c1f.play(); document.querySelectorAll('#c1-modes [data-mode]').forEach((q) => q.classList.toggle('solid', q === b)); }));
+
+SI.boot();
+</script>
+</body>
+</html>

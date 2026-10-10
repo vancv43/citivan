@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu đàn kiến (ACO)" data-title-en="Ant Colony Optimization (ACO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu đàn kiến (ACO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 4 · Trí tuệ bầy đàn</span><span class="en">Chapter 4 · Swarm Intelligence</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu đàn kiến</span><span class="en">Ant Colony Optimization</span><span class="sub"><span class="vi">Ant Colony Optimization — ACO</span><span class="en">ACO — shortest paths drawn in pheromone</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Giải thích stigmergy và thí nghiệm cầu đôi.</span><span class="en">Explain stigmergy and the double-bridge experiment.</span></li>
+          <li class="reveal d3"><span class="vi">Viết quy tắc chuyển trạng thái xác suất và quy tắc cập nhật pheromone.</span><span class="en">Write the probabilistic transition rule and the pheromone update rule.</span></li>
+          <li class="reveal d4"><span class="vi">Phân tích tác động của <span class="m">α, β, ρ, m</span> tới hội tụ và trì trệ.</span><span class="en">Analyse how <span class="m">α, β, ρ, m</span> affect convergence and stagnation.</span></li>
+          <li class="reveal d5"><span class="vi">Phân biệt Ant System, Ant Colony System và MAX–MIN Ant System.</span><span class="en">Distinguish Ant System, Ant Colony System and MAX–MIN Ant System.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Kiến tìm đường ngắn mà không cần bản đồ</span><span class="en">Ants find short paths without a map</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Marco Dorigo</strong> khởi xướng năm 1992; hệ kiến <em>Ant System</em> được công bố đầy đủ năm 1996 cùng Maniezzo và Colorni.</span><span class="en">Started by <strong>Marco Dorigo</strong> in 1992; the <em>Ant System</em> was published in full in 1996 with Maniezzo and Colorni.</span></li>
+          <li class="reveal d3"><span class="vi">Kiến để lại <strong>pheromone</strong> trên đường đi; kiến sau có xu hướng đi theo vệt đậm hơn.</span><span class="en">Ants lay <strong>pheromone</strong> as they walk; later ants tend to follow stronger trails.</span></li>
+          <li class="reveal d4"><span class="vi">Thí nghiệm <strong>cầu đôi</strong>: nhánh ngắn được đi hết vòng nhanh hơn, nên tích pheromone nhanh hơn và dần hút gần hết đàn kiến.</span><span class="en">The <strong>double-bridge</strong> experiment: the short branch is completed faster, gathers pheromone faster and gradually draws in almost the whole colony.</span></li>
+          <li class="reveal d5"><span class="vi">Giao tiếp gián tiếp qua môi trường như vậy gọi là <strong>stigmergy</strong>.</span><span class="en">This indirect communication through the environment is called <strong>stigmergy</strong>.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 260" role="img" aria-label="Thí nghiệm cầu đôi: nhánh ngắn đậm pheromone hơn">
+          <path d="M40,130 C120,20 260,20 340,130" fill="none" stroke="#1f6f78" stroke-width="3" opacity="0.35"/>
+          <path class="draw" style="--len:320" d="M40,130 C120,190 260,190 340,130" fill="none" stroke="#1f6f78" stroke-width="10" stroke-linecap="round"/>
+          <circle cx="40" cy="130" r="20" fill="#f0cf7a" stroke="#1c2a2e"/><circle cx="340" cy="130" r="20" fill="#f6d8cb" stroke="#1c2a2e"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" text-anchor="middle" fill="#1c2a2e">
+            <text x="40" y="170"><tspan class="vi">tổ</tspan><tspan class="en">nest</tspan></text><text x="340" y="170"><tspan class="vi">thức ăn</tspan><tspan class="en">food</tspan></text>
+            <text x="190" y="40" fill="#56676a"><tspan class="vi">nhánh dài: vệt mờ dần</tspan><tspan class="en">long branch: trail fades</tspan></text>
+            <text x="190" y="215" fill="#1f6f78" font-weight="600"><tspan class="vi">nhánh ngắn: vệt đậm dần</tspan><tspan class="en">short branch: trail builds up</tspan></text>
+          </g>
+          <g fill="#1c2a2e"><circle cx="110" cy="164" r="3.5"/><circle cx="160" cy="176" r="3.5"/><circle cx="215" cy="178" r="3.5"/><circle cx="270" cy="168" r="3.5"/><circle cx="150" cy="58" r="3.5"/></g>
+        </svg>
+        <figcaption><span class="vi">Thí nghiệm cầu đôi (Deneubourg và cs., 1990)</span><span class="en">The double-bridge experiment (Deneubourg et al., 1990)</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CORE IDEA -->
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi con kiến dựng một lời giải từng bước, chọn cạnh tiếp theo dựa trên <span class="hl c-sea">vệt pheromone</span> và <span class="hl c-cog">độ hấp dẫn của cạnh</span>. Lời giải tốt để lại vệt đậm hơn; vệt cũ thì <span class="hl c-soc">bay hơi</span>.</span><span class="en">Each ant builds a solution step by step, choosing the next edge from the <span class="hl c-sea">pheromone trail</span> and the <span class="hl c-cog">edge's appeal</span>. Good solutions leave stronger trails; old trails <span class="hl c-soc">evaporate</span>.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: var(--sea)"><b class="c-sea"><span class="m">τ<sub>ij</sub></span> · pheromone</b><span><span class="vi">kinh nghiệm tích lũy của cả đàn</span><span class="en">the colony's accumulated experience</span></span></div>
+      <div class="force reveal d4" style="border-color: var(--moss)"><b class="c-cog"><span class="m">η<sub>ij</sub></span> · heuristic</b><span><span class="vi">hiểu biết sẵn về bài toán, ví dụ <span class="m">1 / d<sub>ij</sub></span></span><span class="en">prior knowledge, e.g. <span class="m">1 / d<sub>ij</sub></span></span></span></div>
+      <div class="force reveal d5" style="border-color: var(--ember)"><b class="c-soc"><span class="m">ρ</span> · <span class="vi">bay hơi</span><span class="en">evaporation</span></b><span><span class="vi">quên dần lựa chọn cũ, tránh kẹt sớm</span><span class="en">forget old choices to avoid early stagnation</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. TRANSITION RULE -->
+<section class="slide" aria-label="Quy tắc chọn cạnh" data-label-en="Transition rule">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học · TSP</span><span class="en">Mathematical model · TSP</span></p>
+      <h2 class="reveal d1"><span class="vi">Kiến ở thành phố <span class="m">i</span> chọn thành phố <span class="m">j</span> tiếp theo</span><span class="en">An ant at city <span class="m">i</span> picks the next city <span class="m">j</span></span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="eq">
+        <span class="m">p<span class="ss"><i>k</i><i>ij</i></span> =</span>
+        <span class="m" style="display:inline-flex;flex-direction:column;align-items:center;line-height:1.25"><span style="border-bottom:1.5px solid currentColor;padding:0 0.3em">[τ<sub>ij</sub>]<sup>α</sup> [η<sub>ij</sub>]<sup>β</sup></span><span>Σ<sub>l ∈ N<span style="font-size:0.8em"><sup>k</sup><sub>i</sub></span></sub> [τ<sub>il</sub>]<sup>α</sup> [η<sub>il</sub>]<sup>β</sup></span></span>
+        <span class="m">, &nbsp; j ∈ N<span class="ss"><i>k</i><i>i</i></span></span>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="m">N<span class="ss"><i>k</i><i>i</i></span></span><span class="vi">: các thành phố kiến <span class="m">k</span> chưa đi qua; xác suất bằng 0 với thành phố đã đi.</span><span class="en">: cities ant <span class="m">k</span> has not yet visited; already-visited cities get probability 0.</span></li>
+      <li class="reveal d4"><span class="m">η<sub>ij</sub> = 1 / d<sub>ij</sub></span><span class="vi">: thành phố càng gần càng hấp dẫn.</span><span class="en">: the closer the city, the more appealing.</span></li>
+      <li class="reveal d5"><span class="m">α, β</span><span class="vi"> cân bằng giữa “tin vào kinh nghiệm của đàn” và “tin vào khoảng cách”.</span><span class="en"> balance “trust the colony's experience” against “trust the distance”.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. PHEROMONE UPDATE -->
+<section class="slide" aria-label="Cập nhật pheromone" data-label-en="Pheromone update">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bay hơi trước, rồi mỗi con kiến rải pheromone theo chất lượng hành trình</span><span class="en">Evaporate first, then each ant deposits according to its tour quality</span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="eq">
+        <span class="term"><span class="tm">τ<sub>ij</sub></span></span><span class="op">←</span>
+        <span class="term t-soc"><span class="tm">(1 − ρ) τ<sub>ij</sub></span><span class="lbl"><span class="vi">Bay hơi</span><span class="en">Evaporation</span></span></span><span class="op">+</span>
+        <span class="term t-in"><span class="tm">Σ<sub>k=1</sub><sup>m</sup> Δτ<span class="ss"><i>k</i><i>ij</i></span></span><span class="lbl"><span class="vi">Rải thêm</span><span class="en">Deposit</span></span></span>
+      </div>
+    </div>
+    <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size)*0.85); text-align:center; white-space:normal">Δτ<span class="ss"><i>k</i><i>ij</i></span> = Q / L<sub>k</sub> &nbsp;<span class="up"><span class="vi">nếu kiến <i>k</i> đi qua cạnh (i, j)</span><span class="en">if ant <i>k</i> used edge (i, j)</span></span>, &nbsp; 0 &nbsp;<span class="up"><span class="vi">ngược lại</span><span class="en">otherwise</span></span></div></div>
+    <ul class="bullets">
+      <li class="reveal d4"><span class="m">ρ ∈ (0, 1]</span><span class="vi">: tốc độ bay hơi. </span><span class="en">: evaporation rate. </span><span class="m">L<sub>k</sub></span><span class="vi">: độ dài hành trình của kiến <span class="m">k</span>; hành trình càng ngắn, lượng rải càng nhiều.</span><span class="en">: length of ant <span class="m">k</span>'s tour; the shorter the tour, the more it deposits.</span></li>
+      <li class="reveal d5"><span class="vi">Đây là vòng phản hồi dương: cạnh tốt được chọn nhiều hơn, nên lại được rải thêm.</span><span class="en">This is positive feedback: good edges are chosen more, so they get reinforced more.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6. PARAMETERS -->
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Bốn núm vặn của Ant System</span><span class="en">The four knobs of Ant System</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">α</span></td><td><span class="vi">Trọng số pheromone. Nếu bằng 0: chỉ còn tham lam theo khoảng cách.</span><span class="en">Pheromone weight. At 0: pure greedy by distance.</span></td><td>1</td></tr>
+        <tr><td><span class="m">β</span></td><td><span class="vi">Trọng số heuristic. Nếu bằng 0: chỉ theo pheromone, dễ kẹt sớm.</span><span class="en">Heuristic weight. At 0: pheromone only, prone to early stagnation.</span></td><td>2 – 5</td></tr>
+        <tr><td><span class="m">ρ</span></td><td><span class="vi">Tốc độ bay hơi: lớn thì quên nhanh, nhỏ thì nhớ lâu.</span><span class="en">Evaporation rate: large forgets fast, small remembers long.</span></td><td>0.5</td></tr>
+        <tr><td><span class="m">m</span></td><td><span class="vi">Số kiến mỗi vòng lặp.</span><span class="en">Ants per iteration.</span></td><td><span class="vi">bằng số thành phố <span class="m">n</span></span><span class="en">number of cities <span class="m">n</span></span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Giá trị khởi tạo thường dùng: <em>τ<sub>0</sub> = m / C<sup>nn</sup></em>, với <em>C<sup>nn</sup></em> là độ dài hành trình láng giềng gần nhất (Dorigo &amp; Stützle, 2004).</span><span class="en">A common initial value: <em>τ<sub>0</sub> = m / C<sup>nn</sup></em>, where <em>C<sup>nn</sup></em> is the nearest-neighbour tour length (Dorigo &amp; Stützle, 2004).</span></p>
+  </div>
+</section>
+
+<!-- 7. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của ACO cho TSP</span><span class="en">ACO for TSP step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ant System (Dorigo và cs., 1996) và ACS (Dorigo &amp; Gambardella, 1997).</span><span class="en">Ant System (Dorigo et al., 1996) and ACS (Dorigo &amp; Gambardella, 1997).</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo pheromone <span class="m">τ<sub>0</sub></span> trên mọi cạnh; <span class="m">η<sub>ij</sub> = 1/d<sub>ij</sub></span>.</span><span class="en">Initialize pheromone <span class="m">τ<sub>0</sub></span> on all edges; <span class="m">η<sub>ij</sub> = 1/d<sub>ij</sub></span>.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Mỗi kiến xây một chu trình bằng quy tắc chọn cạnh xác suất.</span><span class="en">Each ant builds a tour with the probabilistic edge rule.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Tính độ dài; ghi nhớ chu trình ngắn nhất.</span><span class="en">Compute lengths; remember the shortest tour.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Bay hơi: <span class="m">τ ← (1 − ρ)τ</span>.</span><span class="en">Evaporate: <span class="m">τ ← (1 − ρ)τ</span>.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Rải pheromone tỉ lệ <span class="m">1/L</span>; lặp đến hết ngân sách.</span><span class="en">Deposit pheromone proportional to <span class="m">1/L</span>; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">pheromone τ₀</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">pheromone τ₀</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="78">η = 1/d</text></g><g class="en"><text x="875" y="78">η = 1/d</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Kiến xây</text><text x="875" y="259">chu trình</text></g><g class="en"><text x="875" y="237">Ants build</text><text x="875" y="259">tours</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Bay hơi;</text><text x="625" y="259">rải 1/L</text></g><g class="en"><text x="625" y="237">Evaporate;</text><text x="625" y="259">deposit 1/L</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về chu trình tốt nhất</text></g><g class="en"><text x="125" y="248">Return best tour</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán Ant System</span><span class="en">The Ant System algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả cho TSP</span><span class="en">Pseudocode for TSP</span></h2>
+        <p class="lead reveal d2"><span class="vi">Khác với các chương sau, ACO dựng lời giải trên một đồ thị, nên rất hợp với bài toán tổ hợp.</span><span class="en">Unlike later chapters, ACO builds solutions on a graph, so it fits combinatorial problems naturally.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Đặt <span class="m">τ<sub>ij</sub> = τ<sub>0</sub></span> cho mọi cạnh</span><span class="en">Set <span class="m">τ<sub>ij</sub> = τ<sub>0</sub></span> on every edge</span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi kiến</span><span class="en">each ant</span> <span class="m">k</span>:</span> <span class="vi">đặt ở một thành phố ngẫu nhiên</span><span class="en">place it at a random city</span></li>
+        <li style="--ind:2"><span class="vi">Lặp <span class="m">n − 1</span> lần: chọn thành phố tiếp theo theo <span class="m">p<span class="ss"><i>k</i><i>ij</i></span></span></span><span class="en">Repeat <span class="m">n − 1</span> times: pick the next city by <span class="m">p<span class="ss"><i>k</i><i>ij</i></span></span></span></li>
+        <li style="--ind:2"><span class="vi">Quay về thành phố đầu, tính <span class="m">L<sub>k</sub></span></span><span class="en">Return to the start, compute <span class="m">L<sub>k</sub></span></span></li>
+        <li style="--ind:1"><span class="vi">Bay hơi mọi cạnh, rồi mỗi kiến rải <span class="m">Q / L<sub>k</sub></span></span><span class="en">Evaporate all edges, then each ant deposits <span class="m">Q / L<sub>k</sub></span></span></li>
+        <li style="--ind:1"><span class="vi">Ghi nhớ hành trình ngắn nhất</span><span class="en">Remember the shortest tour</span></li>
+        <li><span><span class="kw">return</span> <span class="vi">hành trình ngắn nhất</span><span class="en">the shortest tour</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">16 con kiến giải bài toán người du lịch 16 thành phố</span><span class="en">16 ants solving a 16-city travelling salesman problem</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Độ đậm của mỗi cạnh là lượng pheromone. Đường cam là hành trình ngắn nhất tìm được; đường nét đứt xanh là hành trình tốt nhất của vòng hiện tại.</span><span class="en">Edge darkness shows pheromone. The orange line is the shortest tour found; the dashed blue line is the best tour of the current iteration.</span></p>
+        <p class="note"><span class="vi">Ant System: <em>α = 1, β = 3, ρ = 0.5, Q = 1, m = n = 16</em>. Ban đầu pheromone trải đều; dần dần chỉ còn vài cạnh đậm.</span><span class="en">Ant System: <em>α = 1, β = 3, ρ = 0.5, Q = 1, m = n = 16</em>. Pheromone starts uniform and gradually concentrates on a few edges.</span></p>
+      </div>
+      <div class="field" id="aco-field">
+        <canvas aria-label="ACO TSP simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. VARIANTS -->
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của ACO</span><span class="en">ACO applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">ACO mạnh nhất ở bài toán đồ thị và tổ hợp.</span><span class="en">ACO is strongest on graph and combinatorial problems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Định tuyến</span><span class="en">Routing</span></h3><p><span class="vi">TSP, định tuyến xe (chương 18), mạng (AntNet).</span><span class="en">TSP, vehicle routing (chapter 18), networks (AntNet).</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Job-shop, lịch học, lịch tàu.</span><span class="en">Job-shop, timetabling, train scheduling.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Gán</span><span class="en">Assignment</span></h3><p><span class="vi">Bài toán gán bậc hai (QAP).</span><span class="en">Quadratic assignment (QAP).</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Miền liên tục</span><span class="en">Continuous</span></h3><p><span class="vi">ACO<sub>R</sub> (Socha &amp; Dorigo, 2008).</span><span class="en">ACO<sub>R</sub> (Socha &amp; Dorigo, 2008).</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm TSP" data-label-en="TSP experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · TSP</span><span class="en">Experiment · TSP</span></p>
+      <h2 class="reveal d1"><span class="vi">Tốt nhất / sai lệch TB so với tối ưu, 10 000 chu trình, 10 lần chạy</span><span class="en">Best / mean gap to optimum, 10,000 tours, 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Phương pháp</span><span class="en">Method</span></th><th><span class="vi">eil51 (426)</span><span class="en">eil51 (426)</span></th><th><span class="vi">berlin52 (7542)</span><span class="en">berlin52 (7542)</span></th><th><span class="vi">st70 (675)</span><span class="en">st70 (675)</span></th></tr></thead>
+      <tbody>
+        <tr><td>NN</td><td>511 / 19.95%</td><td>8980 / 19.07%</td><td>830 / 22.96%</td></tr>
+        <tr><td>NN+2opt</td><td>449 / 5.40%</td><td>8009 / 6.19%</td><td>723 / 7.11%</td></tr>
+        <tr><td>AS</td><td>438 / 5.21%</td><td>7567 / 1.63%</td><td>714 / 7.93%</td></tr>
+        <tr><td>MMAS</td><td>456 / 13.80%</td><td>8187 / 11.94%</td><td>840 / 35.67%</td></tr>
+        <tr><td>ACS</td><td>426 / 1.34%</td><td>7542 / 1.46%</td><td>679 / 2.44%</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Bộ TSPLIB, tối ưu đã biết. ACS (không tìm kiếm cục bộ) đạt đúng tối ưu trên eil51 và berlin52. MMAS kém vì cần nhiều vòng hơn 10 000 chu trình để hội tụ: đây là kết quả trung thực với ngân sách này, không phải nhận định chung về MMAS.</span><span class="en">TSPLIB instances with known optima. ACS (no local search) hits the optimum on eil51 and berlin52. MMAS is poor because it needs far more than 10,000 tours to converge: an honest result for this budget, not a general verdict on MMAS.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/aco_tsp.py" class="c-sea">code/si/aco_tsp.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> built &lt; budget_tours:
+        it += 1
+        k = min(m, budget_tours - built)
+        <span class="k">if</span> variant == &<span class="c">#x27;ACS&#x27;:</span>
+            tours = [_construct(rng, tau, eta, alpha, beta, q0, (xi, tau0)) <span class="k">for</span> _ <span class="k">in</span> range(k)]
+        <span class="k">else</span>:
+            tours = [_construct(rng, tau, eta, alpha, beta) <span class="k">for</span> _ <span class="k">in</span> range(k)]
+        built += k
+        Ls = [length(D, t) <span class="k">for</span> t <span class="k">in</span> tours]
+        ib = int(np.argmin(Ls))
+        <span class="k">if</span> Ls[ib] &lt; bestL:
+            bestL, best = Ls[ib], tours[ib].copy()
+        <span class="k">if</span> variant == &<span class="c">#x27;AS&#x27;:</span>
+            tau *= 1 - rho
+            <span class="k">for</span> t, L <span class="k">in</span> zip(tours, Ls):
+                tau[t, np.roll(t, -1)] += 1 / L; tau[np.roll(t, -1), t] += 1 / L</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ACO<sub>R</sub></span><span class="en">Experiment · ACO<sub>R</sub></span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.29e+0</td><td class="num">1.79e+0</td><td class="num">1.63e−1</td><td><span class="sg-plus">+</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">2.18e+1</td><td class="num">9.87e+0</td><td class="num">1.89e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">7.17e−1</td><td class="num">9.92e−1</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F5 · Griewank</td><td class="num">1.31e−1</td><td class="num">9.00e−2</td><td class="num">1.16e−1</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">2.46e+1</td><td class="num">1.14e+1</td><td class="num">2.39e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>7.21</b>, đứng thứ <b>7/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>7.21</b>, position <b>7/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Bản liên tục ACO<sub>R</sub>: kho 50 lời giải, lấy mẫu Gauss quanh từng lời giải trong kho.</span><span class="en">Continuous ACO<sub>R</sub>: an archive of 50 solutions, Gaussian sampling around each archive member.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ACO<sub>R</sub></span><span class="en">Experiment · ACO<sub>R</sub></span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/ACOR.svg" alt="convergence ACOR" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Biến thể và ứng dụng</span><span class="en">Variants and applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Từ Ant System đến cả một họ thuật toán</span><span class="en">From Ant System to a whole family</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><h3>Ant Colony System</h3><p><span class="vi">Dorigo &amp; Gambardella, 1997: quy tắc chọn giả ngẫu nhiên với <span class="m">q<sub>0</sub></span>, cập nhật pheromone cục bộ, chỉ kiến tốt nhất rải toàn cục.</span><span class="en">Dorigo &amp; Gambardella, 1997: pseudo-random proportional rule with <span class="m">q<sub>0</sub></span>, local pheromone update, only the best ant deposits globally.</span></p></div>
+      <div class="card reveal d3"><h3>MAX–MIN Ant System</h3><p><span class="vi">Stützle &amp; Hoos, 2000: giới hạn <span class="m">τ</span> trong <span class="m">[τ<sub>min</sub>, τ<sub>max</sub>]</span> để tránh kẹt sớm; chỉ một kiến tốt nhất được rải.</span><span class="en">Stützle &amp; Hoos, 2000: bound <span class="m">τ</span> within <span class="m">[τ<sub>min</sub>, τ<sub>max</sub>]</span> to avoid stagnation; only one best ant deposits.</span></p></div>
+      <div class="card reveal d4"><h3>ACO<sub>R</sub></h3><p><span class="vi">Socha &amp; Dorigo, 2008: mở rộng cho miền liên tục bằng một kho lời giải và hàm mật độ Gauss.</span><span class="en">Socha &amp; Dorigo, 2008: extends ACO to continuous domains with a solution archive and Gaussian kernels.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Ứng dụng</span><span class="en">Applications</span></h3><p><span class="vi">TSP, định tuyến xe, lập lịch, định tuyến mạng (AntNet), các bài toán gán.</span><span class="en">TSP, vehicle routing, scheduling, network routing (AntNet), assignment problems.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. ASSESSMENT -->
+<section class="slide" aria-label="Ưu và nhược điểm" data-label-en="Strengths and limitations">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Mạnh trên đồ thị, cần cẩn thận với tham số</span><span class="en">Strong on graphs, careful with parameters</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Dựng lời giải từng bước, tự nhiên cho bài toán tổ hợp và đồ thị.</span><span class="en">Step-by-step construction is natural for combinatorial and graph problems.</span></li>
+          <li><span class="vi">Dễ kết hợp hiểu biết bài toán qua <span class="m">η</span>, và với tìm kiếm cục bộ như 2-opt.</span><span class="en">Easily injects problem knowledge via <span class="m">η</span>, and combines well with local search such as 2-opt.</span></li>
+          <li><span class="vi">Thích nghi với môi trường động: pheromone bay hơi và được làm mới.</span><span class="en">Adapts to dynamic settings: pheromone evaporates and is refreshed.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế</span><span class="en">Limitations</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Dễ <strong>trì trệ</strong>: pheromone dồn vào vài cạnh, mọi kiến cùng đi một đường.</span><span class="en">Prone to <strong>stagnation</strong>: pheromone piles on a few edges and every ant takes the same tour.</span></li>
+          <li><span class="vi">Nhiều tham số tương tác (<span class="m">α, β, ρ, m</span>); khó phân tích lý thuyết.</span><span class="en">Several interacting parameters (<span class="m">α, β, ρ, m</span>); hard to analyse theoretically.</span></li>
+          <li><span class="vi">Mỗi kiến dựng cả một lời giải, nên chi phí mỗi vòng là <span class="m">O(m · n²)</span> với TSP.</span><span class="en">Each ant builds a full solution, so one iteration costs <span class="m">O(m · n²)</span> on TSP.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VÍ DỤ TÍNH TAY (Okwu & Tartibu, 2021) -->
+<section class="slide" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · TSP 5 thành phố</span><span class="en">Worked example · a 5-city TSP</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba con kiến, <span class="m">α = 1, β = 2, ρ = 0.5, τ<sub>0</sub> = 1</span></span><span class="en">Three ants, <span class="m">α = 1, β = 2, ρ = 0.5, τ<sub>0</sub> = 1</span></span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <div class="stack reveal d2" style="font-size:0.85em">
+        <table class="mini-table dist"><thead><tr><th></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr></thead><tbody>
+<tr><td><b>1</b></td><td>–</td><td>10</td><td>12</td><td>11</td><td>14</td></tr>
+<tr><td><b>2</b></td><td>10</td><td>–</td><td>13</td><td>15</td><td>8</td></tr>
+<tr><td><b>3</b></td><td>12</td><td>13</td><td>–</td><td>9</td><td>14</td></tr>
+<tr><td><b>4</b></td><td>11</td><td>15</td><td>9</td><td>–</td><td>16</td></tr>
+<tr><td><b>5</b></td><td>14</td><td>8</td><td>14</td><td>16</td><td>–</td></tr>
+</tbody></table>
+        <p class="note"><span class="vi">Ma trận khoảng cách; <span class="m">η<sub>ij</sub> = 1 / d<sub>ij</sub></span>.</span><span class="en">Distance matrix; <span class="m">η<sub>ij</sub> = 1 / d<sub>ij</sub></span>.</span></p>
+      </div>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Từ thành phố 1: <span class="m">τη² = 0.0100, 0.0069, 0.0083, 0.0051</span> tới 2, 3, 4, 5; xác suất <span class="m">0.330, 0.229, 0.273, 0.168</span>, cộng dồn <span class="m">0.330, 0.559, 0.832, 1</span>.</span><span class="en">From city 1: <span class="m">τη² = 0.0100, 0.0069, 0.0083, 0.0051</span> to 2, 3, 4, 5; probabilities <span class="m">0.330, 0.229, 0.273, 0.168</span>, cumulative <span class="m">0.330, 0.559, 0.832, 1</span>.</span></li>
+        <li><span class="vi"><span class="m">r = 0.6841</span> nằm trong <span class="m">(0.559, 0.832]</span>, nên kiến 1 đi tới thành phố 4.</span><span class="en"><span class="m">r = 0.6841</span> falls in <span class="m">(0.559, 0.832]</span>, so ant 1 moves to city 4.</span></li>
+        <li><span class="vi">Từ 4 tới 2, 3, 5: xác suất <span class="m">0.215, 0.597, 0.189</span>; <span class="m">r = 0.4024</span> chọn thành phố 3.</span><span class="en">From 4 to 2, 3, 5: probabilities <span class="m">0.215, 0.597, 0.189</span>; <span class="m">r = 0.4024</span> picks city 3.</span></li>
+        <li><span class="vi">Ba hành trình: 1-4-3-5-2-1 dài <b>52</b>, 1-4-2-5-3-1 dài 60, 1-4-5-2-3-1 dài 60. Liệt kê cả 24 hành trình cho thấy <b>52 là tối ưu</b>.</span><span class="en">Three tours: 1-4-3-5-2-1 of length <b>52</b>, 1-4-2-5-3-1 of 60, 1-4-5-2-3-1 of 60. Enumerating all 24 tours confirms <b>52 is optimal</b>.</span></li>
+        <li><span class="vi">Bay hơi: <span class="m">τ ← 0.5 · 1 = 0.5</span>; mỗi cạnh trên hành trình kiến 1 được cộng <span class="m">1/52 = 0.0192</span>, kiến 2 và 3 cộng <span class="m">1/60 = 0.0167</span>.</span><span class="en">Evaporation: <span class="m">τ ← 0.5 · 1 = 0.5</span>; each edge on the tour of ant 1 gains <span class="m">1/52 = 0.0192</span>, ants 2 and 3 add <span class="m">1/60 = 0.0167</span>.</span></li>
+      </ul>
+    </div>
+    <p class="note reveal d4"><span class="vi">Đối chiếu sách: số liệu đúng, nhưng công thức 4.2 trong sách là quy tắc ACS (chỉ kiến tốt nhất rải) trong khi lời giải cho cả ba kiến rải như Ant System; một nhãn cộng dồn bị ghi nhầm “0.1887 + 0.5965”.</span><span class="en">Checked against the book: the numbers are right, but its equation 4.2 is the ACS rule (best ant only) while the solution lets all three ants deposit, as in Ant System; one cumulative label is misprinted as “0.1887 + 0.5965”.</span></p>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Kiến ở thành phố <span class="m">i</span> có ba lựa chọn với <span class="m">τ = (1, 2, 1)</span>, <span class="m">d = (2, 4, 1)</span>, <span class="m">α = 1, β = 2</span>. Tính ba xác suất chọn.</span><span class="en">An ant at city <span class="m">i</span> has three options with <span class="m">τ = (1, 2, 1)</span>, <span class="m">d = (2, 4, 1)</span>, <span class="m">α = 1, β = 2</span>. Compute the three probabilities.</span></li>
+          <li><span class="vi">Khi <span class="m">α = 0</span> hoặc <span class="m">β = 0</span>, ACO thoái hóa thành thuật toán gì?</span><span class="en">What does ACO degenerate into when <span class="m">α = 0</span> or <span class="m">β = 0</span>?</span></li>
+          <li><span class="vi">Vì sao bỏ bay hơi (<span class="m">ρ = 0</span>) làm thuật toán dễ trì trệ?</span><span class="en">Why does removing evaporation (<span class="m">ρ = 0</span>) lead to stagnation?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài Ant System cho bài TSPLIB eil51; so sánh với hành trình láng giềng gần nhất.</span><span class="en">Implement Ant System on TSPLIB eil51; compare with the nearest-neighbour tour.</span></li>
+          <li><span class="vi">Thêm tìm kiếm cục bộ 2-opt cho hành trình tốt nhất mỗi vòng và đo mức cải thiện.</span><span class="en">Add 2-opt local search to the best tour of each iteration and measure the gain.</span></li>
+          <li><span class="vi">Cài MMAS và so sánh với AS trên 30 lần chạy.</span><span class="en">Implement MMAS and compare it with AS over 30 runs.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>J. L. Deneubourg, S. Aron, S. Goss, and J. M. Pasteels, “The self-organizing exploratory pattern of the argentine ant,” <em>J Insect Behav</em>, vol. 3, no. 2, pp. 159–168, 1990, doi: <a href="https://doi.org/10.1007/BF01417909">10.1007/BF01417909</a>.</li>
+        <li>M. Dorigo, V. Maniezzo, and A. Colorni, “Ant system: optimization by a colony of cooperating agents,” <em>IEEE Trans. Syst., Man, Cybern. B</em>, vol. 26, no. 1, pp. 29–41, 1996, doi: <a href="https://doi.org/10.1109/3477.484436">10.1109/3477.484436</a>.</li>
+        <li>M. Dorigo and L. Gambardella, “Ant colony system: a cooperative learning approach to the traveling salesman problem,” <em>IEEE Trans. Evol. Computat.</em>, vol. 1, no. 1, pp. 53–66, 1997, doi: <a href="https://doi.org/10.1109/4235.585892">10.1109/4235.585892</a>.</li>
+        <li>B. Bullnheimer, R. Hartl, and C. Strauss, “An improved Ant System algorithm for theVehicle Routing Problem,” <em>Annals of Operations Research</em>, vol. 89, no. 0, pp. 319–328, 1999, doi: <a href="https://doi.org/10.1023/A:1018940026670">10.1023/A:1018940026670</a>.</li>
+        <li>T. Stützle and H. H. Hoos, “MAX–MIN Ant System,” <em>Future Generation Computer Systems</em>, vol. 16, no. 8, pp. 889–914, 2000, doi: <a href="https://doi.org/10.1016/S0167-739X(00)00043-1">10.1016/S0167-739X(00)00043-1</a>.</li>
+        <li>M. Dorigo and T. Stützle, <em>Ant Colony Optimization</em>. Cambridge, MA, USA: MIT Press, 2004.</li>
+        <li>K. Socha and M. Dorigo, “Ant colony optimization for continuous domains,” <em>European Journal of Operational Research</em>, vol. 185, no. 3, pp. 1155–1173, 2008, doi: <a href="https://doi.org/10.1016/j.ejor.2006.06.046">10.1016/j.ejor.2006.06.046</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Pheromone <span class="m">τ</span> · heuristic <span class="m">η</span> · bay hơi <span class="m">ρ</span></span><span class="en">Pheromone <span class="m">τ</span> · heuristic <span class="m">η</span> · evaporation <span class="m">ρ</span></span></span>
+      <span><span class="vi">Chọn cạnh theo xác suất <span class="m">τ<sup>α</sup>η<sup>β</sup></span></span><span class="en">Pick edges with probability <span class="m">τ<sup>α</sup>η<sup>β</sup></span></span></span>
+      <span><span class="vi">Hành trình ngắn rải nhiều pheromone hơn</span><span class="en">Shorter tours deposit more</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Dorigo, Maniezzo &amp; Colorni, <em>IEEE Trans. SMC, Part B</em> 26(1), 1996</span><span class="en">Original paper: Dorigo, Maniezzo &amp; Colorni, <em>IEEE Trans. SMC, Part B</em> 26(1), 1996</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* ===========================================
+   Ant System cho TSP 16 thành phố — cùng bộ nút và hành vi tự chạy như khung 2D.
+   =========================================== */
+class TSPDemo {
+  constructor(root) {
+    this.root = root; this.cv = root.querySelector('canvas'); this.g = this.cv.getContext('2d');
+    this.stat = root.querySelector('.field-stat'); this.playBtn = root.querySelector('[data-act="play"]');
+    this.slide = root.closest('.slide'); this.timer = null;
+    this.n = 16; this.m = 16; this.alpha = 1; this.beta = 3; this.rho = 0.5; this.Q = 1; this.T = 40;
+    const rnd = SI.rng(31); this.city = Array.from({ length: this.n }, () => [0.08 + rnd() * 0.84, 0.08 + rnd() * 0.84]);
+    this.d = this.city.map((a) => this.city.map((b) => Math.hypot(a[0] - b[0], a[1] - b[1])));
+    this.nn = this.tourLen(this.nearestTour());
+    root.querySelector('[data-act="step"]').addEventListener('click', () => { this.userPaused = true; this.pause(); this.iterate(); });
+    root.querySelector('[data-act="reset"]').addEventListener('click', () => { this.reset(); if (!this.userPaused && !reduceMotion) this.play(); });
+    this.playBtn.addEventListener('click', () => { if (this.timer) { this.userPaused = true; this.pause(); } else { this.userPaused = false; this.play(); } });
+    this.slide.addEventListener('slideenter', () => { if (!reduceMotion && !this.userPaused && this.t < this.T) this.play(); });
+    this.slide.addEventListener('slideleave', () => this.pause());
+    window.addEventListener('resize', () => { this.size(); this.render(); });
+    SI.onLang(() => { this.updateStat(); this.updatePlay(); });
+    this.size(); this.reset();
+  }
+  nearestTour() { const seen = new Set([0]), t = [0]; while (t.length < this.n) { const i = t[t.length - 1]; let b = -1; for (let j = 0; j < this.n; j++) if (!seen.has(j) && (b < 0 || this.d[i][j] < this.d[i][b])) b = j; t.push(b); seen.add(b); } return t; }
+  tourLen(t) { let L = 0; for (let k = 0; k < t.length; k++) L += this.d[t[k]][t[(k + 1) % t.length]]; return L; }
+  size() { const r = this.cv.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1), s = Math.max(120, Math.floor(r.width)); this.cv.width = s * dpr; this.cv.height = s * dpr; this.px = s; this.g.setTransform(dpr, 0, 0, dpr, 0, 0); }
+  reset() {
+    this.pause(); this.rnd = SI.rng(17); this.t = 0;
+    const tau0 = this.m / this.nn; this.tau = this.d.map((row) => row.map(() => tau0));
+    this.best = null; this.bestL = Infinity; this.iterBest = null;
+    this.render(); this.updateStat(); this.updatePlay();
+  }
+  buildTour() {
+    const n = this.n, start = Math.floor(this.rnd() * n), seen = new Array(n).fill(false), t = [start]; seen[start] = true;
+    while (t.length < n) {
+      const i = t[t.length - 1], w = []; let sum = 0;
+      for (let j = 0; j < n; j++) { const v = seen[j] ? 0 : Math.pow(this.tau[i][j], this.alpha) * Math.pow(1 / this.d[i][j], this.beta); w.push(v); sum += v; }
+      let r = this.rnd() * sum, j = 0; while (j < n - 1 && (seen[j] || r > w[j])) { r -= w[j]; j++; }
+      if (seen[j]) j = w.findIndex((v, q) => !seen[q]);
+      t.push(j); seen[j] = true;
+    }
+    return t;
+  }
+  iterate() {
+    if (this.t >= this.T) { this.pause(); return; }
+    this.t++;
+    const tours = Array.from({ length: this.m }, () => this.buildTour()), lens = tours.map((t) => this.tourLen(t));
+    for (const row of this.tau) for (let j = 0; j < row.length; j++) row[j] *= 1 - this.rho;      // bay hơi
+    tours.forEach((t, k) => { const dt = this.Q / lens[k]; for (let q = 0; q < t.length; q++) { const a = t[q], b = t[(q + 1) % t.length]; this.tau[a][b] += dt; this.tau[b][a] += dt; } });
+    const kb = lens.indexOf(Math.min(...lens)); this.iterBest = tours[kb];
+    if (lens[kb] < this.bestL) { this.bestL = lens[kb]; this.best = tours[kb]; }
+    this.render(); this.updateStat();
+    if (this.t >= this.T) this.pause();
+  }
+  render() {
+    const g = this.g, s = this.px, P = (c) => [c[0] * s, c[1] * s];
+    g.fillStyle = '#ebe3d2'; g.fillRect(0, 0, s, s);
+    let tmax = 0; for (const row of this.tau) for (const v of row) tmax = Math.max(tmax, v);
+    for (let i = 0; i < this.n; i++) for (let j = i + 1; j < this.n; j++) {
+      const w = this.tau[i][j] / tmax; if (w < 0.03) continue;
+      const [x1, y1] = P(this.city[i]), [x2, y2] = P(this.city[j]);
+      g.strokeStyle = `rgba(31,111,120,${(0.08 + 0.8 * w).toFixed(3)})`; g.lineWidth = 0.6 + 5 * w;
+      g.beginPath(); g.moveTo(x1, y1); g.lineTo(x2, y2); g.stroke();
+    }
+    const path = (t, color, width, dash) => { g.setLineDash(dash); g.strokeStyle = color; g.lineWidth = width; g.beginPath(); t.forEach((c, k) => { const [x, y] = P(this.city[c]); k ? g.lineTo(x, y) : g.moveTo(x, y); }); g.closePath(); g.stroke(); g.setLineDash([]); };
+    if (this.iterBest) path(this.iterBest, '#3a7fc1', 1.6, [5, 5]);
+    if (this.best) path(this.best, '#d9562f', 3, []);
+    for (const c of this.city) { const [x, y] = P(c); SI.dot(g, x, y, 6, '#f5f0e6'); }
+  }
+  play() { if (this.t >= this.T) this.reset(); clearInterval(this.timer); this.timer = setInterval(() => this.iterate(), 550); this.updatePlay(); }
+  pause() { clearInterval(this.timer); this.timer = null; this.updatePlay(); }
+  updatePlay() { this.playBtn.textContent = this.timer ? (SI.lang() === 'en' ? '❚❚ Pause' : '❚❚ Dừng') : (SI.lang() === 'en' ? '▶ Run' : '▶ Chạy'); }
+  updateStat() {
+    const en = SI.lang() === 'en', L = this.bestL === Infinity ? '—' : this.bestL.toFixed(3);
+    this.stat.innerHTML = `<span><b>t</b> = ${this.t} / ${this.T}</span><span><b>${en ? 'shortest' : 'ngắn nhất'}</b> L = ${L}</span><span><b>${en ? 'nearest neighbour' : 'láng giềng gần nhất'}</b> = ${this.nn.toFixed(3)}</span>`;
+  }
+}
+new TSPDemo(document.getElementById('aco-field'));
+SI.boot();
+</script>
+</body>
+</html>

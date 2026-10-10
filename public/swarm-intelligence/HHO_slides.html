@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bầy diều hâu Harris (HHO)" data-title-en="Harris Hawks Optimization (HHO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy diều hâu Harris (HHO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+<style>
+  .grid22 { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px; font-size: calc(var(--body-size) * 0.92); }
+  .grid22 > div { border-radius: 10px; padding: 0.55em 0.8em; }
+  .grid22 .h { background: transparent; font-weight: 600; color: var(--sea); font-size: var(--small-size); display: flex; align-items: center; }
+  .grid22 b { display: block; font-family: var(--font-display); font-size: var(--h3-size); font-weight: 600; }
+  .grid22 small { color: var(--ink-soft); font-size: var(--small-size); }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 8 · Trí tuệ bầy đàn</span><span class="en">Chapter 8 · Swarm Intelligence</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy diều hâu Harris</span><span class="en">Harris Hawks Optimization</span><span class="sub"><span class="vi">Harris Hawks Optimization — HHO</span><span class="en">HHO — a coordinated surprise pounce</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Giải thích chiến thuật “vồ bất ngờ” và năng lượng thoát thân <span class="m">E</span>.</span><span class="en">Explain the “surprise pounce” and the escaping energy <span class="m">E</span>.</span></li>
+          <li class="reveal d3"><span class="vi">Viết hai quy tắc khám phá và bốn quy tắc khai thác.</span><span class="en">Write the two exploration rules and the four exploitation rules.</span></li>
+          <li class="reveal d4"><span class="vi">Mô tả bước lao nhanh với bước Lévy và cơ chế chọn tham lam.</span><span class="en">Describe rapid dives with Lévy steps and the greedy choice.</span></li>
+          <li class="reveal d5"><span class="vi">So sánh HHO với các thuật toán khác theo số lần đánh giá hàm.</span><span class="en">Compare HHO with other algorithms by evaluation count.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Diều hâu Harris săn mồi theo nhóm</span><span class="en">Harris's hawks hunt as a team</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Heidari và cộng sự</strong> đề xuất năm 2019.</span><span class="en">Proposed by <strong>Heidari et al.</strong> in 2019.</span></li>
+          <li class="reveal d3"><span class="vi">Diều hâu Harris là một trong số ít loài chim săn mồi phối hợp theo nhóm: nhiều con cùng lao vào con thỏ từ các hướng khác nhau.</span><span class="en">Harris's hawks are among the few raptors that hunt cooperatively: several birds swoop on a rabbit from different directions.</span></li>
+          <li class="reveal d4"><span class="vi">Chiến thuật “vồ bất ngờ” thay đổi theo sức chạy thoát của con mồi: còn khỏe thì vây lỏng, đã đuối thì siết chặt.</span><span class="en">The “surprise pounce” adapts to the prey's strength: loose siege while it is fresh, a tight one once it tires.</span></li>
+          <li class="reveal d5"><span class="vi">HHO biến <strong>năng lượng thoát thân</strong> của con mồi thành công tắc chuyển giữa khám phá và khai thác.</span><span class="en">HHO turns the prey's <strong>escaping energy</strong> into the switch between exploration and exploitation.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 360 300" role="img" aria-label="Nhiều diều hâu lao vào con thỏ từ nhiều hướng">
+          <defs><marker id="hk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker></defs>
+          <circle cx="180" cy="160" r="70" fill="none" stroke="#d9562f" stroke-dasharray="5 6" opacity="0.6"/>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#hk)">
+            <path class="draw" style="--len:120" d="M60,50 Q100,120 160,148"/>
+            <path class="draw d2" style="--len:120" d="M320,60 Q250,110 200,148"/>
+            <path class="draw d3" style="--len:120" d="M330,260 Q260,220 202,172"/>
+            <path class="draw d4" style="--len:120" d="M40,250 Q110,220 160,174"/>
+          </g>
+          <g fill="#1c2a2e"><path d="M50,44 l-14,-8 l10,10 l-12,4 z"/><path d="M325,54 l14,-8 l-10,10 l12,4 z"/><path d="M335,266 l14,8 l-10,-10 l12,-4 z"/><path d="M35,256 l-14,8 l10,-10 l-12,-4 z"/></g>
+          <ellipse cx="180" cy="160" rx="13" ry="9" fill="#d9562f"/><circle cx="191" cy="153" r="5" fill="#d9562f"/>
+          <text x="180" y="200" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="13" fill="#56676a"><tspan class="vi">con thỏ = lời giải tốt nhất</tspan><tspan class="en">rabbit = best solution</tspan></text>
+        </svg>
+        <figcaption><span class="vi">Cả nhóm cùng lao vào từ nhiều phía</span><span class="en">The team closes in from all sides</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. ESCAPING ENERGY -->
+<section class="slide" aria-label="Năng lượng thoát thân" data-label-en="Escaping energy">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+      <h2 class="reveal d1"><span class="vi">Năng lượng thoát thân <span class="m">E</span> quyết định chiến thuật</span><span class="en">The escaping energy <span class="m">E</span> decides the tactic</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">E = 2E<sub>0</sub> (1 − t / T), &nbsp;&nbsp; E<sub>0</sub> ~ U(−1, 1)</span></div></div>
+        <ul class="bullets">
+          <li class="reveal d3"><span class="m">E<sub>0</sub></span><span class="vi">: sức lực ban đầu, rút lại mỗi vòng cho từng diều hâu.</span><span class="en">: initial energy, redrawn every iteration for every hawk.</span></li>
+          <li class="reveal d4"><span class="vi"><strong><span class="m">|E| ≥ 1</span></strong>: thỏ còn khỏe, diều hâu đi <strong>khám phá</strong>.</span><span class="en"><strong><span class="m">|E| ≥ 1</span></strong>: the rabbit is fresh, hawks <strong>explore</strong>.</span></li>
+          <li class="reveal d5"><span class="vi"><strong><span class="m">|E| &lt; 1</span></strong>: thỏ đã mệt, diều hâu <strong>khai thác</strong> bằng bốn kiểu vây.</span><span class="en"><strong><span class="m">|E| &lt; 1</span></strong>: the rabbit tires, hawks <strong>exploit</strong> with four siege types.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 440 260" role="img" aria-label="Các mẫu E theo thời gian, biên độ giảm dần" id="hho-energy"></svg>
+        <figcaption><span class="vi">Mỗi chấm là một giá trị <span class="m">E</span> được rút; biên độ co dần về 0</span><span class="en">Each dot is one sampled <span class="m">E</span>; the envelope shrinks to 0</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 4. EXPLORATION -->
+<section class="slide" aria-label="Pha khám phá" data-label-en="Exploration phase">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha khám phá · <span class="m">|E| ≥ 1</span></span><span class="en">Exploration · <span class="m">|E| ≥ 1</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Đậu chờ ở chỗ ngẫu nhiên, hai cách chọn với xác suất bằng nhau</span><span class="en">Perch at random spots, two equally likely rules</span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="m" style="font-size: var(--eq-size); line-height: 1.9; text-align:center; white-space: normal">
+        X(t+1) = X<sub>rand</sub>(t) − r<sub>1</sub> | X<sub>rand</sub>(t) − 2r<sub>2</sub>X(t) | &nbsp;&nbsp; <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> q ≥ 0.5<br />
+        X(t+1) = (X<sub>rabbit</sub>(t) − X<sub>m</sub>(t)) − r<sub>3</sub>(LB + r<sub>4</sub>(UB − LB)) &nbsp;&nbsp; <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> q &lt; 0.5
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="vi"><strong>q ≥ 0.5</strong>: đậu ở vị trí ngẫu nhiên gần một diều hâu chọn ngẫu nhiên.</span><span class="en"><strong>q ≥ 0.5</strong>: perch at a random spot near a randomly chosen hawk.</span></li>
+      <li class="reveal d4"><span class="vi"><strong>q &lt; 0.5</strong>: đậu dựa trên con thỏ và vị trí trung bình <span class="m">X<sub>m</sub> = (1/N) Σ X<sub>i</sub></span> của cả nhóm.</span><span class="en"><strong>q &lt; 0.5</strong>: perch based on the rabbit and the group's mean position <span class="m">X<sub>m</sub> = (1/N) Σ X<sub>i</sub></span>.</span></li>
+      <li class="reveal d5"><span class="m">r<sub>1</sub> … r<sub>4</sub>, q ~ U(0, 1)</span><span class="vi">; </span><span class="en">; </span><span class="m">LB, UB</span><span class="vi">: cận dưới và cận trên của miền tìm kiếm.</span><span class="en">: lower and upper bounds of the search space.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. FOUR SIEGES -->
+<section class="slide" aria-label="Bốn kiểu vây" data-label-en="Four sieges">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha khai thác · <span class="m">|E| &lt; 1</span></span><span class="en">Exploitation · <span class="m">|E| &lt; 1</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Bốn kiểu vây, chọn theo <span class="m">|E|</span> và cơ hội thoát <span class="m">r</span></span><span class="en">Four sieges, chosen by <span class="m">|E|</span> and the escape chance <span class="m">r</span></span></h2>
+    </header>
+    <div class="grid22 reveal d2">
+      <div class="h"></div>
+      <div class="h"><span class="m">|E| ≥ 0.5</span>&nbsp;<span class="vi">· thỏ còn sức</span><span class="en">· still energetic</span></div>
+      <div class="h"><span class="m">|E| &lt; 0.5</span>&nbsp;<span class="vi">· thỏ đã đuối</span><span class="en">· exhausted</span></div>
+      <div class="h"><span class="m">r ≥ 0.5</span>&nbsp;<span class="vi">· thoát không được</span><span class="en">· fails to escape</span></div>
+      <div style="background:#d6e5f3"><b><span class="vi">Vây mềm</span><span class="en">Soft besiege</span></b><small><span class="vi">vây lỏng, để thỏ tự kiệt sức</span><span class="en">encircle loosely, let it tire</span></small></div>
+      <div style="background:#f6d8cb"><b><span class="vi">Vây cứng</span><span class="en">Hard besiege</span></b><small><span class="vi">siết chặt rồi vồ</span><span class="en">close in tight and pounce</span></small></div>
+      <div class="h"><span class="m">r &lt; 0.5</span>&nbsp;<span class="vi">· thỏ bỏ chạy</span><span class="en">· tries to escape</span></div>
+      <div style="background:#dcefc8"><b><span class="vi">Vây mềm + lao nhanh</span><span class="en">Soft besiege + rapid dives</span></b><small><span class="vi">bám theo đường chạy zíc zắc bằng bước Lévy</span><span class="en">follow the zig-zag escape with Lévy steps</span></small></div>
+      <div style="background:#e6def0"><b><span class="vi">Vây cứng + lao nhanh</span><span class="en">Hard besiege + rapid dives</span></b><small><span class="vi">cả nhóm thu hẹp khoảng cách trung bình tới thỏ</span><span class="en">the team shrinks its mean distance to the rabbit</span></small></div>
+    </div>
+  </div>
+</section>
+
+<!-- 6. BESIEGE EQUATIONS -->
+<section class="slide" aria-label="Công thức vây mềm và vây cứng" data-label-en="Soft and hard besiege equations">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha khai thác · <span class="m">r ≥ 0.5</span></span><span class="en">Exploitation · <span class="m">r ≥ 0.5</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Vây mềm và vây cứng</span><span class="en">Soft and hard besiege</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <h3 class="reveal d2" style="color:var(--sky)"><span class="vi">Vây mềm</span><span class="en">Soft besiege</span> · <span class="m">|E| ≥ 0.5</span></h3>
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">X(t+1) = ΔX(t) − E | J · X<sub>rabbit</sub>(t) − X(t) |</span></div>
+          <div class="eq" style="margin-top:0.3em"><span class="m">ΔX(t) = X<sub>rabbit</sub>(t) − X(t), &nbsp; J = 2(1 − r<sub>5</sub>)</span></div>
+        </div>
+        <p class="note reveal d3"><span class="vi"><em>J</em>: sức nhảy ngẫu nhiên của thỏ trong lúc chạy trốn.</span><span class="en"><em>J</em>: the rabbit's random jump strength while fleeing.</span></p>
+      </div>
+      <div class="stack">
+        <h3 class="reveal d3" style="color:var(--ember)"><span class="vi">Vây cứng</span><span class="en">Hard besiege</span> · <span class="m">|E| &lt; 0.5</span></h3>
+        <div class="eq-box reveal d3"><div class="eq"><span class="m">X(t+1) = X<sub>rabbit</sub>(t) − E | ΔX(t) |</span></div></div>
+        <p class="note reveal d4"><span class="vi">Thỏ quá mệt nên diều hâu hầu như không cần vòng quanh: bước nhảy tỉ lệ thuận với <em>|E|</em> và rất ngắn.</span><span class="en">The rabbit is too tired to need circling: the step is proportional to <em>|E|</em> and very short.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7. RAPID DIVES -->
+<section class="slide" aria-label="Lao nhanh kiểu Lévy" data-label-en="Progressive rapid dives">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha khai thác · <span class="m">r &lt; 0.5</span></span><span class="en">Exploitation · <span class="m">r &lt; 0.5</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Lao nhanh liên tiếp: thử một bước, nếu chưa tốt thì thử bước Lévy</span><span class="en">Progressive rapid dives: try a step, then a Lévy step</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">Y = X<sub>rabbit</sub> − E | J · X<sub>rabbit</sub> − X̃ |</span></div>
+          <div class="eq" style="margin-top:0.3em"><span class="m">Z = Y + S × LF(D)</span></div>
+        </div>
+        <p class="note reveal d3"><span class="m">X̃ = X</span><span class="vi"> khi vây mềm; </span><span class="en"> for the soft version; </span><span class="m">X̃ = X<sub>m</sub></span><span class="vi"> khi vây cứng. </span><span class="en"> for the hard version. </span><span class="m">S</span><span class="vi">: vector ngẫu nhiên kích thước </span><span class="en">: random vector of size </span><span class="m">D</span>.</p>
+        <div class="eq-box sand reveal d4">
+          <div class="m" style="font-size: calc(var(--eq-size)*0.85); text-align:center; line-height:1.7; white-space:normal">
+            X(t+1) = Y &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span> F(Y) &lt; F(X); &nbsp; Z &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span> F(Z) &lt; F(X)
+          </div>
+        </div>
+      </div>
+      <div class="stack">
+        <p class="reveal d3"><span class="vi"><strong>Bước Lévy</strong> phần lớn rất ngắn, thỉnh thoảng có một bước rất dài, giống đường chạy zíc zắc của con thỏ:</span><span class="en">A <strong>Lévy step</strong> is mostly tiny with the occasional very long jump, like the rabbit's zig-zag escape:</span></p>
+        <div class="eq-box reveal d4"><div class="eq"><span class="m">LF(x) = 0.01 · u·σ / |v|<sup>1/β</sup>, &nbsp; β = 1.5</span></div></div>
+        <p class="note reveal d5"><span class="m">u, v ~ N(0, 1)</span><span class="vi">; σ là hằng số tính từ hàm Gamma theo β. Nếu cả Y và Z đều không tốt hơn, diều hâu đứng yên.</span><span class="en">; σ is a constant computed from the Gamma function of β. If neither Y nor Z improves, the hawk stays put.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 8. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của HHO</span><span class="en">HHO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Heidari và cs. (2019); các lần đánh giá Y, Z được tính vào ngân sách.</span><span class="en">Heidari et al. (2019); the Y, Z evaluations are counted in the budget.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> diều hâu; con mồi = lời giải tốt nhất.</span><span class="en">Initialize <span class="m">n</span> hawks; the rabbit = best solution.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Mỗi diều hâu tính năng lượng <span class="m">E = 2E<sub>0</sub>(1 − t/T)</span>, <span class="m">E<sub>0</sub> ~ U(−1, 1)</span>.</span><span class="en">Each hawk computes energy <span class="m">E = 2E<sub>0</sub>(1 − t/T)</span>, <span class="m">E<sub>0</sub> ~ U(−1, 1)</span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi"><span class="m">|E| ≥ 1</span>: khám phá (đậu ngẫu nhiên theo con khác hoặc theo trung bình bầy).</span><span class="en"><span class="m">|E| ≥ 1</span>: exploration (perch by another hawk or by the swarm mean).</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi"><span class="m">|E| &lt; 1</span>: một trong bốn kiểu vây theo <span class="m">r</span> và <span class="m">|E|</span>.</span><span class="en"><span class="m">|E| &lt; 1</span>: one of four besiege strategies chosen by <span class="m">r</span> and <span class="m">|E|</span>.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật con mồi; lặp đến hết ngân sách.</span><span class="en">Update the rabbit; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n diều hâu</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n hawks</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Con mồi ←</text><text x="875" y="89">tốt nhất</text></g><g class="en"><text x="875" y="67">Rabbit ←</text><text x="875" y="89">best</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Tính E: khám phá</text><text x="875" y="259">hay vây bắt</text></g><g class="en"><text x="875" y="237">Compute E: explore</text><text x="875" y="259">or besiege</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">4 kiểu vây</text><text x="625" y="259">(Lévy nếu cần)</text></g><g class="en"><text x="625" y="237">4 besieges</text><text x="625" y="259">(Lévy if needed)</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về con mồi</text></g><g class="en"><text x="125" y="248">Return rabbit</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của HHO</span><span class="en">HHO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">E<sub>0</sub></span></td><td><span class="vi">Năng lượng ban đầu, ngẫu nhiên mỗi lần</span><span class="en">Initial energy, random each time</span></td><td><span class="m">U(−1, 1)</span></td></tr>
+        <tr><td><span class="m">J</span></td><td><span class="vi">Sức nhảy của con mồi</span><span class="en">Rabbit jump strength</span></td><td><span class="m">2(1 − r<sub>5</sub>)</span></td></tr>
+        <tr><td><span class="m">β</span></td><td><span class="vi">Chỉ số bước Lévy</span><span class="en">Lévy step index</span></td><td>1.5 (hệ số 0.01)</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">HHO không có tham số cần chỉnh ngoài <span class="m">n</span> và <span class="m">T</span>.</span><span class="en">HHO has no parameters to tune besides <span class="m">n</span> and <span class="m">T</span>.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán HHO</span><span class="en">The HHO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Tham số người dùng chỉ còn <span class="m">N</span> và <span class="m">T</span>; mọi chuyển pha đều do <span class="m">E</span> và <span class="m">r</span> quyết định.</span><span class="en">The user only sets <span class="m">N</span> and <span class="m">T</span>; every phase switch is driven by <span class="m">E</span> and <span class="m">r</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">N</span> diều hâu</span><span class="en">Initialize <span class="m">N</span> hawks</span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span>:</span> <span class="vi">đánh giá, <span class="m">X<sub>rabbit</sub></span> ← con tốt nhất</span><span class="en">evaluate, <span class="m">X<sub>rabbit</sub></span> ← the best</span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi diều hâu</span><span class="en">each hawk</span>:</span> <span class="m">E<sub>0</sub>, J, E</span></li>
+        <li style="--ind:2"><span><span class="kw">if</span> <span class="m">|E| ≥ 1</span>:</span> <span class="vi">khám phá</span><span class="en">explore</span></li>
+        <li style="--ind:2"><span><span class="kw">else if</span> <span class="m">r ≥ 0.5, |E| ≥ 0.5</span>:</span> <span class="vi">vây mềm</span><span class="en">soft besiege</span></li>
+        <li style="--ind:2"><span><span class="kw">else if</span> <span class="m">r ≥ 0.5, |E| &lt; 0.5</span>:</span> <span class="vi">vây cứng</span><span class="en">hard besiege</span></li>
+        <li style="--ind:2"><span><span class="kw">else if</span> <span class="m">r &lt; 0.5, |E| ≥ 0.5</span>:</span> <span class="vi">vây mềm + lao nhanh</span><span class="en">soft besiege + dives</span></li>
+        <li style="--ind:2"><span><span class="kw">else</span>:</span> <span class="vi">vây cứng + lao nhanh</span><span class="en">hard besiege + dives</span></li>
+        <li><span><span class="kw">return</span> <span class="m">X<sub>rabbit</sub></span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 9. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">10 diều hâu và một con thỏ</span><span class="en">10 hawks and one rabbit</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Cùng địa hình với các chương khác. Màu của mỗi diều hâu cho biết chiến thuật nó vừa dùng; hình vuông cam là con thỏ.</span><span class="en">Same landscape as the other chapters. Each hawk's colour shows the tactic it just used; the orange square is the rabbit.</span></p>
+        <div class="key">
+          <span><i style="background:#e6904f"></i><span class="vi">khám phá</span><span class="en">exploration</span></span>
+          <span><i style="background:#3a7fc1"></i><span class="vi">vây mềm</span><span class="en">soft besiege</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">vây cứng</span><span class="en">hard besiege</span></span>
+          <span><i style="background:#4b8f45"></i><span class="vi">vây mềm + lao nhanh</span><span class="en">soft + dives</span></span>
+          <span><i style="background:#7b5ea7"></i><span class="vi">vây cứng + lao nhanh</span><span class="en">hard + dives</span></span>
+        </div>
+      </div>
+      <div class="field" id="hho-field">
+        <canvas aria-label="HHO simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. ASSESSMENT -->
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Năng lượng và vây mềm</span><span class="en">Energy and soft besiege</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">E = 2E<sub>0</sub>(1 − t/T)</span></div>
+          <div class="eq"><span class="m">X(t+1) = ΔX − E |J X<sub>rabbit</sub> − X|, &nbsp; ΔX = X<sub>rabbit</sub> − X</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">E<sub>0</sub> = −0.6, t/T = 0.25</span>: <span class="m">E = −0.9</span>; <span class="m">|E| &lt; 1</span> nên khai thác, <span class="m">|E| ≥ 0.5</span> nên vây mềm (nếu <span class="m">r ≥ 0.5</span>).</span><span class="en"><span class="m">E<sub>0</sub> = −0.6, t/T = 0.25</span>: <span class="m">E = −0.9</span>; <span class="m">|E| &lt; 1</span> so exploit, <span class="m">|E| ≥ 0.5</span> so soft besiege (if <span class="m">r ≥ 0.5</span>).</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Một chiều</span><span class="en">One dimension</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">X<sub>rabbit</sub> = 1, X = 3, J = 1</span>: <span class="m">ΔX = −2</span>.</span><span class="en"><span class="m">X<sub>rabbit</sub> = 1, X = 3, J = 1</span>: <span class="m">ΔX = −2</span>.</span></li>
+          <li><span class="vi"><span class="m">X(t+1) = −2 + 0.9 · |1 − 3| = −0.2</span>.</span><span class="en"><span class="m">X(t+1) = −2 + 0.9 · |1 − 3| = −0.2</span>.</span></li>
+          <li><span class="vi">Công thức gốc dùng <span class="m">ΔX</span> (một độ dời) làm vị trí mới, nên bị kéo về gần 0: một nguồn gây thiên lệch gốc tọa độ.</span><span class="en">The original formula uses <span class="m">ΔX</span> (a displacement) as the new position, pulling it toward 0: one source of origin bias.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của HHO</span><span class="en">HHO applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">HHO là một trong những thuật toán được trích dẫn nhiều nhất từ 2019.</span><span class="en">HHO is one of the most cited algorithms since 2019.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">BHHO cho dữ liệu y sinh.</span><span class="en">BHHO for biomedical data.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Tham số pin mặt trời, điều độ.</span><span class="en">Solar-cell parameters, dispatch.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Học sâu</span><span class="en">Deep learning</span></h3><p><span class="vi">Chỉnh siêu tham số CNN.</span><span class="en">CNN hyper-parameter tuning.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Ảnh</span><span class="en">Imaging</span></h3><p><span class="vi">Phân ngưỡng đa mức.</span><span class="en">Multi-level thresholding.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · HHO</span><span class="en">Experiment · HHO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">2.29e−3</td><td class="num">3.27e−3</td><td class="num">8.41e−4</td><td><span class="sg-plus">+</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">3.53e+3</td><td class="num">1.75e+3</td><td class="num">3.54e+3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">3.66e+1</td><td class="num">1.25e+1</td><td class="num">3.37e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>6.79</b>, đứng thứ <b>5/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>6.79</b>, position <b>5/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Thiên lệch gốc tọa độ: trung vị F1 = 0 nhưng F6 (cùng hàm, dịch tâm) = 3.54e+3. Kết quả tốt trên F1 phần lớn do tối ưu nằm tại 0.</span><span class="en">Origin bias: median F1 = 0 but F6 (same function, shifted) = 3.54e+3. The good F1 result is largely due to the optimum lying at 0.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · HHO</span><span class="en">Experiment · HHO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/HHO.svg" alt="convergence HHO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/hho.py" class="c-sea">code/si/algorithms/hho.py</a></p>
+    <pre class="codeblock reveal d2">                r = rng.random()
+                dX = rabbit - X[i]
+                <span class="k">if</span> r &gt;= 0.5 <span class="k">and</span> abs(E) &gt;= 0.5:
+                    X[i] = prob.clip(dX - E * np.abs(J * rabbit - X[i])); fx[i] = prob(X[i])[0]
+                <span class="k">elif</span> r &gt;= 0.5:
+                    X[i] = prob.clip(rabbit - E * np.abs(dX)); fx[i] = prob(X[i])[0]
+                <span class="k">else</span>:
+                    ref = X[i] <span class="k">if</span> abs(E) &gt;= 0.5 <span class="k">else</span> Xm
+                    Y = prob.clip(rabbit - E * np.abs(J * rabbit - ref))
+                    fy = prob(Y)[0]
+                    <span class="k">if</span> fy &lt; fx[i]:
+                        X[i], fx[i] = Y, fy
+                    <span class="k">else</span>:
+                        Z = prob.clip(Y + rng.random(prob.dim) * 0.01 * levy(rng, prob.dim))
+                        fz = prob(Z)[0]
+                        <span class="k">if</span> fz &lt; fx[i]:</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá và biến thể" data-label-en="Assessment and variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Nhiều chiến thuật, không thêm tham số</span><span class="en">Many tactics, no extra parameters</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Chuyển pha tự động theo <span class="m">E</span>, không phải chỉnh tay.</span><span class="en">Phase switching is automatic through <span class="m">E</span>; nothing to hand-tune.</span></li>
+          <li><span class="vi">Bước lao nhanh có chọn lọc tham lam, chỉ nhận bước làm lời giải tốt hơn.</span><span class="en">Rapid dives are greedy: a step is only accepted if it improves.</span></li>
+          <li><span class="vi">Bước Lévy giúp thoát cực trị cục bộ ở cuối quá trình.</span><span class="en">Lévy steps help escape local optima late in the run.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Lao nhanh tốn thêm tới hai lần đánh giá hàm mỗi diều hâu; cần so sánh công bằng theo số lần đánh giá, không theo số vòng lặp.</span><span class="en">Rapid dives cost up to two extra evaluations per hawk; compare fairly by evaluation count, not by iterations.</span></li>
+          <li><span class="vi">Khám phá chỉ xảy ra khi <span class="m">|E| ≥ 1</span>, tức chỉ trong nửa đầu.</span><span class="en">Exploration only happens while <span class="m">|E| ≥ 1</span>, i.e. in the first half.</span></li>
+          <li><span class="vi">Biến thể: HHO nhị phân, HHO hỗn loạn, lai với DE hoặc SA; dùng nhiều cho chọn đặc trưng và tinh chỉnh mô hình học sâu.</span><span class="en">Variants: binary HHO, chaotic HHO, hybrids with DE or SA; widely used for feature selection and deep-model tuning.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tại <span class="m">t = 0.75T</span> với <span class="m">E<sub>0</sub> = 0.8</span>, tính <span class="m">E</span> và cho biết những kiểu vây nào có thể xảy ra.</span><span class="en">At <span class="m">t = 0.75T</span> with <span class="m">E<sub>0</sub> = 0.8</span>, compute <span class="m">E</span> and list which sieges can occur.</span></li>
+          <li><span class="vi">Chứng minh khám phá không xảy ra khi <span class="m">t &gt; T/2</span>.</span><span class="en">Prove that exploration cannot happen once <span class="m">t &gt; T/2</span>.</span></li>
+          <li><span class="vi">Mỗi vòng, một diều hâu tốn tối đa bao nhiêu lần đánh giá hàm?</span><span class="en">At most how many evaluations does one hawk use per iteration?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài HHO bằng Python và kiểm tra lại mô phỏng trong chương.</span><span class="en">Implement HHO in Python and reproduce the chapter simulation.</span></li>
+          <li><span class="vi">So sánh HHO và PSO với cùng ngân sách đánh giá hàm trên Sphere, Rastrigin, Ackley.</span><span class="en">Compare HHO and PSO under the same evaluation budget on Sphere, Rastrigin and Ackley.</span></li>
+          <li><span class="vi">Cài Binary HHO với hàm chuyển dạng V cho bài toán chọn đặc trưng (liên kết chương 15).</span><span class="en">Implement Binary HHO with a V-shaped transfer function for feature selection (see chapter 15).</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>J. C. Bednarz, “Cooperative Hunting Harris' Hawks (Parabuteo unicinctus),” <em>Science</em>, vol. 239, no. 4847, pp. 1525–1527, 1988, doi: <a href="https://doi.org/10.1126/science.239.4847.1525">10.1126/science.239.4847.1525</a>.</li>
+        <li>A. A. Heidari, S. Mirjalili, H. Faris, I. Aljarah, M. Mafarja, and H. Chen, “Harris hawks optimization: Algorithm and applications,” <em>Future Generation Computer Systems</em>, vol. 97, pp. 849–872, 2019, doi: <a href="https://doi.org/10.1016/j.future.2019.02.028">10.1016/j.future.2019.02.028</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi"><span class="m">E</span> giảm dần: khám phá → khai thác</span><span class="en"><span class="m">E</span> decays: explore → exploit</span></span>
+      <span><span class="vi">Bốn kiểu vây theo <span class="m">|E|</span> và <span class="m">r</span></span><span class="en">Four sieges by <span class="m">|E|</span> and <span class="m">r</span></span></span>
+      <span><span class="vi">Lao nhanh với bước Lévy</span><span class="en">Rapid dives with Lévy steps</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Heidari và cs., <em>Future Generation Computer Systems</em> 97, 2019</span><span class="en">Original paper: Heidari et al., <em>Future Generation Computer Systems</em> 97, 2019</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* Đồ thị năng lượng E (slide 3): 400 mẫu E = 2E0(1 − t/T) */
+(function energyPlot() {
+  const svg = document.getElementById('hho-energy'), rnd = SI.rng(9);
+  const X = (t) => 40 + t * 380, Y = (e) => 130 - e * 52;
+  let h = `<rect x="40" y="${Y(2)}" width="380" height="${Y(1) - Y(2)}" fill="#fbe9d6"/><rect x="40" y="${Y(-1)}" width="380" height="${Y(-2) - Y(-1)}" fill="#fbe9d6"/>`;
+  h += `<line x1="40" y1="${Y(1)}" x2="420" y2="${Y(1)}" stroke="#e6904f" stroke-dasharray="4 4"/><line x1="40" y1="${Y(-1)}" x2="420" y2="${Y(-1)}" stroke="#e6904f" stroke-dasharray="4 4"/>`;
+  h += `<line x1="40" y1="${Y(0.5)}" x2="420" y2="${Y(0.5)}" stroke="#d9562f" stroke-dasharray="2 5"/><line x1="40" y1="${Y(-0.5)}" x2="420" y2="${Y(-0.5)}" stroke="#d9562f" stroke-dasharray="2 5"/>`;
+  h += `<line x1="40" y1="130" x2="425" y2="130" stroke="#1c2a2e"/><line x1="40" y1="20" x2="40" y2="240" stroke="#1c2a2e"/>`;
+  h += `<path d="M40,${Y(2)} L420,130 L40,${Y(-2)}" fill="none" stroke="#1f6f78" stroke-width="1.5"/>`;
+  for (let i = 0; i < 400; i++) { const t = rnd(), e = 2 * (2 * rnd() - 1) * (1 - t); h += `<circle cx="${X(t).toFixed(1)}" cy="${Y(e).toFixed(1)}" r="1.8" fill="${Math.abs(e) >= 1 ? '#e6904f' : Math.abs(e) >= 0.5 ? '#3a7fc1' : '#d9562f'}" opacity="0.8"/>`; }
+  h += `<g font-family="STIX Two Text, serif" font-style="italic" font-size="15" fill="#1c2a2e"><text x="22" y="${Y(2) + 5}">2</text><text x="22" y="${Y(1) + 5}">1</text><text x="22" y="135">0</text><text x="14" y="${Y(-1) + 5}">−1</text><text x="14" y="${Y(-2) + 5}">−2</text><text x="412" y="150">t</text><text x="50" y="${Y(2) - 4}">E</text></g>`;
+  h += `<g font-family="Be Vietnam Pro, sans-serif" font-size="12" font-weight="600"><text x="300" y="${Y(1.5)}" fill="#c56a2a"><tspan class="vi">|E| ≥ 1: khám phá</tspan><tspan class="en">|E| ≥ 1: explore</tspan></text></g>`;
+  svg.innerHTML = h;
+})();
+
+/* HHO trên địa hình chung (cực tiểu), theo đúng 6 quy tắc cập nhật của bài báo gốc */
+new SI.Field2D(document.getElementById('hho-field'), {
+  n: 10, T: 60, seed: 21,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), mode: 0 }); S.E = 2; },
+  step(S) {
+    const R = S.best.slice(), N = S.pop.length, rnd = S.rnd;
+    const Xm = [0, 1].map((d) => S.pop.reduce((s, h) => s + h.x[d], 0) / N);
+    const old = S.pop.map((h) => h.x.slice());
+    let eSum = 0;
+    for (const h of S.pop) {
+      const E0 = 2 * rnd() - 1, E = 2 * E0 * (1 - S.t / S.T), J = 2 * (1 - rnd());
+      eSum += Math.abs(E);
+      const X = h.x;
+      if (Math.abs(E) >= 1) {
+        h.mode = 1;
+        if (rnd() >= 0.5) { const Xr = old[Math.floor(rnd() * N)]; const r1 = rnd(), r2 = rnd(); h.x = [0, 1].map((d) => Xr[d] - r1 * Math.abs(Xr[d] - 2 * r2 * X[d])); }
+        else { const r3 = rnd(), r4 = rnd(); h.x = [0, 1].map((d) => (R[d] - Xm[d]) - r3 * (SI.LO + r4 * (SI.HI - SI.LO))); }
+      } else {
+        const r = rnd();
+        if (r >= 0.5 && Math.abs(E) >= 0.5) { h.mode = 2; h.x = [0, 1].map((d) => (R[d] - X[d]) - E * Math.abs(J * R[d] - X[d])); }
+        else if (r >= 0.5) { h.mode = 3; h.x = [0, 1].map((d) => R[d] - E * Math.abs(R[d] - X[d])); }
+        else {
+          const ref = Math.abs(E) >= 0.5 ? X : Xm;
+          h.mode = Math.abs(E) >= 0.5 ? 4 : 5;
+          const Y = [0, 1].map((d) => SI.clamp(R[d] - E * Math.abs(J * R[d] - ref[d])));
+          const Z = Y.map((y) => SI.clamp(y + rnd() * SI.levy(rnd)));
+          const fx = SI.f(X);
+          if (SI.f(Y) < fx) h.x = Y; else if (SI.f(Z) < fx) h.x = Z; else h.x = X.slice();
+        }
+      }
+      h.x = h.x.map(SI.clamp);
+    }
+    S.E = eSum / N;
+  },
+  draw(g, S, P) {
+    const col = ['#f5f0e6', '#e6904f', '#3a7fc1', '#d9562f', '#4b8f45', '#7b5ea7'];
+    for (const h of S.pop) SI.trail(g, P, h, 'rgba(28,42,46,0.3)');
+    const [bx, by] = P.pt(S.best);
+    g.fillStyle = '#d9562f'; g.fillRect(bx - 7, by - 7, 14, 14); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.5; g.strokeRect(bx - 7, by - 7, 14, 14);
+    for (const h of S.pop) {
+      const [x, y] = P.at(h), p = h.prev || h.x, ang = Math.atan2(-(h.x[1] - p[1]), h.x[0] - p[0]);
+      g.save(); g.translate(x, y); g.rotate(ang);
+      g.beginPath(); g.moveTo(9, 0); g.lineTo(-6, 6); g.lineTo(-2, 0); g.lineTo(-6, -6); g.closePath();
+      g.fillStyle = col[h.mode]; g.fill(); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1; g.stroke(); g.restore();
+    }
+  },
+  status(S, en) {
+    const env = 2 * (1 - S.t / S.T);
+    return `<span><b>${en ? 'max' : 'tối đa'} |E|</b> = ${env.toFixed(2)}</span>`;
+  },
+});
+SI.boot();
+</script>
+</body>
+</html>

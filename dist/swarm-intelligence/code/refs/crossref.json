@@ -1,0 +1,2129 @@
+{
+ "10.1109/4235.585893": {
+  "ch": 1,
+  "title": "No free lunch theorems for optimization",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "D.H.",
+    "Wolpert"
+   ],
+   [
+    "W.G.",
+    "Macready"
+   ]
+  ],
+  "year": 1997,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "1",
+  "page": "67-82",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1145/937503.937505": {
+  "ch": 1,
+  "title": "Metaheuristics in combinatorial optimization",
+  "container": "ACM Computing Surveys",
+  "short": "ACM Comput. Surv.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Christian",
+    "Blum"
+   ],
+   [
+    "Andrea",
+    "Roli"
+   ]
+  ],
+  "year": 2003,
+  "year_src": "published-print",
+  "volume": "35",
+  "issue": "3",
+  "page": "268-308",
+  "article": null,
+  "publisher": "Association for Computing Machinery (ACM)"
+ },
+ "10.1137/S003614450242889": {
+  "ch": 1,
+  "title": "Optimization by Direct Search: New Perspectives on Some Classical and Modern Methods",
+  "container": "SIAM Review",
+  "short": "SIAM Rev.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Tamara G.",
+    "Kolda"
+   ],
+   [
+    "Robert Michael",
+    "Lewis"
+   ],
+   [
+    "Virginia",
+    "Torczon"
+   ]
+  ],
+  "year": 2003,
+  "year_src": "published-print",
+  "volume": "45",
+  "issue": "3",
+  "page": "385-482",
+  "article": null,
+  "publisher": "Society for Industrial & Applied Mathematics (SIAM)"
+ },
+ "10.1007/978-3-030-61111-8": {
+  "ch": 1,
+  "title": "Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications",
+  "container": "Studies in Computational Intelligence",
+  "short": "",
+  "type": "book",
+  "authors": [
+   [
+    "Modestus O.",
+    "Okwu"
+   ],
+   [
+    "Lagouge K.",
+    "Tartibu"
+   ]
+  ],
+  "year": 2021,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": null,
+  "article": null,
+  "publisher": "Springer International Publishing"
+ },
+ "10.1145/2480741.2480752": {
+  "ch": 1,
+  "title": "Exploration and exploitation in evolutionary algorithms",
+  "container": "ACM Computing Surveys",
+  "short": "ACM Comput. Surv.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Matej",
+    "Črepinšek"
+   ],
+   [
+    "Shih-Hsi",
+    "Liu"
+   ],
+   [
+    "Marjan",
+    "Mernik"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "45",
+  "issue": "3",
+  "page": "1-33",
+  "article": null,
+  "publisher": "Association for Computing Machinery (ACM)"
+ },
+ "10.1103/PhysRevE.49.4677": {
+  "ch": 2,
+  "title": "Fast, accurate algorithm for numerical simulation of Lévy stable stochastic processes",
+  "container": "Physical Review E",
+  "short": "Phys. Rev. E",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Rosario Nunzio",
+    "Mantegna"
+   ]
+  ],
+  "year": 1994,
+  "year_src": "issued",
+  "volume": "49",
+  "issue": "5",
+  "page": "4677-4683",
+  "article": null,
+  "publisher": "American Physical Society (APS)"
+ },
+ "10.1038/44831": {
+  "ch": 2,
+  "title": "Optimizing the success of random searches",
+  "container": "Nature",
+  "short": "Nature",
+  "type": "journal-article",
+  "authors": [
+   [
+    "G. M.",
+    "Viswanathan"
+   ],
+   [
+    "Sergey V.",
+    "Buldyrev"
+   ],
+   [
+    "Shlomo",
+    "Havlin"
+   ],
+   [
+    "M. G. E.",
+    "da Luz"
+   ],
+   [
+    "E. P.",
+    "Raposo"
+   ],
+   [
+    "H. Eugene",
+    "Stanley"
+   ]
+  ],
+  "year": 1999,
+  "year_src": "published-print",
+  "volume": "401",
+  "issue": "6756",
+  "page": "911-914",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1109/4235.771163": {
+  "ch": 2,
+  "title": "Evolutionary programming made faster",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "",
+    "Xin Yao"
+   ],
+   [
+    "",
+    "Yong Liu"
+   ],
+   [
+    "",
+    "Guangming Lin"
+   ]
+  ],
+  "year": 1999,
+  "year_src": "published-print",
+  "volume": "3",
+  "issue": "2",
+  "page": "82-102",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1016/j.swevo.2011.02.002": {
+  "ch": 2,
+  "title": "A practical tutorial on the use of nonparametric statistical tests as a methodology for comparing evolutionary and swarm intelligence algorithms",
+  "container": "Swarm and Evolutionary Computation",
+  "short": "Swarm and Evolutionary Computation",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Joaquín",
+    "Derrac"
+   ],
+   [
+    "Salvador",
+    "García"
+   ],
+   [
+    "Daniel",
+    "Molina"
+   ],
+   [
+    "Francisco",
+    "Herrera"
+   ]
+  ],
+  "year": 2011,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "1",
+  "page": "3-18",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1504/IJMMNO.2013.055204": {
+  "ch": 2,
+  "title": "A literature survey of benchmark functions for global optimisation problems",
+  "container": "International Journal of Mathematical Modelling and Numerical Optimisation",
+  "short": "IJMMNO",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Momin",
+    "Jamil"
+   ],
+   [
+    "Xin She",
+    "Yang"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "4",
+  "issue": "2",
+  "page": "150",
+  "article": "55204",
+  "publisher": "Inderscience Publishers"
+ },
+ "10.1109/ICNN.1995.488968": {
+  "ch": 3,
+  "title": "Particle swarm optimization",
+  "container": "Proceedings of ICNN'95 - International Conference on Neural Networks",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "J.",
+    "Kennedy"
+   ],
+   [
+    "R.",
+    "Eberhart"
+   ]
+  ],
+  "year": 1995,
+  "year_src": "title",
+  "volume": "4",
+  "issue": null,
+  "page": "1942-1948",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/ICEC.1998.699146": {
+  "ch": 3,
+  "title": "A modified particle swarm optimizer",
+  "container": "1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "Y.",
+    "Shi"
+   ],
+   [
+    "R.",
+    "Eberhart"
+   ]
+  ],
+  "year": 1998,
+  "year_src": "title",
+  "volume": null,
+  "issue": null,
+  "page": "69-73",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/4235.985692": {
+  "ch": 3,
+  "title": "The particle swarm - explosion, stability, and convergence in a multidimensional complex space",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "M.",
+    "Clerc"
+   ],
+   [
+    "J.",
+    "Kennedy"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "published-print",
+  "volume": "6",
+  "issue": "1",
+  "page": "58-73",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/ICSMC.1997.637339": {
+  "ch": 3,
+  "title": "A discrete binary version of the particle swarm algorithm",
+  "container": "1997 IEEE International Conference on Systems, Man, and Cybernetics. Computational Cybernetics and Simulation",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "J.",
+    "Kennedy"
+   ],
+   [
+    "R.C.",
+    "Eberhart"
+   ]
+  ],
+  "year": 1997,
+  "year_src": "title",
+  "volume": "5",
+  "issue": null,
+  "page": "4104-4108",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1007/s11721-007-0002-0": {
+  "ch": 3,
+  "title": "Particle swarm optimization",
+  "container": "Swarm Intelligence",
+  "short": "Swarm Intell",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Riccardo",
+    "Poli"
+   ],
+   [
+    "James",
+    "Kennedy"
+   ],
+   [
+    "Tim",
+    "Blackwell"
+   ]
+  ],
+  "year": 2007,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "1",
+  "page": "33-57",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1109/CEC.2002.1004393": {
+  "ch": 3,
+  "title": "EPSO - best-of-two-worlds meta-heuristic applied to power system problems",
+  "container": "Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "V.",
+    "Miranda"
+   ],
+   [
+    "N.",
+    "Fonseca"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "title",
+  "volume": "2",
+  "issue": null,
+  "page": "1080-1085",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/ICSMC.2003.1244483": {
+  "ch": 3,
+  "title": "DEPSO: hybrid particle swarm with differential evolution operator",
+  "container": "SMC'03 Conference Proceedings. 2003 IEEE International Conference on Systems, Man and Cybernetics. Conference Theme - System Security and Assurance (Cat. No.03CH37483)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "",
+    "Wen-Jun Zhang"
+   ],
+   [
+    "",
+    "Xiao-Feng Xie"
+   ]
+  ],
+  "year": 2003,
+  "year_src": "title",
+  "volume": "4",
+  "issue": null,
+  "page": "3816-3821",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/3477.484436": {
+  "ch": 4,
+  "title": "Ant system: optimization by a colony of cooperating agents",
+  "container": "IEEE Transactions on Systems, Man, and Cybernetics, Part B (Cybernetics)",
+  "short": "IEEE Trans. Syst., Man, Cybern. B",
+  "type": "journal-article",
+  "authors": [
+   [
+    "M.",
+    "Dorigo"
+   ],
+   [
+    "V.",
+    "Maniezzo"
+   ],
+   [
+    "A.",
+    "Colorni"
+   ]
+  ],
+  "year": 1996,
+  "year_src": "published-print",
+  "volume": "26",
+  "issue": "1",
+  "page": "29-41",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/4235.585892": {
+  "ch": 4,
+  "title": "Ant colony system: a cooperative learning approach to the traveling salesman problem",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "M.",
+    "Dorigo"
+   ],
+   [
+    "L.M.",
+    "Gambardella"
+   ]
+  ],
+  "year": 1997,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "1",
+  "page": "53-66",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1016/S0167-739X(00)00043-1": {
+  "ch": 4,
+  "title": "– Ant System",
+  "container": "Future Generation Computer Systems",
+  "short": "Future Generation Computer Systems",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Thomas",
+    "Stützle"
+   ],
+   [
+    "Holger H.",
+    "Hoos"
+   ]
+  ],
+  "year": 2000,
+  "year_src": "published-print",
+  "volume": "16",
+  "issue": "8",
+  "page": "889-914",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.ejor.2006.06.046": {
+  "ch": 4,
+  "title": "Ant colony optimization for continuous domains",
+  "container": "European Journal of Operational Research",
+  "short": "European Journal of Operational Research",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Krzysztof",
+    "Socha"
+   ],
+   [
+    "Marco",
+    "Dorigo"
+   ]
+  ],
+  "year": 2008,
+  "year_src": "published-print",
+  "volume": "185",
+  "issue": "3",
+  "page": "1155-1173",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1007/BF01417909": {
+  "ch": 4,
+  "title": "The self-organizing exploratory pattern of the argentine ant",
+  "container": "Journal of Insect Behavior",
+  "short": "J Insect Behav",
+  "type": "journal-article",
+  "authors": [
+   [
+    "J. -L.",
+    "Deneubourg"
+   ],
+   [
+    "S.",
+    "Aron"
+   ],
+   [
+    "S.",
+    "Goss"
+   ],
+   [
+    "J. M.",
+    "Pasteels"
+   ]
+  ],
+  "year": 1990,
+  "year_src": "published-print",
+  "volume": "3",
+  "issue": "2",
+  "page": "159-168",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1023/A:1018940026670": {
+  "ch": 4,
+  "title": "An improved Ant System algorithm for theVehicle Routing Problem",
+  "container": "Annals of Operations Research",
+  "short": "Annals of Operations Research",
+  "type": "journal-article",
+  "authors": [
+   [
+    "B.",
+    "Bullnheimer"
+   ],
+   [
+    "R.F.",
+    "Hartl"
+   ],
+   [
+    "C.",
+    "Strauss"
+   ]
+  ],
+  "year": 1999,
+  "year_src": "published-print",
+  "volume": "89",
+  "issue": "0",
+  "page": "319-328",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1007/s10898-007-9149-x": {
+  "ch": 5,
+  "title": "A powerful and efficient algorithm for numerical function optimization: artificial bee colony (ABC) algorithm",
+  "container": "Journal of Global Optimization",
+  "short": "J Glob Optim",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Dervis",
+    "Karaboga"
+   ],
+   [
+    "Bahriye",
+    "Basturk"
+   ]
+  ],
+  "year": 2007,
+  "year_src": "published-print",
+  "volume": "39",
+  "issue": "3",
+  "page": "459-471",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1016/j.amc.2010.08.049": {
+  "ch": 5,
+  "title": "Gbest-guided artificial bee colony algorithm for numerical function optimization",
+  "container": "Applied Mathematics and Computation",
+  "short": "Applied Mathematics and Computation",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Guopu",
+    "Zhu"
+   ],
+   [
+    "Sam",
+    "Kwong"
+   ]
+  ],
+  "year": 2010,
+  "year_src": "published-print",
+  "volume": "217",
+  "issue": "7",
+  "page": "3166-3173",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.asoc.2010.12.001": {
+  "ch": 5,
+  "title": "A modified Artificial Bee Colony (ABC) algorithm for constrained optimization problems",
+  "container": "Applied Soft Computing",
+  "short": "Applied Soft Computing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Dervis",
+    "Karaboga"
+   ],
+   [
+    "Bahriye",
+    "Akay"
+   ]
+  ],
+  "year": 2011,
+  "year_src": "published-print",
+  "volume": "11",
+  "issue": "3",
+  "page": "3021-3031",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1007/978-3-642-04944-6_14": {
+  "ch": 5,
+  "title": "Firefly Algorithms for Multimodal Optimization",
+  "container": "Lecture Notes in Computer Science",
+  "short": "",
+  "type": "book-chapter",
+  "authors": [
+   [
+    "Xin-She",
+    "Yang"
+   ]
+  ],
+  "year": 2009,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "169-178",
+  "article": null,
+  "publisher": "Springer Berlin Heidelberg"
+ },
+ "10.1504/IJSI.2013.055801": {
+  "ch": 5,
+  "title": "Firefly algorithm: recent advances and applications",
+  "container": "International Journal of Swarm Intelligence",
+  "short": "IJSI",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Xin She",
+    "Yang"
+   ],
+   [
+    "Xingshi",
+    "He"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "1",
+  "page": "36",
+  "article": "55801",
+  "publisher": "Inderscience Publishers"
+ },
+ "10.1016/j.advengsoft.2015.01.010": {
+  "ch": 6,
+  "title": "The Ant Lion Optimizer",
+  "container": "Advances in Engineering Software",
+  "short": "Advances in Engineering Software",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ]
+  ],
+  "year": 2015,
+  "year_src": "published-print",
+  "volume": "83",
+  "issue": null,
+  "page": "80-98",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.knosys.2015.07.006": {
+  "ch": 6,
+  "title": "Moth-flame optimization algorithm: A novel nature-inspired heuristic paradigm",
+  "container": "Knowledge-Based Systems",
+  "short": "Knowledge-Based Systems",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ]
+  ],
+  "year": 2015,
+  "year_src": "published-print",
+  "volume": "89",
+  "issue": null,
+  "page": "228-249",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.neucom.2016.03.101": {
+  "ch": 6,
+  "title": "Binary ant lion approaches for feature selection",
+  "container": "Neurocomputing",
+  "short": "Neurocomputing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "E.",
+    "Emary"
+   ],
+   [
+    "Hossam M.",
+    "Zawbaa"
+   ],
+   [
+    "Aboul Ella",
+    "Hassanien"
+   ]
+  ],
+  "year": 2016,
+  "year_src": "published-print",
+  "volume": "213",
+  "issue": null,
+  "page": "54-65",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1007/s00521-019-04570-6": {
+  "ch": 6,
+  "title": "Moth–flame optimization algorithm: variants and applications",
+  "container": "Neural Computing and Applications",
+  "short": "Neural Comput &amp; Applic",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Mohammad",
+    "Shehab"
+   ],
+   [
+    "Laith",
+    "Abualigah"
+   ],
+   [
+    "Husam",
+    "Al Hamad"
+   ],
+   [
+    "Hamzeh",
+    "Alabool"
+   ],
+   [
+    "Mohammad",
+    "Alshinwan"
+   ],
+   [
+    "Ahmad M.",
+    "Khasawneh"
+   ]
+  ],
+  "year": 2020,
+  "year_src": "published-print",
+  "volume": "32",
+  "issue": "14",
+  "page": "9859-9884",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1016/j.advengsoft.2017.01.004": {
+  "ch": 7,
+  "title": "Grasshopper Optimisation Algorithm: Theory and application",
+  "container": "Advances in Engineering Software",
+  "short": "Advances in Engineering Software",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Shahrzad",
+    "Saremi"
+   ],
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Andrew",
+    "Lewis"
+   ]
+  ],
+  "year": 2017,
+  "year_src": "published-print",
+  "volume": "105",
+  "issue": null,
+  "page": "30-47",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1007/s00500-018-3102-4": {
+  "ch": 7,
+  "title": "Butterfly optimization algorithm: a novel approach for global optimization",
+  "container": "Soft Computing",
+  "short": "Soft Comput",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Sankalap",
+    "Arora"
+   ],
+   [
+    "Satvir",
+    "Singh"
+   ]
+  ],
+  "year": 2019,
+  "year_src": "published-print",
+  "volume": "23",
+  "issue": "3",
+  "page": "715-734",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1007/s10489-017-1019-8": {
+  "ch": 7,
+  "title": "Grasshopper optimization algorithm for multi-objective optimization problems",
+  "container": "Applied Intelligence",
+  "short": "Appl Intell",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedeh Zahra",
+    "Mirjalili"
+   ],
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Shahrzad",
+    "Saremi"
+   ],
+   [
+    "Hossam",
+    "Faris"
+   ],
+   [
+    "Ibrahim",
+    "Aljarah"
+   ]
+  ],
+  "year": 2018,
+  "year_src": "published-print",
+  "volume": "48",
+  "issue": "4",
+  "page": "805-820",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1016/j.future.2019.02.028": {
+  "ch": 8,
+  "title": "Harris hawks optimization: Algorithm and applications",
+  "container": "Future Generation Computer Systems",
+  "short": "Future Generation Computer Systems",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Ali Asghar",
+    "Heidari"
+   ],
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Hossam",
+    "Faris"
+   ],
+   [
+    "Ibrahim",
+    "Aljarah"
+   ],
+   [
+    "Majdi",
+    "Mafarja"
+   ],
+   [
+    "Huiling",
+    "Chen"
+   ]
+  ],
+  "year": 2019,
+  "year_src": "published-print",
+  "volume": "97",
+  "issue": null,
+  "page": "849-872",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1126/science.239.4847.1525": {
+  "ch": 8,
+  "title": "Cooperative Hunting Harris' Hawks (<i>Parabuteo unicinctus</i>)",
+  "container": "Science",
+  "short": "Science",
+  "type": "journal-article",
+  "authors": [
+   [
+    "James C.",
+    "Bednarz"
+   ]
+  ],
+  "year": 1988,
+  "year_src": "published-print",
+  "volume": "239",
+  "issue": "4847",
+  "page": "1525-1527",
+  "article": null,
+  "publisher": "American Association for the Advancement of Science (AAAS)"
+ },
+ "10.1016/j.advengsoft.2013.12.007": {
+  "ch": 9,
+  "title": "Grey Wolf Optimizer",
+  "container": "Advances in Engineering Software",
+  "short": "Advances in Engineering Software",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Seyed Mohammad",
+    "Mirjalili"
+   ],
+   [
+    "Andrew",
+    "Lewis"
+   ]
+  ],
+  "year": 2014,
+  "year_src": "published-print",
+  "volume": "69",
+  "issue": null,
+  "page": "46-61",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.eswa.2015.10.039": {
+  "ch": 9,
+  "title": "Multi-objective grey wolf optimizer: A novel algorithm for multi-criterion optimization",
+  "container": "Expert Systems with Applications",
+  "short": "Expert Systems with Applications",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Shahrzad",
+    "Saremi"
+   ],
+   [
+    "Seyed Mohammad",
+    "Mirjalili"
+   ],
+   [
+    "Leandro dos S.",
+    "Coelho"
+   ]
+  ],
+  "year": 2016,
+  "year_src": "published-print",
+  "volume": "47",
+  "issue": null,
+  "page": "106-119",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.neucom.2015.06.083": {
+  "ch": 9,
+  "title": "Binary grey wolf optimization approaches for feature selection",
+  "container": "Neurocomputing",
+  "short": "Neurocomputing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "E.",
+    "Emary"
+   ],
+   [
+    "Hossam M.",
+    "Zawbaa"
+   ],
+   [
+    "Aboul Ella",
+    "Hassanien"
+   ]
+  ],
+  "year": 2016,
+  "year_src": "published-print",
+  "volume": "172",
+  "issue": null,
+  "page": "371-381",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.knosys.2019.01.018": {
+  "ch": 9,
+  "title": "The defect of the Grey Wolf optimization algorithm and its verification method",
+  "container": "Knowledge-Based Systems",
+  "short": "Knowledge-Based Systems",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Peifeng",
+    "Niu"
+   ],
+   [
+    "Songpeng",
+    "Niu"
+   ],
+   [
+    "Nan",
+    "liu"
+   ],
+   [
+    "Lingfang",
+    "Chang"
+   ]
+  ],
+  "year": 2019,
+  "year_src": "published-print",
+  "volume": "171",
+  "issue": null,
+  "page": "37-43",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.advengsoft.2016.01.008": {
+  "ch": 10,
+  "title": "The Whale Optimization Algorithm",
+  "container": "Advances in Engineering Software",
+  "short": "Advances in Engineering Software",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Andrew",
+    "Lewis"
+   ]
+  ],
+  "year": 2016,
+  "year_src": "published-print",
+  "volume": "95",
+  "issue": null,
+  "page": "51-67",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1525/bio.2013.63.2.5": {
+  "ch": 10,
+  "title": "Integrative Approaches to the Study of Baleen Whale Diving Behavior, Feeding Performance, and Foraging Ecology",
+  "container": "BioScience",
+  "short": "",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Jeremy A.",
+    "Goldbogen"
+   ],
+   [
+    "Ari S.",
+    "Friedlaender"
+   ],
+   [
+    "John",
+    "Calambokidis"
+   ],
+   [
+    "Megan F.",
+    "McKenna"
+   ],
+   [
+    "Malene",
+    "Simon"
+   ],
+   [
+    "Douglas P.",
+    "Nowacek"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "63",
+  "issue": "2",
+  "page": "90-100",
+  "article": null,
+  "publisher": "Oxford University Press (OUP)"
+ },
+ "10.1007/978-3-642-12538-6_6": {
+  "ch": 10,
+  "title": "A New Metaheuristic Bat-Inspired Algorithm",
+  "container": "Studies in Computational Intelligence",
+  "short": "",
+  "type": "book-chapter",
+  "authors": [
+   [
+    "Xin-She",
+    "Yang"
+   ]
+  ],
+  "year": 2010,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "65-74",
+  "article": null,
+  "publisher": "Springer Berlin Heidelberg"
+ },
+ "10.3390/biomimetics10090565": {
+  "ch": 10,
+  "title": "Red-Crowned Crane Optimization: A Novel Biomimetic Metaheuristic Algorithm for Engineering Applications",
+  "container": "Biomimetics",
+  "short": "Biomimetics",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Jie",
+    "Kang"
+   ],
+   [
+    "Zhiyuan",
+    "Ma"
+   ]
+  ],
+  "year": 2025,
+  "year_src": "issued",
+  "volume": "10",
+  "issue": "9",
+  "page": "565",
+  "article": null,
+  "publisher": "MDPI AG"
+ },
+ "10.1016/j.neucom.2017.04.053": {
+  "ch": 10,
+  "title": "Hybrid Whale Optimization Algorithm with simulated annealing for feature selection",
+  "container": "Neurocomputing",
+  "short": "Neurocomputing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Majdi M.",
+    "Mafarja"
+   ],
+   [
+    "Seyedali",
+    "Mirjalili"
+   ]
+  ],
+  "year": 2017,
+  "year_src": "published-print",
+  "volume": "260",
+  "issue": null,
+  "page": "302-312",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.eswa.2020.113377": {
+  "ch": 11,
+  "title": "Marine Predators Algorithm: A nature-inspired metaheuristic",
+  "container": "Expert Systems with Applications",
+  "short": "Expert Systems with Applications",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Afshin",
+    "Faramarzi"
+   ],
+   [
+    "Mohammad",
+    "Heidarinejad"
+   ],
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Amir H.",
+    "Gandomi"
+   ]
+  ],
+  "year": 2020,
+  "year_src": "published-print",
+  "volume": "152",
+  "issue": null,
+  "page": "113377",
+  "article": "113377",
+  "publisher": "Elsevier BV"
+ },
+ "10.1038/nature09116": {
+  "ch": 11,
+  "title": "Environmental context explains Lévy and Brownian movement patterns of marine predators",
+  "container": "Nature",
+  "short": "Nature",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Nicolas E.",
+    "Humphries"
+   ],
+   [
+    "Nuno",
+    "Queiroz"
+   ],
+   [
+    "Jennifer R. M.",
+    "Dyer"
+   ],
+   [
+    "Nicolas G.",
+    "Pade"
+   ],
+   [
+    "Michael K.",
+    "Musyl"
+   ],
+   [
+    "Kurt M.",
+    "Schaefer"
+   ],
+   [
+    "Daniel W.",
+    "Fuller"
+   ],
+   [
+    "Juerg M.",
+    "Brunnschweiler"
+   ],
+   [
+    "Thomas K.",
+    "Doyle"
+   ],
+   [
+    "Jonathan D. R.",
+    "Houghton"
+   ],
+   [
+    "Graeme C.",
+    "Hays"
+   ],
+   [
+    "Catherine S.",
+    "Jones"
+   ],
+   [
+    "Leslie R.",
+    "Noble"
+   ],
+   [
+    "Victoria J.",
+    "Wearmouth"
+   ],
+   [
+    "Emily J.",
+    "Southall"
+   ],
+   [
+    "David W.",
+    "Sims"
+   ]
+  ],
+  "year": 2010,
+  "year_src": "published-print",
+  "volume": "465",
+  "issue": "7301",
+  "page": "1066-1069",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1016/j.advengsoft.2017.07.002": {
+  "ch": 12,
+  "title": "Salp Swarm Algorithm: A bio-inspired optimizer for engineering design problems",
+  "container": "Advances in Engineering Software",
+  "short": "Advances in Engineering Software",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Amir H.",
+    "Gandomi"
+   ],
+   [
+    "Seyedeh Zahra",
+    "Mirjalili"
+   ],
+   [
+    "Shahrzad",
+    "Saremi"
+   ],
+   [
+    "Hossam",
+    "Faris"
+   ],
+   [
+    "Seyed Mohammad",
+    "Mirjalili"
+   ]
+  ],
+  "year": 2017,
+  "year_src": "published-print",
+  "volume": "114",
+  "issue": null,
+  "page": "163-191",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1016/j.asoc.2015.03.003": {
+  "ch": 12,
+  "title": "Artificial algae algorithm (AAA) for nonlinear global optimization",
+  "container": "Applied Soft Computing",
+  "short": "Applied Soft Computing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Sait Ali",
+    "Uymaz"
+   ],
+   [
+    "Gulay",
+    "Tezel"
+   ],
+   [
+    "Esra",
+    "Yel"
+   ]
+  ],
+  "year": 2015,
+  "year_src": "published-print",
+  "volume": "31",
+  "issue": null,
+  "page": "153-171",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1109/MCS.2002.1004010": {
+  "ch": 13,
+  "title": "Biomimicry of bacterial foraging for distributed optimization and control",
+  "container": "IEEE Control Systems",
+  "short": "IEEE Control Syst.",
+  "type": "journal-article",
+  "authors": [],
+  "year": 2002,
+  "year_src": "published-print",
+  "volume": "22",
+  "issue": "3",
+  "page": "52-67",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/NABIC.2009.5393690": {
+  "ch": 13,
+  "title": "Cuckoo Search via L&amp;#x00E9;vy flights",
+  "container": "2009 World Congress on Nature &amp; Biologically Inspired Computing (NaBIC)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "Xin-She",
+    "Yang"
+   ],
+   [
+    "",
+    "Suash Deb"
+   ]
+  ],
+  "year": 2009,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "210-214",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1504/IJMMNO.2010.035430": {
+  "ch": 13,
+  "title": "Engineering optimisation by cuckoo search",
+  "container": "International Journal of Mathematical Modelling and Numerical Optimisation",
+  "short": "IJMMNO",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Xin She",
+    "Yang"
+   ],
+   [
+    "Suash",
+    "Deb"
+   ]
+  ],
+  "year": 2010,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "4",
+  "page": "330",
+  "article": "35430",
+  "publisher": "Inderscience Publishers"
+ },
+ "10.1109/TEVC.2004.826067": {
+  "ch": 14,
+  "title": "Handling multiple objectives with particle swarm optimization",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "C.A.C.",
+    "Coello"
+   ],
+   [
+    "G.T.",
+    "Pulido"
+   ],
+   [
+    "M.S.",
+    "Lechuga"
+   ]
+  ],
+  "year": 2004,
+  "year_src": "published-print",
+  "volume": "8",
+  "issue": "3",
+  "page": "256-279",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/4235.996017": {
+  "ch": 14,
+  "title": "A fast and elitist multiobjective genetic algorithm: NSGA-II",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "K.",
+    "Deb"
+   ],
+   [
+    "A.",
+    "Pratap"
+   ],
+   [
+    "S.",
+    "Agarwal"
+   ],
+   [
+    "T.",
+    "Meyarivan"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "published-print",
+  "volume": "6",
+  "issue": "2",
+  "page": "182-197",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1162/106365600568202": {
+  "ch": 14,
+  "title": "Comparison of Multiobjective Evolutionary Algorithms: Empirical Results",
+  "container": "Evolutionary Computation",
+  "short": "Evolutionary Computation",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Eckart",
+    "Zitzler"
+   ],
+   [
+    "Kalyanmoy",
+    "Deb"
+   ],
+   [
+    "Lothar",
+    "Thiele"
+   ]
+  ],
+  "year": 2000,
+  "year_src": "published-print",
+  "volume": "8",
+  "issue": "2",
+  "page": "173-195",
+  "article": null,
+  "publisher": "MIT Press"
+ },
+ "10.1145/1068009.1068047": {
+  "ch": 14,
+  "title": "An effective use of crowding distance in multiobjective particle swarm optimization",
+  "container": "Proceedings of the 7th annual conference on Genetic and evolutionary computation",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "Carlo R.",
+    "Raquel"
+   ],
+   [
+    "Prospero C.",
+    "Naval"
+   ]
+  ],
+  "year": 2005,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "257-264",
+  "article": null,
+  "publisher": "ACM"
+ },
+ "10.1109/ACCESS.2020.2990567": {
+  "ch": 14,
+  "title": "Pymoo: Multi-Objective Optimization in Python",
+  "container": "IEEE Access",
+  "short": "IEEE Access",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Julian",
+    "Blank"
+   ],
+   [
+    "Kalyanmoy",
+    "Deb"
+   ]
+  ],
+  "year": 2020,
+  "year_src": "published-print",
+  "volume": "8",
+  "issue": null,
+  "page": "89497-89509",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1016/j.swevo.2012.09.002": {
+  "ch": 15,
+  "title": "S-shaped versus V-shaped transfer functions for binary Particle Swarm Optimization",
+  "container": "Swarm and Evolutionary Computation",
+  "short": "Swarm and Evolutionary Computation",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ],
+   [
+    "Andrew",
+    "Lewis"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "9",
+  "issue": null,
+  "page": "1-14",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1109/ICEC.1998.699327": {
+  "ch": 16,
+  "title": "Using selection to improve particle swarm optimization",
+  "container": "1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "P.J.",
+    "Angeline"
+   ]
+  ],
+  "year": 1998,
+  "year_src": "title",
+  "volume": null,
+  "issue": null,
+  "page": "84-89",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/TSMCB.2003.818557": {
+  "ch": 16,
+  "title": "A Hybrid of Genetic Algorithm and Particle Swarm Optimization for Recurrent Network Design",
+  "container": "IEEE Transactions on Systems, Man and Cybernetics, Part B (Cybernetics)",
+  "short": "IEEE Trans. Syst., Man, Cybern. B",
+  "type": "journal-article",
+  "authors": [
+   [
+    "C.-F.",
+    "Juang"
+   ]
+  ],
+  "year": 2004,
+  "year_src": "published-print",
+  "volume": "34",
+  "issue": "2",
+  "page": "997-1006",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/TEVC.2002.804320": {
+  "ch": 16,
+  "title": "Quantum-inspired evolutionary algorithm for a class of combinatorial optimization",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "",
+    "Kuk-Hyun Han"
+   ],
+   [
+    "",
+    "Jong-Hwan Kim"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "published-print",
+  "volume": "6",
+  "issue": "6",
+  "page": "580-593",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1109/CEC.2004.1330875": {
+  "ch": 16,
+  "title": "Particle swarm optimization with particles having quantum behavior",
+  "container": "Proceedings of the 2004 Congress on Evolutionary Computation (IEEE Cat. No.04TH8753)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "",
+    "Jun Sun"
+   ],
+   [
+    "",
+    "Bin Feng"
+   ],
+   [
+    "",
+    "Wenbo Xu"
+   ]
+  ],
+  "year": 2004,
+  "year_src": "title",
+  "volume": null,
+  "issue": null,
+  "page": "325-331",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1023/A:1016540724870": {
+  "ch": 16,
+  "title": "A Taxonomy of Hybrid Metaheuristics",
+  "container": "Journal of Heuristics",
+  "short": "Journal of Heuristics",
+  "type": "journal-article",
+  "authors": [
+   [
+    "E.-G.",
+    "Talbi"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "published-print",
+  "volume": "8",
+  "issue": "5",
+  "page": "541-564",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1287/ijoc.1.3.190": {
+  "ch": 16,
+  "title": "Tabu Search—Part I",
+  "container": "ORSA Journal on Computing",
+  "short": "ORSA Journal on Computing",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Fred",
+    "Glover"
+   ]
+  ],
+  "year": 1989,
+  "year_src": "published-print",
+  "volume": "1",
+  "issue": "3",
+  "page": "190-206",
+  "article": null,
+  "publisher": "Institute for Operations Research and the Management Sciences (INFORMS)"
+ },
+ "10.1109/TSMC.1979.4310076": {
+  "ch": 17,
+  "title": "A Threshold Selection Method from Gray-Level Histograms",
+  "container": "IEEE Transactions on Systems, Man, and Cybernetics",
+  "short": "IEEE Trans. Syst., Man, Cybern.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Nobuyuki",
+    "Otsu"
+   ]
+  ],
+  "year": 1979,
+  "year_src": "published-print",
+  "volume": "9",
+  "issue": "1",
+  "page": "62-66",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1023/A:1010933404324": {
+  "ch": 17,
+  "title": "Random Forests",
+  "container": "Machine Learning",
+  "short": "Machine Learning",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Leo",
+    "Breiman"
+   ]
+  ],
+  "year": 2001,
+  "year_src": "published-print",
+  "volume": "45",
+  "issue": "1",
+  "page": "5-32",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1007/s10489-014-0645-7": {
+  "ch": 17,
+  "title": "How effective is the Grey Wolf optimizer in training multi-layer perceptrons",
+  "container": "Applied Intelligence",
+  "short": "Appl Intell",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Seyedali",
+    "Mirjalili"
+   ]
+  ],
+  "year": 2015,
+  "year_src": "published-print",
+  "volume": "43",
+  "issue": "1",
+  "page": "150-161",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1145/3071178.3071208": {
+  "ch": 17,
+  "title": "Particle swarm optimization for hyper-parameter selection in deep neural networks",
+  "container": "Proceedings of the Genetic and Evolutionary Computation Conference",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "Pablo Ribalta",
+    "Lorenzo"
+   ],
+   [
+    "Jakub",
+    "Nalepa"
+   ],
+   [
+    "Michal",
+    "Kawulok"
+   ],
+   [
+    "Luciano Sanchez",
+    "Ramos"
+   ],
+   [
+    "José Ranilla",
+    "Pastor"
+   ]
+  ],
+  "year": 2017,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "481-488",
+  "article": null,
+  "publisher": "ACM"
+ },
+ "10.1287/opre.12.4.568": {
+  "ch": 18,
+  "title": "Scheduling of Vehicles from a Central Depot to a Number of Delivery Points",
+  "container": "Operations Research",
+  "short": "Operations Research",
+  "type": "journal-article",
+  "authors": [
+   [
+    "G.",
+    "Clarke"
+   ],
+   [
+    "J. W.",
+    "Wright"
+   ]
+  ],
+  "year": 1964,
+  "year_src": "published-print",
+  "volume": "12",
+  "issue": "4",
+  "page": "568-581",
+  "article": null,
+  "publisher": "Institute for Operations Research and the Management Sciences (INFORMS)"
+ },
+ "10.1109/CEC.1999.785502": {
+  "ch": 18,
+  "title": "Memory enhanced evolutionary algorithms for changing optimization problems",
+  "container": "Proceedings of the 1999 Congress on Evolutionary Computation-CEC99 (Cat. No. 99TH8406)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "J.",
+    "Branke"
+   ]
+  ],
+  "year": 1999,
+  "year_src": "title",
+  "volume": null,
+  "issue": null,
+  "page": "1875-1882",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1109/CEC.2002.1004492": {
+  "ch": 18,
+  "title": "Adaptive particle swarm optimization: detection and response to dynamic systems",
+  "container": "Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)",
+  "short": "",
+  "type": "proceedings-article",
+  "authors": [
+   [
+    "",
+    "Xiaohui Hu"
+   ],
+   [
+    "R.C.",
+    "Eberhart"
+   ]
+  ],
+  "year": 2002,
+  "year_src": "title",
+  "volume": "2",
+  "issue": null,
+  "page": "1666-1670",
+  "article": null,
+  "publisher": "IEEE"
+ },
+ "10.1007/978-3-540-30552-1_2": {
+  "ch": 18,
+  "title": "Swarm Robotics: From Sources of Inspiration to Domains of Application",
+  "container": "Lecture Notes in Computer Science",
+  "short": "",
+  "type": "book-chapter",
+  "authors": [
+   [
+    "Erol",
+    "Şahin"
+   ]
+  ],
+  "year": 2005,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "10-20",
+  "article": null,
+  "publisher": "Springer Berlin Heidelberg"
+ },
+ "10.1007/s11721-012-0075-2": {
+  "ch": 18,
+  "title": "Swarm robotics: a review from the swarm engineering perspective",
+  "container": "Swarm Intelligence",
+  "short": "Swarm Intell",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Manuele",
+    "Brambilla"
+   ],
+   [
+    "Eliseo",
+    "Ferrante"
+   ],
+   [
+    "Mauro",
+    "Birattari"
+   ],
+   [
+    "Marco",
+    "Dorigo"
+   ]
+  ],
+  "year": 2013,
+  "year_src": "published-print",
+  "volume": "7",
+  "issue": "1",
+  "page": "1-41",
+  "article": null,
+  "publisher": "Springer Science and Business Media LLC"
+ },
+ "10.1145/37402.37406": {
+  "ch": 18,
+  "title": "Flocks, herds and schools: A distributed behavioral model",
+  "container": "ACM SIGGRAPH Computer Graphics",
+  "short": "SIGGRAPH Comput. Graph.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Craig W.",
+    "Reynolds"
+   ]
+  ],
+  "year": 1987,
+  "year_src": "published-print",
+  "volume": "21",
+  "issue": "4",
+  "page": "25-34",
+  "article": null,
+  "publisher": "Association for Computing Machinery (ACM)"
+ },
+ "10.1109/TEVC.2013.2281543": {
+  "ch": 18,
+  "title": "Cooperative Co-Evolution With Differential Grouping for Large Scale Optimization",
+  "container": "IEEE Transactions on Evolutionary Computation",
+  "short": "IEEE Trans. Evol. Computat.",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Mohammad Nabi",
+    "Omidvar"
+   ],
+   [
+    "Xiaodong",
+    "Li"
+   ],
+   [
+    "Yi",
+    "Mei"
+   ],
+   [
+    "Xin",
+    "Yao"
+   ]
+  ],
+  "year": 2014,
+  "year_src": "published-print",
+  "volume": "18",
+  "issue": "3",
+  "page": "378-393",
+  "article": null,
+  "publisher": "Institute of Electrical and Electronics Engineers (IEEE)"
+ },
+ "10.1016/j.ins.2009.03.004": {
+  "ch": 18,
+  "title": "GSA: A Gravitational Search Algorithm",
+  "container": "Information Sciences",
+  "short": "Information Sciences",
+  "type": "journal-article",
+  "authors": [
+   [
+    "Esmat",
+    "Rashedi"
+   ],
+   [
+    "Hossein",
+    "Nezamabadi-pour"
+   ],
+   [
+    "Saeid",
+    "Saryazdi"
+   ]
+  ],
+  "year": 2009,
+  "year_src": "published-print",
+  "volume": "179",
+  "issue": "13",
+  "page": "2232-2248",
+  "article": null,
+  "publisher": "Elsevier BV"
+ },
+ "10.1126/science.220.4598.671": {
+  "ch": 18,
+  "title": "Optimization by Simulated Annealing",
+  "container": "Science",
+  "short": "Science",
+  "type": "journal-article",
+  "authors": [
+   [
+    "S.",
+    "Kirkpatrick"
+   ],
+   [
+    "C. D.",
+    "Gelatt"
+   ],
+   [
+    "M. P.",
+    "Vecchi"
+   ]
+  ],
+  "year": 1983,
+  "year_src": "published-print",
+  "volume": "220",
+  "issue": "4598",
+  "page": "671-680",
+  "article": null,
+  "publisher": "American Association for the Advancement of Science (AAAS)"
+ },
+ "10.1016/B978-008045157-2/50081-X": {
+  "ch": 5,
+  "title": "The Bees Algorithm — A Novel Tool for Complex Optimisation Problems",
+  "container": "Intelligent Production Machines and Systems",
+  "short": "",
+  "type": "book-chapter",
+  "authors": [
+   [
+    "D.T.",
+    "Pham"
+   ],
+   [
+    "A.",
+    "Ghanbarzadeh"
+   ],
+   [
+    "E.",
+    "Koç"
+   ],
+   [
+    "S.",
+    "Otri"
+   ],
+   [
+    "S.",
+    "Rahim"
+   ],
+   [
+    "M.",
+    "Zaidi"
+   ]
+  ],
+  "year": 2006,
+  "year_src": "published-print",
+  "volume": null,
+  "issue": null,
+  "page": "454-459",
+  "article": null,
+  "publisher": "Elsevier"
+ }
+}

@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bầy sếu đầu đỏ (RCO)" data-title-en="Red-Crowned Crane Optimization (RCO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy sếu đầu đỏ (RCO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 10 · Mục 10.3</span><span class="en">Chapter 10 · Section 10.3</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy sếu đầu đỏ</span><span class="en">Red-Crowned Crane Optimization</span><span class="sub"><span class="vi">Red-Crowned Crane Optimization — RCO</span><span class="en">RCO — forage by day, roost by night, dance in between</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả bốn tập tính của sếu đầu đỏ được mô hình hóa trong RCO.</span><span class="en">Describe the four red-crowned crane behaviours modelled in RCO.</span></li>
+        <li class="reveal d3"><span class="vi">Viết công thức kiếm ăn ngẫu nhiên, kiếm ăn đường dài, thoát hiểm và nghỉ đêm.</span><span class="en">Write the random foraging, long-distance foraging, escape and roosting updates.</span></li>
+        <li class="reveal d4"><span class="vi">Viết công thức điệu múa dùng hai con tốt nhất.</span><span class="en">Write the dance update using the two best cranes.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả thực nghiệm độc lập của giáo trình cho thuật toán mới này.</span><span class="en">Read the textbook's independent experiments on this new algorithm.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Sếu đầu đỏ: kiếm ăn tản ra, nghỉ đêm tụ lại</span><span class="en">Red-crowned cranes: forage apart, roost together</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Kang và Ma</strong> đề xuất năm 2025 (<em>Biomimetics</em> 10(9): 565).</span><span class="en">Proposed by <strong>Kang and Ma</strong> in 2025 (<em>Biomimetics</em> 10(9): 565).</span></li>
+          <li class="reveal d3"><span class="vi">Ban ngày sếu tản ra kiếm ăn; một số tìm quanh nơi quen, một số bay xa.</span><span class="en">By day cranes disperse to forage; some search near familiar spots, others fly far.</span></li>
+          <li class="reveal d4"><span class="vi">Ban đêm chúng tụ về chỗ nghỉ an toàn; khi gặp nguy hiểm thì bỏ chạy.</span><span class="en">At night they gather at a safe roost; when in danger they flee.</span></li>
+          <li class="reveal d5"><span class="vi">Sếu nổi tiếng với điệu múa kết đôi, được dùng làm bước khai thác quanh hai con tốt nhất.</span><span class="en">Cranes are famous for courtship dances, used here as an exploitation step around the two best cranes.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 230" role="img" aria-label="Sếu tản ra và tụ lại"><g id="rco-art"></g></svg>
+        <figcaption><span class="vi">Tản ra kiếm ăn, tụ về chỗ nghỉ</span><span class="en">Disperse to forage, gather to roost</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi vòng, với xác suất <span class="m">p<sub>c</sub></span>, đàn <span class="hl c-in">kiếm ăn</span> (nửa tốt tìm gần, nửa kém bay xa và có thể <span class="hl c-soc">thoát hiểm</span>) rồi <span class="hl c-sea">tụ về chỗ nghỉ</span>; ngược lại đàn <span class="hl c-cog">múa</span> quanh hai con tốt nhất.</span><span class="en">Each iteration, with probability <span class="m">p<sub>c</sub></span>, the flock <span class="hl c-in">forages</span> (the better half searches near, the worse half flies far and may <span class="hl c-soc">escape</span>) and then <span class="hl c-sea">roosts</span>; otherwise it <span class="hl c-cog">dances</span> around the two best cranes.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Kiếm ăn</span><span class="en">Foraging</span></b><span><span class="vi">gần và xa, tùy thứ hạng</span><span class="en">near or far by rank</span></span></div>
+      <div class="force reveal d4" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Nghỉ đêm</span><span class="en">Roosting</span></b><span><span class="vi">tụ về vị trí tốt nhất</span><span class="en">gather at the best position</span></span></div>
+      <div class="force reveal d5" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Múa</span><span class="en">Dancing</span></b><span><span class="vi">khai thác quanh hai con tốt nhất</span><span class="en">exploit around the two best</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Ký hiệu chính</span><span class="en">Main notation</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="m">X<sub>home</sub></span></span><span class="en"><span class="m">X<sub>home</sub></span></span></dt><dd><span class="vi">Vị trí tốt nhất của vòng hiện tại (chỗ nghỉ)</span><span class="en">The best position in the current iteration (the roost)</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="m">k</span></span><span class="en"><span class="m">k</span></span></dt><dd><span class="vi">Số con kiếm ăn ngẫu nhiên; bài báo dùng tỉ lệ 1:1 nên <span class="m">k = n/2</span></span><span class="en">Number of random foragers; the paper uses 1:1, so <span class="m">k = n/2</span></span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="m">X<span class="ss"><i>pbest</i><i>i</i></span></span></span><span class="en"><span class="m">X<span class="ss"><i>pbest</i><i>i</i></span></span></span></dt><dd><span class="vi">Vị trí tốt nhất riêng của con sếu</span><span class="en">Each crane's personal best</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="m">p<sub>c</sub></span></span><span class="en"><span class="m">p<sub>c</sub></span></span></dt><dd><span class="vi">Xác suất chọn nhánh kiếm ăn</span><span class="en">Probability of the foraging branch</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Hệ số giảm dần</span><span class="en">Decaying coefficients</span></h3><span class="m">c<sub>2</sub> = 5 − 4t/T, &nbsp; c<sub>3</sub> = 2 − t/T</span></div>
+        <div class="card ember mathcard reveal d4"><h3><span class="vi">Điều kiện thoát hiểm</span><span class="en">Escape condition</span></h3><span class="m">c<sub>r</sub> &lt; (t/T)<sup>1/2</sup></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của RCO</span><span class="en">RCO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Hai nhánh xen kẽ ngẫu nhiên: kiếm ăn + nghỉ đêm, hoặc múa.</span><span class="en">Two randomly alternating branches: forage + roost, or dance.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo đàn sếu; đánh giá.</span><span class="en">Initialize the flock; evaluate.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Rút <span class="m">r<sub>5</sub></span>; nếu <span class="m">r<sub>5</sub> &lt; p<sub>c</sub></span> thì sang bước 3, ngược lại sang bước 5.</span><span class="en">Draw <span class="m">r<sub>5</sub></span>; if <span class="m">r<sub>5</sub> &lt; p<sub>c</sub></span> go to step 3, else step 5.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Sắp xếp; nửa tốt kiếm ăn ngẫu nhiên, nửa kém kiếm ăn đường dài (có thể thoát hiểm).</span><span class="en">Sort; the better half forages randomly, the worse half long-distance (possibly escaping).</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Cập nhật chỗ nghỉ; cả đàn tụ về chỗ nghỉ.</span><span class="en">Update the roost; the whole flock gathers there.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Múa: mỗi con tiến về trung bình của hai bước nhỏ hướng về hai con tốt nhất.</span><span class="en">Dance: each crane moves to the mean of two small steps toward the two best.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">đàn sếu</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">the flock</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="78">r₅ < p_c ?</text></g><g class="en"><text x="375" y="78">r₅ < p_c ?</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Kiếm ăn gần</text><text x="625" y="89">và xa; thoát hiểm</text></g><g class="en"><text x="625" y="67">Forage near</text><text x="625" y="89">and far; escape</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Tụ về</text><text x="875" y="89">chỗ nghỉ</text></g><g class="en"><text x="875" y="67">Gather at</text><text x="875" y="89">the roost</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">hoặc: múa quanh</text><text x="875" y="259">2 con tốt nhất</text></g><g class="en"><text x="875" y="237">or: dance around</text><text x="875" y="259">the 2 best</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Cập nhật</text><text x="625" y="259">pbest, tốt nhất</text></g><g class="en"><text x="625" y="237">Update</text><text x="625" y="259">pbest, best</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">t < T ?</text></g><g class="en"><text x="385" y="248" font-size="15">t < T ?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="237">Trả về</text><text x="125" y="259">tốt nhất</text></g><g class="en"><text x="125" y="237">Return</text><text x="125" y="259">best</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Kiếm ăn và thoát hiểm" data-label-en="Foraging and escape">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Kiếm ăn gần, kiếm ăn xa và thoát hiểm</span><span class="en">Near foraging, far foraging and escape</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">X′<sub>i</sub> = X<sub>i</sub> + c<sub>1</sub> R ⊗ (X<sub>home</sub> − X<sub>i</sub>), &nbsp; c<sub>1</sub> = 2</span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">X′<sub>i</sub> = X<sub>i</sub> + c<sub>2</sub> (X<sub>home</sub> − X<sub>i</sub>), &nbsp; c<sub>2</sub> = 5 − 4t/T</span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">X′<sub>i</sub> ← X′<sub>i</sub> + r<sub>1</sub>(X<sub>rand</sub> − X′<sub>i</sub>) + r<sub>2</sub>(X<span class="ss"><i>pbest</i><i>i</i></span> − X′<sub>i</sub>)</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Dòng 1: nửa tốt (kiếm ăn ngẫu nhiên), <span class="m">R</span> là vector đều <span class="m">[0, 1]<sup>d</sup></span>.</span><span class="en">Line 1: the better half (random foragers); <span class="m">R</span> is a uniform vector in <span class="m">[0, 1]<sup>d</sup></span>.</span></li>
+          <li class="reveal d4"><span class="vi">Dòng 2: nửa kém bay qua chỗ nghỉ với bước <span class="m">c<sub>2</sub></span> từ 5 giảm về 1: nhảy xa, khám phá.</span><span class="en">Line 2: the worse half overshoots the roost with <span class="m">c<sub>2</sub></span> from 5 down to 1: long jumps, exploration.</span></li>
+          <li class="reveal d5"><span class="vi">Dòng 3 chỉ áp dụng khi <span class="m">c<sub>r</sub> ~ U(0, 1) &lt; (t/T)<sup>1/2</sup></span>; <span class="m">r<sub>1</sub>, r<sub>2</sub> ~ U(1, 2)</span>.</span><span class="en">Line 3 applies only when <span class="m">c<sub>r</sub> ~ U(0, 1) &lt; (t/T)<sup>1/2</sup></span>; <span class="m">r<sub>1</sub>, r<sub>2</sub> ~ U(1, 2)</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Nghỉ đêm và múa" data-label-en="Roosting and dancing">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Tụ về chỗ nghỉ, hoặc múa quanh hai con tốt nhất</span><span class="en">Gather at the roost, or dance around the two best</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">X<sub>i</sub> = X′<sub>i</sub> + c<sub>3</sub> r<sub>3</sub> (X′<sub>home</sub> − X′<sub>i</sub>), &nbsp; c<sub>3</sub> = 2 − t/T</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">X′ = X + u r<sub>4</sub>(X<sub>first</sub> − X), &nbsp; X″ = X + u r<sub>4</sub>(X<sub>second</sub> − X)</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">X<sub>i</sub> = (X′ + X″) / 2, &nbsp; r<sub>4</sub> ~ U(0, 0.1), &nbsp; u ~ N(1, (1 − t/T)²)</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi"><span class="m">X′<sub>home</sub></span>: chỗ nghỉ sau khi kiếm ăn (cập nhật nếu có con tốt hơn).</span><span class="en"><span class="m">X′<sub>home</sub></span>: the roost after foraging (updated if someone did better).</span></li>
+          <li class="reveal d4"><span class="vi">Điệu múa chỉ dịch chuyển tối đa khoảng 10% quãng đường tới hai con tốt nhất: một bước khai thác nhỏ.</span><span class="en">The dance moves at most about 10% of the way toward the two best: a small exploitation step.</span></li>
+          <li class="reveal d5"><span class="vi">Nhánh kiếm ăn tốn <span class="m">2n</span> lần đánh giá, nhánh múa tốn <span class="m">n</span>.</span><span class="en">The foraging branch costs <span class="m">2n</span> evaluations, the dance <span class="m">n</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của RCO</span><span class="en">RCO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">p<sub>c</sub></span></td><td><span class="vi">Xác suất nhánh kiếm ăn</span><span class="en">Foraging-branch probability</span></td><td>0.7 (CEC) / 0.9 (bài toán kỹ thuật)</td></tr>
+        <tr><td><span class="m">k : (n − k)</span></td><td><span class="vi">Tỉ lệ kiếm ăn gần : xa</span><span class="en">Near : far foragers</span></td><td>1 : 1</td></tr>
+        <tr><td><span class="m">c<sub>1</sub></span></td><td><span class="vi">Hệ số kiếm ăn gần</span><span class="en">Near-foraging factor</span></td><td>2</td></tr>
+        <tr><td><span class="m">c<sub>2</sub>, c<sub>3</sub></span></td><td><span class="vi">Hệ số giảm tuyến tính</span><span class="en">Linearly decaying factors</span></td><td><span class="m">5 − 4t/T, &nbsp; 2 − t/T</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Bài báo dùng hai giá trị <span class="m">p<sub>c</sub></span> khác nhau ở hai phần; giáo trình dùng 0.7 như bảng 2 cho bộ CEC.</span><span class="en">The paper uses two different <span class="m">p<sub>c</sub></span> values in two sections; the textbook uses 0.7 as in its table 2 for the CEC suite.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 con sếu trên địa hình chung</span><span class="en">12 cranes on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Xanh dương: vừa kiếm ăn gần; cam: vừa kiếm ăn xa; đỏ: vừa thoát hiểm; xanh lá: vừa múa.</span><span class="en">Blue: near foraging; orange: far foraging; red: escape; green: dance.</span></p>
+        <p class="note"><span class="vi">Tham số: <span class="m">p<sub>c</sub> = 0.7, k = n/2</span>.</span><span class="en">Settings: <span class="m">p<sub>c</sub> = 0.7, k = n/2</span>.</span></p>
+        <div class="key">
+          <span><i style="background:#3a7fc1"></i><span class="vi">kiếm ăn gần</span><span class="en">near foraging</span></span>
+          <span><i style="background:#e6904f"></i><span class="vi">kiếm ăn xa</span><span class="en">far foraging</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">thoát hiểm</span><span class="en">escape</span></span>
+          <span><i style="background:#4b8f45"></i><span class="vi">múa</span><span class="en">dance</span></span>
+        </div>
+      </div>
+      <div class="field" id="rco-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Kiếm ăn, nghỉ đêm và múa cho một con sếu</span><span class="en">Foraging, roosting and dancing for one crane</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">X = (4, 2), &nbsp; X<sub>home</sub> = (1, 1), &nbsp; t/T = 0.25</span></div>
+          <div class="eq"><span class="m">R = (0.5, 0.3), &nbsp; r<sub>3</sub> = 0.4</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Kiếm ăn gần: <span class="m">X′ = (4, 2) + 2·(0.5, 0.3)⊗(−3, −1) = (1, 1.4)</span>.</span><span class="en">Near foraging: <span class="m">X′ = (4, 2) + 2·(0.5, 0.3)⊗(−3, −1) = (1, 1.4)</span>.</span></li>
+          <li><span class="vi">Nếu là con kiếm ăn xa: <span class="m">c<sub>2</sub> = 4</span>, <span class="m">X′ = (4, 2) + 4·(−3, −1) = (−8, −2)</span>: vượt qua chỗ nghỉ.</span><span class="en">If it were a far forager: <span class="m">c<sub>2</sub> = 4</span>, <span class="m">X′ = (4, 2) + 4·(−3, −1) = (−8, −2)</span>: it overshoots the roost.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Nghỉ đêm từ <span class="m">(1, 1.4)</span>: <span class="m">c<sub>3</sub> = 1.75</span>, <span class="m">X = (1, 1.4) + 0.7·(0, −0.4) = (1, 1.12)</span>.</span><span class="en">Roosting from <span class="m">(1, 1.4)</span>: <span class="m">c<sub>3</sub> = 1.75</span>, <span class="m">X = (1, 1.4) + 0.7·(0, −0.4) = (1, 1.12)</span>.</span></li>
+          <li><span class="vi">Múa với <span class="m">X<sub>first</sub> = (1, 1), X<sub>second</sub> = (2, 0), u = 1.2, r<sub>4</sub> = 0.05</span>: <span class="m">X′ = (3.82, 1.94), X″ = (3.88, 1.88)</span>.</span><span class="en">Dance with <span class="m">X<sub>first</sub> = (1, 1), X<sub>second</sub> = (2, 0), u = 1.2, r<sub>4</sub> = 0.05</span>: <span class="m">X′ = (3.82, 1.94), X″ = (3.88, 1.88)</span>.</span></li>
+          <li><span class="vi">Vị trí sau múa: <span class="m">(3.85, 1.91)</span>.</span><span class="en">Position after the dance: <span class="m">(3.85, 1.91)</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng phát triển</span><span class="en">Directions</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">Kiểm chứng độc lập</span><span class="en">Independent verification</span></h3><p><span class="vi">RCO mới công bố năm 2025; cần thêm các so sánh độc lập.</span><span class="en">RCO was published in 2025; independent comparisons are still needed.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">Chọn <span class="m">p<sub>c</sub></span> thích nghi</span><span class="en">Adaptive <span class="m">p<sub>c</sub></span></span></h3><p><span class="vi">Bài báo cho thấy ảnh hưởng của <span class="m">p<sub>c</sub></span> không đồng nhất.</span><span class="en">The paper reports mixed effects of <span class="m">p<sub>c</sub></span>.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">Nhị phân / đa mục tiêu</span><span class="en">Binary / multi-objective</span></h3><p><span class="vi">Chưa có bản chính thức.</span><span class="en">No official version yet.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">Lai ghép</span><span class="en">Hybrids</span></h3><p><span class="vi">Dùng điệu múa như bước khai thác cho thuật toán khác.</span><span class="en">Use the dance as an exploitation step in other algorithms.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng trong bài gốc</span><span class="en">Applications in the original paper</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Bài báo đánh giá RCO trên CEC-2005, CEC-2022 và tám bài toán kỹ thuật.</span><span class="en">The paper evaluates RCO on CEC-2005, CEC-2022 and eight engineering problems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Bộ hàm CEC</span><span class="en">CEC suites</span></h3><p><span class="vi">Tác giả báo cáo RCO tốt hơn 8 thuật toán so sánh ở 74% hàm CEC-2005 và 50% hàm CEC-2022.</span><span class="en">The authors report RCO better than 8 competitors on 74% of CEC-2005 and 50% of CEC-2022 functions.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Thiết kế kỹ thuật</span><span class="en">Engineering design</span></h3><p><span class="vi">Tám bài toán thiết kế có ràng buộc.</span><span class="en">Eight constrained design problems.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Thực nghiệm của giáo trình</span><span class="en">Textbook experiment</span></h3><p><span class="vi">Kết quả độc lập ở slide sau cho thấy bức tranh khác.</span><span class="en">The independent results on the next slide paint a different picture.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Bài học</span><span class="en">Lesson</span></h3><p><span class="vi">Luôn chạy lại thuật toán mới với giao thức của chính mình.</span><span class="en">Always re-run new algorithms under your own protocol.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · RCO</span><span class="en">Experiment · RCO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">9.27e−3</td><td class="num">9.16e−3</td><td class="num">7.42e−3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">6.14e+2</td><td class="num">8.58e+2</td><td class="num">1.56e+2</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">3.28e+1</td><td class="num">1.52e+1</td><td class="num">3.48e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">2.90e+0</td><td class="num">9.34e−1</td><td class="num">2.97e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">5.43e−1</td><td class="num">3.68e−1</td><td class="num">4.41e−1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">2.55e−2</td><td class="num">2.88e−2</td><td class="num">1.41e−2</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">4.07e+1</td><td class="num">1.38e+1</td><td class="num">3.91e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>14.86</b>, đứng thứ <b>16/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>14.86</b>, position <b>16/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Trong giao thức của giáo trình (D = 10, 20 000 lần đánh giá, tham số theo bài), RCO đứng 16/18, kém PSO trên cả 7 hàm. Kết quả này khác với kết luận trong bài gốc; cần thêm nghiên cứu độc lập.</span><span class="en">Under the textbook's protocol (D = 10, 20,000 evaluations, paper parameters) RCO ranks 16/18 and loses to PSO on all 7 functions. This differs from the original paper's conclusion; more independent studies are needed.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · RCO</span><span class="en">Experiment · RCO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/RCO.svg" alt="convergence RCO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/rco.py" class="c-sea">code/si/algorithms/rco.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        tt = min(t / T, 1.0)
+        o = np.argsort(fx)
+        <span class="k">if</span> rng.random() &lt; pc:
+            home = X[o[0]].copy(); hf = fx[o[0]]
+            Xp = X.copy()
+            <span class="k">for</span> rank, i <span class="k">in</span> enumerate(o):
+                <span class="k">if</span> rank &lt; k:                                           <span class="c"># kiếm ăn ngẫu nhiên</span>
+                    Xp[i] = X[i] + 2 * rng.random(prob.dim) * (home - X[i])
+                <span class="k">else</span>:                                                  <span class="c"># kiếm ăn đường dài</span>
+                    Xp[i] = X[i] + (5 - 4 * tt) * (home - X[i])
+                    <span class="k">if</span> rng.random() &lt; tt ** 0.5:                       <span class="c"># thoát hiểm</span>
+                        Xr = prob.random(rng, 1)[0]
+                        Xp[i] = Xp[i] + rng.uniform(1, 2) * (Xr - Xp[i]) + rng.uniform(1, 2) * (pbest[i] - Xp[i])
+            Xp = prob.clip(Xp)
+            fp = prob(Xp)
+            <span class="k">if</span> fp.min() &lt; hf:
+                home = Xp[np.argmin(fp)].copy()
+            X = prob.clip(Xp + (2 - tt) * rng.random((n, 1)) * (home - Xp))   <span class="c"># tụ tập nghỉ đêm</span>
+            fx = prob(X)
+        <span class="k">else</span>:
+            first, second = X[o[0]].copy(), X[o[1]].copy()
+            u = rng.normal(1, max(1 - tt, 1e-12), (n, 1))
+            r4 = rng.uniform(0, 0.1, (n, 1))
+            X = prob.clip(((X + u * r4 * (first - X)) + (X + u * r4 * (second - X))) / 2)
+            fx = prob(X)</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Ý tưởng mới, cần kiểm chứng thêm</span><span class="en">A new idea that needs more verification</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Kết hợp nhiều hành vi trong một khung rõ ràng.</span><span class="en">Combines several behaviours in a clear framework.</span></li>
+          <li><span class="vi">Ít tham số; dễ cài đặt từ mô tả trong bài báo.</span><span class="en">Few parameters; easy to implement from the paper.</span></li>
+          <li><span class="vi">Nhánh kiếm ăn xa và thoát hiểm giữ khả năng khám phá.</span><span class="en">Far foraging and escape keep exploration alive.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Bước kiếm ăn xa với <span class="m">c<sub>2</sub> = 5</span> và thoát hiểm với <span class="m">r<sub>1</sub>, r<sub>2</sub> ∈ [1, 2]</span> rất lớn; nhiều bước bị kẹp ở biên.</span><span class="en">Far foraging with <span class="m">c<sub>2</sub> = 5</span> and escape with <span class="m">r<sub>1</sub>, r<sub>2</sub> ∈ [1, 2]</span> are huge; many steps get clipped at the bounds.</span></li>
+          <li><span class="vi">Không có chọn lọc tham lam: vị trí tốt có thể bị ghi đè.</span><span class="en">No greedy selection: good positions can be overwritten.</span></li>
+          <li><span class="vi">Kết quả độc lập kém hơn công bố gốc.</span><span class="en">Independent results are weaker than published ones.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">c<sub>2</sub>, c<sub>3</sub></span> và xác suất thoát hiểm tại <span class="m">t/T = 0.1, 0.5, 0.9</span>.</span><span class="en">Compute <span class="m">c<sub>2</sub>, c<sub>3</sub></span> and the escape probability at <span class="m">t/T = 0.1, 0.5, 0.9</span>.</span></li>
+          <li><span class="vi">Lặp lại ví dụ múa với <span class="m">u = 0.5</span>.</span><span class="en">Redo the dance example with <span class="m">u = 0.5</span>.</span></li>
+          <li><span class="vi">Kỳ vọng số lần đánh giá mỗi vòng khi <span class="m">p<sub>c</sub> = 0.7</span>?</span><span class="en">Expected evaluations per iteration with <span class="m">p<sub>c</sub> = 0.7</span>?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Thêm chọn lọc tham lam vào RCO và đo lại trên bộ 7 hàm.</span><span class="en">Add greedy selection to RCO and re-run the 7-function suite.</span></li>
+          <li><span class="vi">So sánh <span class="m">p<sub>c</sub> = 0.7</span> và <span class="m">0.9</span>.</span><span class="en">Compare <span class="m">p<sub>c</sub> = 0.7</span> and <span class="m">0.9</span>.</span></li>
+          <li><span class="vi">Chạy RCO trên bộ CEC-2022 bằng thư viện có sẵn và so với bài gốc.</span><span class="en">Run RCO on CEC-2022 with an existing library and compare with the paper.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>X.-S. Yang, “A New Metaheuristic Bat-Inspired Algorithm,” in <em>Studies in Computational Intelligence</em>, Springer Berlin Heidelberg, 2010, pp. 65–74, doi: <a href="https://doi.org/10.1007/978-3-642-12538-6_6">10.1007/978-3-642-12538-6_6</a>.</li>
+        <li>J. A. Goldbogen, A. S. Friedlaender, J. Calambokidis, M. F. McKenna, M. Simon, and D. P. Nowacek, “Integrative Approaches to the Study of Baleen Whale Diving Behavior, Feeding Performance, and Foraging Ecology,” <em>BioScience</em>, vol. 63, no. 2, pp. 90–100, 2013, doi: <a href="https://doi.org/10.1525/bio.2013.63.2.5">10.1525/bio.2013.63.2.5</a>.</li>
+        <li>S. Mirjalili and A. Lewis, “The Whale Optimization Algorithm,” <em>Advances in Engineering Software</em>, vol. 95, pp. 51–67, 2016, doi: <a href="https://doi.org/10.1016/j.advengsoft.2016.01.008">10.1016/j.advengsoft.2016.01.008</a>.</li>
+        <li>M. M. Mafarja and S. Mirjalili, “Hybrid Whale Optimization Algorithm with simulated annealing for feature selection,” <em>Neurocomputing</em>, vol. 260, pp. 302–312, 2017, doi: <a href="https://doi.org/10.1016/j.neucom.2017.04.053">10.1016/j.neucom.2017.04.053</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+        <li>J. Kang and Z. Ma, “Red-Crowned Crane Optimization: A Novel Biomimetic Metaheuristic Algorithm for Engineering Applications,” <em>Biomimetics</em>, vol. 10, no. 9, pp. 565, 2025, doi: <a href="https://doi.org/10.3390/biomimetics10090565">10.3390/biomimetics10090565</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Kiếm ăn · thoát hiểm · nghỉ đêm · múa</span><span class="en">Forage · escape · roost · dance</span></span>
+      <span><span class="vi">Hai nhánh chọn bằng <span class="m">p<sub>c</sub></span></span><span class="en">Two branches chosen by <span class="m">p<sub>c</sub></span></span></span>
+      <span><span class="vi">Thuật toán mới cần kiểm chứng độc lập</span><span class="en">New algorithms need independent checks</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Kang &amp; Ma, <em>Biomimetics</em> 10(9): 565, 2025</span><span class="en">Original paper: Kang &amp; Ma, <em>Biomimetics</em> 10(9): 565, 2025</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () { const rnd = SI.rng(8); let h = '<circle cx="190" cy="115" r="18" fill="#f6e6b8"/>';
+  for (let i = 0; i < 14; i++) { const a = rnd() * 6.28, r = 60 + rnd() * 90, x = 190 + r * Math.cos(a), y = 115 + r * Math.sin(a) * 0.6;
+    h += `<line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${(190 + (x - 190) * 0.25).toFixed(1)}" y2="${(115 + (y - 115) * 0.25).toFixed(1)}" stroke="#56676a" stroke-dasharray="3 4"/><path d="M${x.toFixed(1)},${y.toFixed(1)} l-9,-5 l4,6 l-8,3 z" fill="#1c2a2e"/><circle cx="${(x - 2).toFixed(1)}" cy="${(y - 4).toFixed(1)}" r="2" fill="#d9562f"/>`; }
+  document.getElementById('rco-art').innerHTML = h; })();
+new SI.Field2D(document.getElementById('rco-field'), {
+  n: 12, T: 60, seed: 3, pc: 0.7,
+  init(S) { for (let i = 0; i < this.n; i++) { const x = SI.randPos(S.rnd); S.pop.push({ x, pb: x.slice(), mode: 0 }); } },
+  step(S) {
+    const P = S.pop, n = this.n, rnd = S.rnd, tt = Math.min(1, (S.t - 1) / S.T), k = n / 2;
+    const order = P.map((a, i) => i).sort((p, q) => SI.f(P[p].x) - SI.f(P[q].x));
+    if (rnd() < this.pc) {
+      let home = P[order[0]].x.slice();
+      order.forEach((i, rank) => { const a = P[i];
+        if (rank < k) { a.x = a.x.map((v, d) => SI.clamp(v + 2 * rnd() * (home[d] - v))); a.mode = 1; }
+        else { a.x = a.x.map((v, d) => v + (5 - 4 * tt) * (home[d] - v)); a.mode = 2;
+          if (rnd() < Math.sqrt(tt)) { const xr = SI.randPos(rnd), r1 = 1 + rnd(), r2 = 1 + rnd(); a.x = a.x.map((v, d) => v + r1 * (xr[d] - v) + r2 * (a.pb[d] - v)); a.mode = 3; }
+          a.x = a.x.map(SI.clamp); } });
+      const b = P.reduce((m, a) => (SI.f(a.x) < SI.f(m) ? a.x : m), home); home = b.slice();
+      P.forEach((a) => { const r3 = rnd(); a.x = a.x.map((v, d) => SI.clamp(v + (2 - tt) * r3 * (home[d] - v))); });
+    } else {
+      const f1 = P[order[0]].x.slice(), f2 = P[order[1]].x.slice(), sd = Math.max(1 - tt, 1e-9);
+      P.forEach((a) => { const u = 1 + sd * SI.gauss(rnd), r4 = 0.1 * rnd(); a.x = a.x.map((v, d) => SI.clamp(((v + u * r4 * (f1[d] - v)) + (v + u * r4 * (f2[d] - v))) / 2)); a.mode = 4; });
+    }
+    P.forEach((a) => { if (SI.f(a.x) < SI.f(a.pb)) a.pb = a.x.slice(); });
+  },
+  draw(g, S, P) {
+    const col = ['#f5f0e6', '#3a7fc1', '#e6904f', '#d9562f', '#4b8f45'];
+    for (const a of S.pop) SI.trail(g, P, a, 'rgba(28,42,46,0.3)');
+    for (const a of S.pop) { const [x, y] = P.at(a); SI.dot(g, x, y, 5, col[a.mode]); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return ''; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

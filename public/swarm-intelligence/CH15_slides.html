@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 15: Bầy đàn nhị phân" data-title-en="Chapter 15: Binary swarms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 15: Bầy đàn nhị phân</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 15 · Phần V</span><span class="en">Chapter 15 · Part V</span></p>
+    <h1 class="reveal d1"><span class="vi">Bầy đàn nhị phân và tối ưu rời rạc</span><span class="en">Binary swarms and discrete optimization</span><span class="sub"><span class="vi">Hàm chuyển S và V</span><span class="en">S- and V-shaped transfer functions</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích vì sao thuật toán liên tục cần hàm chuyển để làm việc với bit.</span><span class="en">Explain why continuous algorithms need transfer functions to handle bits.</span></li>
+        <li class="reveal d3"><span class="vi">Phân biệt hàm chuyển dạng S (đặt bit) và dạng V (lật bit).</span><span class="en">Distinguish S-shaped (set the bit) and V-shaped (flip the bit) transfer functions.</span></li>
+        <li class="reveal d4"><span class="vi">Áp dụng Binary PSO cho bài toán cái túi 0/1 và chọn đặc trưng.</span><span class="en">Apply Binary PSO to 0/1 knapsack and feature selection.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả: V2 tốt hơn S2 rõ rệt trên bài cái túi.</span><span class="en">Read the results: V2 clearly beats S2 on knapsack.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Từ liên tục sang nhị phân" data-label-en="From continuous to binary">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ý tưởng</span><span class="en">Idea</span></p>
+      <h2 class="reveal d1"><span class="vi">Vận tốc trở thành xác suất</span><span class="en">Velocity becomes probability</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Nhiều bài toán có biến 0/1: chọn đặc trưng, cái túi, lập lịch, cấu hình mạng.</span><span class="en">Many problems have 0/1 variables: feature selection, knapsack, scheduling, network configuration.</span></li>
+          <li class="reveal d3"><span class="vi">Ý tưởng của Kennedy &amp; Eberhart (1997): giữ nguyên cập nhật vận tốc, nhưng dùng vận tốc để quyết định <strong>xác suất</strong> của bit.</span><span class="en">Kennedy &amp; Eberhart's idea (1997): keep the velocity update, but use velocity to set the <strong>probability</strong> of each bit.</span></li>
+          <li class="reveal d4"><span class="vi">Cách này dùng được cho mọi thuật toán bầy đàn: GWO, HHO, ALO, WOA... đều có bản nhị phân.</span><span class="en">It works for any swarm algorithm: GWO, HHO, ALO, WOA... all have binary versions.</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Hai họ hàm chuyển</span><span class="en">Two families</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><strong>Dạng S</strong>: <span class="m">x = 1</span> với xác suất <span class="m">T(v)</span>, không phụ thuộc bit cũ.</span><span class="en"><strong>S-shaped</strong>: <span class="m">x = 1</span> with probability <span class="m">T(v)</span>, regardless of the old bit.</span></li>
+          <li><span class="vi"><strong>Dạng V</strong>: lật bit cũ với xác suất <span class="m">T(v)</span>; <span class="m">v ≈ 0</span> nghĩa là giữ nguyên.</span><span class="en"><strong>V-shaped</strong>: flip the old bit with probability <span class="m">T(v)</span>; <span class="m">v ≈ 0</span> means keep it.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các hàm chuyển" data-label-en="Transfer functions">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Tám hàm chuyển của Mirjalili &amp; Lewis (2013)</span><span class="en">The eight transfer functions of Mirjalili &amp; Lewis (2013)</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Dạng S</span><span class="en">S-shaped</span></th><th><span class="vi">Công thức</span><span class="en">Formula</span></th><th><span class="vi">Dạng V</span><span class="en">V-shaped</span></th><th><span class="vi">Công thức</span><span class="en">Formula</span></th></tr></thead>
+      <tbody>
+        <tr><td>S1</td><td><span class="m">1 / (1 + e<sup>−2v</sup>)</span></td><td>V1</td><td><span class="m">|erf(√π v / 2)|</span></td></tr>
+        <tr><td>S2</td><td><span class="m">1 / (1 + e<sup>−v</sup>)</span></td><td>V2</td><td><span class="m">|tanh(v)|</span></td></tr>
+        <tr><td>S3</td><td><span class="m">1 / (1 + e<sup>−v/2</sup>)</span></td><td>V3</td><td><span class="m">|v / √(1 + v²)|</span></td></tr>
+        <tr><td>S4</td><td><span class="m">1 / (1 + e<sup>−v/3</sup>)</span></td><td>V4</td><td><span class="m">|(2/π) arctan(πv/2)|</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">S2 chính là hàm sigmoid của Binary PSO gốc (chương 3). Mirjalili &amp; Lewis dùng <span class="m">v<sub>max</sub> = 6</span>.</span><span class="en">S2 is the sigmoid of the original Binary PSO (chapter 3). Mirjalili &amp; Lewis use <span class="m">v<sub>max</sub> = 6</span>.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">Kéo vận tốc, xem xác suất</span><span class="en">Drag the velocity, watch the probability</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <label style="font-size: var(--small-size)"><span class="vi">Vận tốc</span><span class="en">Velocity</span> <span class="m">v</span> = <b id="c15-v">1.0</b><input id="c15-slider" type="range" min="-6" max="6" step="0.1" value="1" style="width:100%"/></label>
+        <p id="c15-out"></p>
+        <p class="note"><span class="vi">Với dạng S, bit mới không phụ thuộc bit cũ; với dạng V, <span class="m">v</span> gần 0 thì bit gần như không đổi: đây là lý do V ổn định hơn ở cuối quá trình.</span><span class="en">With S, the new bit ignores the old one; with V, <span class="m">v</span> near 0 keeps the bit: this is why V is more stable late in the run.</span></p>
+      </div>
+      <figure class="fig"><svg id="c15-plot" viewBox="0 0 400 260" role="img" aria-label="Transfer functions"></svg></figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bit với <span class="m">v = 1</span> và <span class="m">v = −1</span></span><span class="en">One bit with <span class="m">v = 1</span> and <span class="m">v = −1</span></span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">S2(1) = 1/(1 + e<sup>−1</sup>) = 0.731, &nbsp; S2(−1) = 0.269</span></div>
+          <div class="eq"><span class="m">V2(1) = V2(−1) = tanh 1 = 0.762</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">S2: với <span class="m">v = 1</span>, bit thành 1 với xác suất 0.731; với <span class="m">v = −1</span>, chỉ 0.269.</span><span class="en">S2: with <span class="m">v = 1</span> the bit becomes 1 with probability 0.731; with <span class="m">v = −1</span> only 0.269.</span></li>
+          <li><span class="vi">V2: cả hai trường hợp đều lật bit với xác suất 0.762, vì V đối xứng.</span><span class="en">V2: both cases flip the bit with probability 0.762, since V is symmetric.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Cái túi với hàm phạt</span><span class="en">Knapsack with a penalty</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Mục tiêu: <span class="m">max Σv<sub>i</sub>x<sub>i</sub></span> với <span class="m">Σw<sub>i</sub>x<sub>i</sub> ≤ W</span>.</span><span class="en">Objective: <span class="m">max Σv<sub>i</sub>x<sub>i</sub></span> s.t. <span class="m">Σw<sub>i</sub>x<sub>i</sub> ≤ W</span>.</span></li>
+          <li><span class="vi">Giáo trình dùng <span class="m">fitness = Σv<sub>i</sub>x<sub>i</sub> − ρ · max(0, Σw<sub>i</sub>x<sub>i</sub> − W)</span>, <span class="m">ρ = max(v<sub>i</sub>/w<sub>i</sub>)</span>.</span><span class="en">The book uses <span class="m">fitness = Σv<sub>i</sub>x<sub>i</sub> − ρ · max(0, Σw<sub>i</sub>x<sub>i</sub> − W)</span>, <span class="m">ρ = max(v<sub>i</sub>/w<sub>i</sub>)</span>.</span></li>
+          <li><span class="vi">Ví dụ trong sách tham khảo (5 món, 35 kg): tối ưu là 16 với G, M, A, O (34 kg).</span><span class="en">The reference book's example (5 items, 35 kg): optimum 16 with G, M, A, O (34 kg).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · cái túi 0/1</span><span class="en">Experiment · 0/1 knapsack</span></p>
+      <h2 class="reveal d1"><span class="vi">Binary PSO với S2 và V2, 20 000 lần đánh giá, 30 lần chạy</span><span class="en">Binary PSO with S2 and V2, 20,000 evaluations, 30 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Bài</span><span class="en">Instance</span></th><th><span class="vi">Tối ưu (DP)</span><span class="en">Optimum (DP)</span></th><th><span class="vi">S2: TB (sai lệch)</span><span class="en">S2: mean (gap)</span></th><th><span class="vi">V2: TB (sai lệch)</span><span class="en">V2: mean (gap)</span></th><th><span class="vi">Số lần đạt tối ưu S2 / V2</span><span class="en">Optimum hits S2 / V2</span></th><th><span class="vi">p</span><span class="en">p</span></th></tr></thead>
+      <tbody>
+        <tr><td>KP50</td><td>2067</td><td>1960.3 (5.2%)</td><td>2040.5 (1.3%)</td><td>0 / 5</td><td>4.1e-11</td></tr>
+        <tr><td>KP100</td><td>4042</td><td>3313.8 (18.0%)</td><td>3964.8 (1.9%)</td><td>0 / 0</td><td>2.9e-11</td></tr>
+        <tr><td>KP200</td><td>8010</td><td>6358.1 (20.6%)</td><td>7583.7 (5.3%)</td><td>0 / 0</td><td>2.9e-11</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Tối ưu tính bằng quy hoạch động. V2 tốt hơn S2 rõ rệt và có ý nghĩa thống kê trên cả ba bài, khớp với kết luận của Mirjalili &amp; Lewis (2013).</span><span class="en">Optima computed by dynamic programming. V2 clearly and significantly beats S2 on all three instances, matching Mirjalili &amp; Lewis (2013).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Chọn đặc trưng" data-label-en="Feature selection">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · chọn đặc trưng</span><span class="en">Experiment · feature selection</span></p>
+      <h2 class="reveal d1"><span class="vi">Breast Cancer (30 đặc trưng), KNN k = 5, 600 lần đánh giá, 10 lần chạy</span><span class="en">Breast Cancer (30 features), KNN k = 5, 600 evaluations, 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Phương pháp</span><span class="en">Method</span></th><th><span class="vi">Số đặc trưng TB</span><span class="en">Mean features</span></th><th><span class="vi">Độ chính xác kiểm tra</span><span class="en">Test accuracy</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Dùng cả 30 đặc trưng</span><span class="en">All 30 features</span></td><td>30</td><td>0.9474</td></tr>
+        <tr><td>BPSO-S2</td><td>14.3</td><td>0.9403 ± 0.0086</td></tr>
+        <tr><td>BPSO-V2</td><td>14.1</td><td>0.9456 ± 0.0096</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Hàm mục tiêu <span class="m">0.99(1 − acc<sub>CV</sub>) + 0.01|S|/30</span> trên tập huấn luyện (CV 5 lần); tập kiểm tra 30% giữ riêng. BPSO dùng khoảng một nửa số đặc trưng với độ chính xác gần như không đổi; không cải thiện độ chính xác.</span><span class="en">Objective <span class="m">0.99(1 − acc<sub>CV</sub>) + 0.01|S|/30</span> on the training set (5-fold CV); a 30% test set kept aside. BPSO uses about half the features with almost unchanged accuracy; it does not improve accuracy.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng</span><span class="en">Applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Tối ưu rời rạc bằng bầy đàn xuất hiện ở nhiều lĩnh vực.</span><span class="en">Discrete swarm optimization appears in many fields.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">BPSO, BGWO (Emary và cs., 2016), BALO, BHHO.</span><span class="en">BPSO, BGWO (Emary et al., 2016), BALO, BHHO.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Cái túi, phân bổ</span><span class="en">Knapsack, allocation</span></h3><p><span class="vi">Phân bổ ngân sách, chọn dự án.</span><span class="en">Budget allocation, project selection.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Mạng và đồ thị</span><span class="en">Networks and graphs</span></h3><p><span class="vi">Đặt trạm, cây Steiner, phủ đỉnh.</span><span class="en">Station placement, Steiner trees, vertex cover.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Dùng biểu diễn hoán vị thay cho bit.</span><span class="en">Uses permutation encodings instead of bits.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/binary.py" class="c-sea">code/si/binary.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> fes &lt; budget:
+        t += 1
+        w = w_max - (w_max - w_min) * t / T
+        g = P[np.argmin(pf)]
+        Vel = np.clip(w * Vel + c1 * rng.random((n, D)) * (P - X) + c2 * rng.random((n, D)) * (g - X), -vmax, vmax)
+        prob = tf(Vel)
+        <span class="k">if</span> transfer.startswith(&<span class="c">#x27;S&#x27;):</span>
+            X = (rng.random((n, D)) &lt; prob).astype(int)
+        <span class="k">else</span>:
+            X = np.where(rng.random((n, D)) &lt; prob, 1 - X, X)
+        f = fitness(X); fes += n
+        b = f &lt; pf</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Nhị phân hóa: đơn giản nhưng cần chọn hàm chuyển</span><span class="en">Binarization: simple, but choose the transfer function</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Một khung chung cho mọi thuật toán liên tục.</span><span class="en">One framework for every continuous algorithm.</span></li>
+          <li><span class="vi">Dạng V ổn định hơn ở cuối quá trình và cho kết quả tốt hơn trên cái túi.</span><span class="en">V-shapes are more stable late in the run and better on knapsack.</span></li>
+          <li><span class="vi">Chọn đặc trưng giảm một nửa số đặc trưng mà không mất độ chính xác.</span><span class="en">Feature selection halves the features without losing accuracy.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Hàm phạt cho ràng buộc tải trọng cần chọn hệ số cẩn thận.</span><span class="en">The capacity penalty factor needs care.</span></li>
+          <li><span class="vi">Chọn đặc trưng trên dữ liệu nhỏ dễ quá khớp với tập huấn luyện; luôn giữ tập kiểm tra riêng.</span><span class="en">Feature selection on small data easily overfits the training set; always keep a separate test set.</span></li>
+          <li><span class="vi">Bài toán hoán vị (TSP, lập lịch) cần biểu diễn khác, như ACO.</span><span class="en">Permutation problems (TSP, scheduling) need other encodings, such as ACO.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính S1–S4 và V1–V4 tại <span class="m">v = 2</span>.</span><span class="en">Compute S1–S4 and V1–V4 at <span class="m">v = 2</span>.</span></li>
+          <li><span class="vi">Với V2, xác suất lật bit khi <span class="m">v = 0</span> là bao nhiêu? Với S2, xác suất bit bằng 1 là bao nhiêu?</span><span class="en">With V2, what is the flip probability at <span class="m">v = 0</span>? With S2, what is P(bit = 1)?</span></li>
+          <li><span class="vi">Kiểm tra lại đáp án 16 của bài cái túi trong sách bằng cách liệt kê.</span><span class="en">Verify the reference book's knapsack answer 16 by enumeration.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy cả 8 hàm chuyển trên KP100 và xếp hạng.</span><span class="en">Run all 8 transfer functions on KP100 and rank them.</span></li>
+          <li><span class="vi">Cài Binary GWO và so với BPSO-V2 trong chọn đặc trưng.</span><span class="en">Implement Binary GWO and compare with BPSO-V2 for feature selection.</span></li>
+          <li><span class="vi">Thay hàm phạt bằng sửa nghiệm tham lam (bỏ món có v/w nhỏ nhất).</span><span class="en">Replace the penalty with greedy repair (drop the lowest v/w item).</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Mirjalili and A. Lewis, “S-shaped versus V-shaped transfer functions for binary Particle Swarm Optimization,” <em>Swarm and Evolutionary Computation</em>, vol. 9, pp. 1–14, 2013, doi: <a href="https://doi.org/10.1016/j.swevo.2012.09.002">10.1016/j.swevo.2012.09.002</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Vận tốc → xác suất</span><span class="en">Velocity → probability</span></span>
+      <span><span class="vi">S đặt bit, V lật bit</span><span class="en">S sets bits, V flips bits</span></span>
+      <span><span class="vi">V2 thắng S2 trên cái túi</span><span class="en">V2 beats S2 on knapsack</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili &amp; Lewis, <em>Swarm and Evolutionary Computation</em> 9, 2013</span><span class="en">Original paper: Mirjalili &amp; Lewis, <em>Swarm and Evolutionary Computation</em> 9, 2013</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () {
+  const erf = (x) => { const t = 1 / (1 + 0.3275911 * Math.abs(x)), y = 1 - (((((1.061405429 * t - 1.453152027) * t) + 1.421413741) * t - 0.284496736) * t + 0.254829592) * t * Math.exp(-x * x); return x >= 0 ? y : -y; };
+  const T = { S1: (v) => 1 / (1 + Math.exp(-2 * v)), S2: (v) => 1 / (1 + Math.exp(-v)), S3: (v) => 1 / (1 + Math.exp(-v / 2)), S4: (v) => 1 / (1 + Math.exp(-v / 3)),
+              V1: (v) => Math.abs(erf(Math.sqrt(Math.PI) / 2 * v)), V2: (v) => Math.abs(Math.tanh(v)), V3: (v) => Math.abs(v / Math.sqrt(1 + v * v)), V4: (v) => Math.abs(2 / Math.PI * Math.atan(Math.PI / 2 * v)) };
+  const svg = document.getElementById('c15-plot'), X = (v) => 30 + (v + 6) / 12 * 360, Y = (p) => 230 - p * 200;
+  const cols = { S1: '#1f6f78', S2: '#3a7fc1', S3: '#4b8f45', S4: '#7b5ea7', V1: '#d9562f', V2: '#e6904f', V3: '#c9a227', V4: '#8a5a3c' };
+  let h = `<line x1="30" y1="230" x2="390" y2="230" stroke="#1c2a2e"/><line x1="${X(0)}" y1="20" x2="${X(0)}" y2="235" stroke="#1c2a2e"/>`;
+  Object.entries(T).forEach(([k, fn], i) => { let d = ''; for (let j = 0; j <= 120; j++) { const v = -6 + j / 10; d += `${j ? 'L' : 'M'}${X(v).toFixed(1)},${Y(fn(v)).toFixed(1)}`; } h += `<path d="${d}" fill="none" stroke="${cols[k]}" stroke-width="${k[1] === '2' ? 3 : 1.4}" ${k[0] === 'V' ? 'stroke-dasharray="5 3"' : ''}/><text x="${i < 4 ? 40 : 300}" y="${30 + (i % 4) * 16}" font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="${cols[k]}">${k}</text>`; });
+  h += '<line id="c15-mark" y1="20" y2="230" stroke="#1c2a2e" stroke-dasharray="3 3"/>';
+  svg.innerHTML = h;
+  const sl = document.getElementById('c15-slider'), out = document.getElementById('c15-out'), vv = document.getElementById('c15-v'), mk = document.getElementById('c15-mark');
+  const upd = () => { const v = parseFloat(sl.value); vv.textContent = v.toFixed(1); mk.setAttribute('x1', X(v)); mk.setAttribute('x2', X(v));
+    out.innerHTML = `<span class="vi">S2: P(x = 1) = <b>${T.S2(v).toFixed(3)}</b> · V2: P(lật bit) = <b>${T.V2(v).toFixed(3)}</b></span><span class="en">S2: P(x = 1) = <b>${T.S2(v).toFixed(3)}</b> · V2: P(flip) = <b>${T.V2(v).toFixed(3)}</b></span>`; };
+  sl.addEventListener('input', upd); upd();
+})();
+
+SI.boot();
+</script>
+</body>
+</html>

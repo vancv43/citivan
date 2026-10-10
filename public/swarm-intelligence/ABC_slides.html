@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Đàn ong nhân tạo (ABC)" data-title-en="Artificial Bee Colony (ABC)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Đàn ong nhân tạo (ABC)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 5 · Mục 5.1</span><span class="en">Chapter 5 · Section 5.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Đàn ong nhân tạo</span><span class="en">Artificial Bee Colony</span><span class="sub"><span class="vi">Artificial Bee Colony — ABC</span><span class="en">ABC — dividing the work of finding nectar</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Ánh xạ ba vai trò ong thợ, ong quan sát, ong trinh sát sang các bước tối ưu.</span><span class="en">Map the employed, onlooker and scout roles onto optimization steps.</span></li>
+          <li class="reveal d3"><span class="vi">Viết công thức tìm lân cận <span class="m">v<sub>ij</sub></span> và cơ chế chọn tham lam.</span><span class="en">Write the neighbour search <span class="m">v<sub>ij</sub></span> and the greedy selection.</span></li>
+          <li class="reveal d4"><span class="vi">Tính độ thích nghi và xác suất roulette của ong quan sát.</span><span class="en">Compute fitness values and onlooker roulette probabilities.</span></li>
+          <li class="reveal d5"><span class="vi">Giải thích vai trò của <span class="m">limit</span> trong cân bằng khám phá và khai thác.</span><span class="en">Explain how <span class="m">limit</span> balances exploration and exploitation.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Ong mật chia việc đi tìm mật</span><span class="en">Honey bees split up the job of foraging</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Dervis Karaboga</strong> đề xuất năm 2005, phát triển thêm cùng Basturk năm 2007.</span><span class="en">Proposed by <strong>Dervis Karaboga</strong> in 2005, developed further with Basturk in 2007.</span></li>
+          <li class="reveal d3"><span class="vi">Ong thợ khai thác một nguồn hoa, về tổ múa “điệu lắc” để báo vị trí và độ ngọt của nguồn đó.</span><span class="en">Employed bees work a flower patch and perform a “waggle dance” at the hive to report its location and richness.</span></li>
+          <li class="reveal d4"><span class="vi">Ong quan sát xem điệu múa rồi chọn nguồn để bay tới; nguồn càng ngọt càng được chọn nhiều.</span><span class="en">Onlooker bees watch the dances and pick a source to visit; richer sources get picked more often.</span></li>
+          <li class="reveal d5"><span class="vi">Khi một nguồn cạn, ong thợ bỏ nó và thành ong trinh sát, bay đi tìm nguồn mới ngẫu nhiên.</span><span class="en">When a source runs dry, its bee abandons it and becomes a scout, searching randomly for a new one.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 300" role="img" aria-label="Tổ ong và các nguồn hoa với ba loại ong">
+          <g stroke-width="2" fill="none">
+            <path class="draw" style="--len:200" d="M190,160 Q130,90 70,70" stroke="#1f6f78"/>
+            <path class="draw d2" style="--len:200" d="M190,160 Q260,90 310,60" stroke="#1f6f78"/>
+            <path class="draw d3" style="--len:200" d="M190,160 Q280,200 320,240" stroke="#e6904f" stroke-dasharray="5 5"/>
+            <path class="draw d4" style="--len:260" d="M190,160 Q90,230 50,250 Q30,200 70,190" stroke="#4b8f45" stroke-dasharray="2 5"/>
+          </g>
+          <polygon points="190,128 218,144 218,176 190,192 162,176 162,144" fill="#f0cf7a" stroke="#1c2a2e" stroke-width="1.5"/>
+          <text x="190" y="165" text-anchor="middle" font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600" fill="#1c2a2e"><tspan class="vi">tổ</tspan><tspan class="en">hive</tspan></text>
+          <g><circle cx="70" cy="70" r="20" fill="#f6d8cb"/><circle cx="310" cy="60" r="26" fill="#f6d8cb"/><circle cx="320" cy="240" r="14" fill="#f6d8cb"/></g>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a">
+            <text x="40" y="110"><tspan class="vi">nguồn hoa</tspan><tspan class="en">food source</tspan></text>
+            <text x="250" y="105" fill="#1f6f78"><tspan class="vi">ong thợ</tspan><tspan class="en">employed</tspan></text>
+            <text x="240" y="235" fill="#c56a2a"><tspan class="vi">ong quan sát</tspan><tspan class="en">onlooker</tspan></text>
+            <text x="20" y="280" fill="#4b8f45"><tspan class="vi">ong trinh sát</tspan><tspan class="en">scout</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Ba vai trò trong một đàn ong đi kiếm mật</span><span class="en">Three roles in a foraging colony</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. MAPPING -->
+<section class="slide" aria-label="Ánh xạ sang bài toán tối ưu" data-label-en="Mapping to optimization">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+      <h2 class="reveal d1"><span class="vi">Nguồn hoa là lời giải, độ ngọt là độ thích nghi</span><span class="en">A food source is a solution, its nectar is the fitness</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Trong tự nhiên</span><span class="en">In nature</span></th><th><span class="vi">Trong ABC</span><span class="en">In ABC</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Vị trí nguồn hoa</span><span class="en">Location of a food source</span></td><td><span class="vi">Một lời giải <span class="m">x<sub>i</sub> ∈ ℝ<sup>D</sup></span></span><span class="en">A solution <span class="m">x<sub>i</sub> ∈ ℝ<sup>D</sup></span></span></td></tr>
+        <tr><td><span class="vi">Lượng mật</span><span class="en">Amount of nectar</span></td><td><span class="vi">Độ thích nghi <span class="m">fit<sub>i</sub></span></span><span class="en">Fitness <span class="m">fit<sub>i</sub></span></span></td></tr>
+        <tr><td><span class="vi">Ong thợ, ong quan sát</span><span class="en">Employed and onlooker bees</span></td><td><span class="vi">Mỗi loại có <span class="m">SN</span> con, bằng số nguồn hoa; tìm quanh các nguồn đã biết</span><span class="en"><span class="m">SN</span> of each, one per food source; search around known sources</span></td></tr>
+        <tr><td><span class="vi">Ong trinh sát</span><span class="en">Scout bee</span></td><td><span class="vi">Thay một nguồn “cạn” bằng một lời giải ngẫu nhiên mới</span><span class="en">Replaces an “exhausted” source with a new random solution</span></td></tr>
+        <tr><td><span class="vi">Lưu ý</span><span class="en">Note</span></td><td><span class="vi">ABC của Karaboga khác <em>Bees Algorithm</em> của Pham và cs. (2005), thuật toán tuyển thêm ong cho các vùng tốt. Bản ABC cho bài toán có ràng buộc (Karaboga &amp; Akay, 2011) đổi mỗi chiều với xác suất <span class="m">MR</span> thay vì chỉ một chiều.</span><span class="en">Karaboga's ABC differs from the <em>Bees Algorithm</em> of Pham et al. (2005), which recruits extra bees to good patches. The constrained ABC (Karaboga &amp; Akay, 2011) changes each dimension with probability <span class="m">MR</span> instead of a single one.</span></td></tr>
+        <tr><td><span class="vi">Nguồn cạn</span><span class="en">Exhausted source</span></td><td><span class="vi">Lời giải không cải thiện sau <span class="m">limit</span> lần thử</span><span class="en">A solution not improved after <span class="m">limit</span> trials</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 4. EMPLOYED -->
+<section class="slide" aria-label="Pha ong thợ" data-label-en="Employed bee phase">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha 1 · Ong thợ</span><span class="en">Phase 1 · Employed bees</span></p>
+      <h2 class="reveal d1"><span class="vi">Thử một nguồn lân cận, chỉ đổi một chiều</span><span class="en">Try a neighbouring source, changing one dimension</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">v<sub>ij</sub> = x<sub>ij</sub> + φ<sub>ij</sub> (x<sub>ij</sub> − x<sub>kj</sub>)</span></div></div>
+        <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size)*0.85); text-align:center; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> f(v<sub>i</sub>) <span class="up"><span class="vi">tốt hơn</span><span class="en">better than</span></span> f(x<sub>i</sub>): x<sub>i</sub> ← v<sub>i</sub>, trial<sub>i</sub> ← 0; <span class="up"><span class="vi">ngược lại</span><span class="en">else</span></span> trial<sub>i</sub> ← trial<sub>i</sub> + 1</div></div>
+      </div>
+      <ul class="bullets">
+        <li class="reveal d3"><span class="m">j</span><span class="vi">: một chiều chọn ngẫu nhiên; chỉ chiều này thay đổi.</span><span class="en">: one randomly chosen dimension; only it changes.</span></li>
+        <li class="reveal d4"><span class="m">k ≠ i</span><span class="vi">: một nguồn khác chọn ngẫu nhiên, làm “điểm tham chiếu”.</span><span class="en">: another randomly chosen source, used as a reference.</span></li>
+        <li class="reveal d4"><span class="m">φ<sub>ij</sub> ~ U(−1, 1)</span><span class="vi">: bước nhảy co lại khi các nguồn tụ gần nhau.</span><span class="en">: the step shrinks naturally as sources cluster together.</span></li>
+        <li class="reveal d5"><span class="vi"><strong>Chọn tham lam</strong>: giữ lời giải tốt hơn; bộ đếm <span class="m">trial</span> ghi số lần thất bại liên tiếp.</span><span class="en"><strong>Greedy selection</strong>: keep the better one; the <span class="m">trial</span> counter records consecutive failures.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5. ONLOOKER -->
+<section class="slide" aria-label="Pha ong quan sát" data-label-en="Onlooker bee phase">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha 2 · Ong quan sát</span><span class="en">Phase 2 · Onlooker bees</span></p>
+      <h2 class="reveal d1"><span class="vi">Nguồn càng ngọt càng được nhiều ong ghé</span><span class="en">Richer sources attract more visits</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">p<sub>i</sub> = fit<sub>i</sub> / Σ<sub>n=1</sub><sup>SN</sup> fit<sub>n</sub></span></div></div>
+        <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size)*0.85); text-align:center; line-height:1.7">fit<sub>i</sub> = 1 / (1 + f<sub>i</sub>) &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span> f<sub>i</sub> ≥ 0<br />fit<sub>i</sub> = 1 + |f<sub>i</sub>| &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span> f<sub>i</sub> &lt; 0</div></div>
+      </div>
+      <ul class="bullets">
+        <li class="reveal d3"><span class="vi">Mỗi ong quan sát chọn một nguồn bằng <strong>vòng quay roulette</strong> theo xác suất <span class="m">p<sub>i</sub></span>.</span><span class="en">Each onlooker picks a source by <strong>roulette wheel</strong> with probability <span class="m">p<sub>i</sub></span>.</span></li>
+        <li class="reveal d4"><span class="vi">Sau đó làm đúng như ong thợ: tạo <span class="m">v<sub>i</sub></span> rồi chọn tham lam.</span><span class="en">It then acts like an employed bee: build <span class="m">v<sub>i</sub></span> and select greedily.</span></li>
+        <li class="reveal d5"><span class="vi">Kết quả: vùng tốt được tìm kỹ hơn. Đây là phần <strong>khai thác</strong> của ABC.</span><span class="en">Result: good regions are searched more intensively. This is ABC's <strong>exploitation</strong>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6. SCOUT -->
+<section class="slide" aria-label="Pha ong trinh sát" data-label-en="Scout bee phase">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Pha 3 · Ong trinh sát</span><span class="en">Phase 3 · Scout bees</span></p>
+      <h2 class="reveal d1"><span class="vi">Bỏ nguồn cạn, tìm nguồn mới hoàn toàn ngẫu nhiên</span><span class="en">Abandon the exhausted source, start fresh at random</span></h2>
+    </header>
+    <div class="eq-box reveal d2"><div class="m" style="font-size: var(--eq-size); text-align:center; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> trial<sub>i</sub> &gt; limit: &nbsp; x<sub>ij</sub> = x<sub>j</sub><sup>min</sup> + rand(0, 1) · (x<sub>j</sub><sup>max</sup> − x<sub>j</sub><sup>min</sup>)</div></div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="vi">Mỗi vòng lặp, thường chỉ cho tối đa một ong trở thành trinh sát.</span><span class="en">Usually at most one bee becomes a scout per iteration.</span></li>
+      <li class="reveal d4"><span class="m">limit</span><span class="vi"> là tham số riêng của ABC; Karaboga và Basturk gợi ý </span><span class="en"> is ABC's own control parameter; Karaboga and Basturk suggest </span><span class="m">limit = SN · D</span>.</li>
+      <li class="reveal d5"><span class="vi">Trinh sát là phần <strong>khám phá</strong> của ABC: nó đưa lời giải thoát khỏi các nguồn đã bị khai thác hết.</span><span class="en">Scouts are ABC's <strong>exploration</strong>: they free the colony from sources that have been worked out.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 7. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của ABC</span><span class="en">ABC step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Karaboga &amp; Basturk (2007); bầy 30 ong ứng với <span class="m">SN = 15</span> nguồn hoa.</span><span class="en">Karaboga &amp; Basturk (2007); a colony of 30 bees gives <span class="m">SN = 15</span> food sources.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">SN</span> nguồn hoa ngẫu nhiên; đặt bộ đếm thất bại bằng 0.</span><span class="en">Initialize <span class="m">SN</span> random food sources; set the failure counters to 0.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Ong thợ: mỗi nguồn thử một nguồn lân cận, giữ cái tốt hơn (chọn tham lam).</span><span class="en">Employed bees: each source tries a neighbour and keeps the better one (greedy selection).</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Ong quan sát: chọn nguồn theo xác suất tỉ lệ với độ thích nghi rồi thử lân cận.</span><span class="en">Onlookers: pick sources with probability proportional to fitness, then try a neighbour.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Ong trinh sát: nguồn thất bại quá <span class="m">limit</span> lần bị bỏ, thay bằng nguồn ngẫu nhiên.</span><span class="en">Scout: a source that failed more than <span class="m">limit</span> times is abandoned and replaced at random.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Ghi nhớ nguồn tốt nhất; lặp đến hết ngân sách.</span><span class="en">Memorize the best source; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">SN nguồn hoa</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">SN sources</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Đánh giá;</text><text x="875" y="89">bộ đếm = 0</text></g><g class="en"><text x="875" y="67">Evaluate;</text><text x="875" y="89">counters = 0</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Ong thợ +</text><text x="875" y="259">ong quan sát</text></g><g class="en"><text x="875" y="237">Employed +</text><text x="875" y="259">onlookers</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Trinh sát:</text><text x="625" y="259">bỏ nguồn cạn</text></g><g class="en"><text x="625" y="237">Scout:</text><text x="625" y="259">drop exhausted</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về nguồn tốt nhất</text></g><g class="en"><text x="125" y="248">Return best source</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của ABC</span><span class="en">ABC parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">SN</span></td><td><span class="vi">Số nguồn hoa = số ong thợ = nửa bầy</span><span class="en">Food sources = employed bees = half the colony</span></td><td>15 (bầy 30)</td></tr>
+        <tr><td><span class="m">limit</span></td><td><span class="vi">Số lần thất bại trước khi bỏ nguồn</span><span class="en">Failures before a source is abandoned</span></td><td><span class="m">SN · D = 150</span></td></tr>
+        <tr><td><span class="m">φ</span></td><td><span class="vi">Hệ số ngẫu nhiên trong bước lân cận</span><span class="en">Random factor in the neighbour step</span></td><td><span class="m">U(−1, 1)</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">ABC chỉ có một tham số điều khiển thực sự là <span class="m">limit</span>.</span><span class="en">ABC has essentially one control parameter, <span class="m">limit</span>.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán ABC</span><span class="en">The ABC algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ba tham số: số nguồn <span class="m">SN</span>, <span class="m">limit</span> và số vòng lặp tối đa <span class="m">MCN</span>.</span><span class="en">Three parameters: number of sources <span class="m">SN</span>, <span class="m">limit</span>, and the maximum cycle number <span class="m">MCN</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo ngẫu nhiên <span class="m">SN</span> nguồn hoa; <span class="m">trial<sub>i</sub> ← 0</span></span><span class="en">Randomly initialize <span class="m">SN</span> food sources; <span class="m">trial<sub>i</sub> ← 0</span></span></li>
+        <li><span><span class="kw">for</span> <span class="m">cycle = 1 … MCN</span></span></li>
+        <li style="--ind:1"><span class="vi"><span class="kw">Ong thợ:</span> mỗi nguồn tạo <span class="m">v<sub>i</sub></span>, chọn tham lam</span><span class="en"><span class="kw">Employed:</span> each source builds <span class="m">v<sub>i</sub></span>, greedy selection</span></li>
+        <li style="--ind:1"><span class="vi">Tính <span class="m">fit<sub>i</sub></span> và <span class="m">p<sub>i</sub></span></span><span class="en">Compute <span class="m">fit<sub>i</sub></span> and <span class="m">p<sub>i</sub></span></span></li>
+        <li style="--ind:1"><span class="vi"><span class="kw">Ong quan sát:</span> <span class="m">SN</span> lần chọn nguồn theo <span class="m">p<sub>i</sub></span>, tạo <span class="m">v<sub>i</sub></span>, chọn tham lam</span><span class="en"><span class="kw">Onlookers:</span> <span class="m">SN</span> times pick a source by <span class="m">p<sub>i</sub></span>, build <span class="m">v<sub>i</sub></span>, greedy selection</span></li>
+        <li style="--ind:1"><span class="vi"><span class="kw">Trinh sát:</span> nếu <span class="m">max trial<sub>i</sub> &gt; limit</span>, khởi tạo lại nguồn đó</span><span class="en"><span class="kw">Scout:</span> if <span class="m">max trial<sub>i</sub> &gt; limit</span>, re-initialize that source</span></li>
+        <li style="--ind:1"><span class="vi">Ghi nhớ lời giải tốt nhất</span><span class="en">Memorize the best solution</span></li>
+        <li><span><span class="kw">return</span> <span class="vi">lời giải tốt nhất</span><span class="en">the best solution</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">10 nguồn hoa trên cùng địa hình</span><span class="en">10 food sources on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Mỗi chấm là một nguồn hoa. Vòng cung quanh chấm là bộ đếm <span class="m">trial</span>: đầy vòng thì nguồn bị bỏ và một trinh sát xuất hiện (vòng xanh lá).</span><span class="en">Each dot is a food source. The arc around it is the <span class="m">trial</span> counter: when full, the source is abandoned and a scout appears (green ring).</span></p>
+        <p class="note"><span class="vi">Để thấy trinh sát rõ hơn, mô phỏng dùng <em>limit = 8</em>, nhỏ hơn mức gợi ý <em>SN · D = 20</em>. Bước ong thợ chỉ đổi một chiều, nên các nguồn thường nhảy theo phương ngang hoặc dọc.</span><span class="en">To make scouts visible, the demo uses <em>limit = 8</em>, below the suggested <em>SN · D = 20</em>. Employed steps change one dimension, so sources often jump horizontally or vertically.</span></p>
+      </div>
+      <div class="field" id="abc-field">
+        <canvas aria-label="ABC simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. ASSESSMENT -->
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước ong thợ và xác suất của ong quan sát</span><span class="en">One employed-bee step and onlooker probabilities</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">v<sub>ij</sub> = x<sub>ij</sub> + φ(x<sub>ij</sub> − x<sub>kj</sub>)</span></div>
+          <div class="eq"><span class="m">fit = 1/(1 + f), &nbsp; p<sub>i</sub> = fit<sub>i</sub> / Σ fit</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">x<sub>ij</sub> = 2, x<sub>kj</sub> = 5, φ = −0.4</span>: <span class="m">v<sub>ij</sub> = 2 + (−0.4)(−3) = 3.2</span>.</span><span class="en"><span class="m">x<sub>ij</sub> = 2, x<sub>kj</sub> = 5, φ = −0.4</span>: <span class="m">v<sub>ij</sub> = 2 + (−0.4)(−3) = 3.2</span>.</span></li>
+          <li><span class="vi">Chỉ một chiều <span class="m">j</span> thay đổi; nếu <span class="m">f(v) &lt; f(x)</span> thì thay và đặt lại bộ đếm.</span><span class="en">Only dimension <span class="m">j</span> changes; if <span class="m">f(v) &lt; f(x)</span> replace it and reset the counter.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Ba nguồn với f = 0, 1, 3</span><span class="en">Three sources with f = 0, 1, 3</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">fit = 1, 0.5, 0.25; tổng 1.75.</span><span class="en">fit = 1, 0.5, 0.25; sum 1.75.</span></li>
+          <li><span class="vi"><span class="m">p = 0.571, 0.286, 0.143</span>: nguồn tốt được ong quan sát ghé gấp 4 lần nguồn kém.</span><span class="en"><span class="m">p = 0.571, 0.286, 0.143</span>: the good source gets 4× the onlookers of the poor one.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của ABC</span><span class="en">ABC applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">ABC được dùng rộng rãi nhờ đơn giản và ít tham số.</span><span class="en">ABC is widely used thanks to its simplicity and few parameters.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Tối ưu số</span><span class="en">Numerical optimization</span></h3><p><span class="vi">Bài toán liên tục có ràng buộc.</span><span class="en">Constrained continuous problems.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Huấn luyện mạng</span><span class="en">Network training</span></h3><p><span class="vi">Trọng số mạng nơ-ron truyền thẳng.</span><span class="en">Feed-forward neural network weights.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Phân cụm</span><span class="en">Clustering</span></h3><p><span class="vi">Tìm tâm cụm thay cho k-means.</span><span class="en">Finding cluster centres instead of k-means.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Bản rời rạc cho flow-shop, job-shop.</span><span class="en">Discrete versions for flow-shop, job-shop.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ABC</span><span class="en">Experiment · ABC</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">5.60e−1</td><td class="num">1.03e+0</td><td class="num">2.32e−1</td><td><span class="sg-plus">+</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">7.56e−3</td><td class="num">7.20e−3</td><td class="num">8.63e−3</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>4.36</b>, đứng thứ <b>1/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>4.36</b>, position <b>1/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">ABC đứng đầu 18 thuật toán trong giao thức này và tốt hơn PSO trên các hàm đa đỉnh.</span><span class="en">ABC ranks first among 18 algorithms in this protocol and beats PSO on the multimodal functions.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ABC</span><span class="en">Experiment · ABC</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/ABC.svg" alt="convergence ABC" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/abc.py" class="c-sea">code/si/algorithms/abc.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        <span class="k">for</span> i <span class="k">in</span> range(SN):                      <span class="c"># ong thợ</span>
+            try_improve(i)
+        fit = _fit(f)
+        p = fit / fit.sum()
+        <span class="k">for</span> _ <span class="k">in</span> range(SN):                      <span class="c"># ong quan sát</span>
+            try_improve(int(rng.choice(SN, p=p)))
+        i = int(np.argmax(trial))                <span class="c"># ong trinh sát</span>
+        <span class="k">if</span> trial[i] &gt; limit:
+            X[i] = prob.random(rng, 1)[0]
+            f[i] = prob(X[i])[0]
+            trial[i] = 0
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá và biến thể" data-label-en="Assessment and variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Khám phá tốt, khai thác chậm</span><span class="en">Good explorer, slow exploiter</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Rất ít tham số: <span class="m">SN</span>, <span class="m">limit</span>, <span class="m">MCN</span>.</span><span class="en">Very few parameters: <span class="m">SN</span>, <span class="m">limit</span>, <span class="m">MCN</span>.</span></li>
+          <li><span class="vi">Cơ chế trinh sát giúp thoát cực trị cục bộ một cách tường minh.</span><span class="en">The scout mechanism escapes local optima explicitly.</span></li>
+          <li><span class="vi">Chọn tham lam nên lời giải mỗi nguồn không bao giờ xấu đi.</span><span class="en">Greedy selection means no source ever gets worse.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Mỗi bước chỉ đổi một chiều và không dùng lời giải tốt nhất, nên hội tụ chậm ở bài toán nhiều chiều.</span><span class="en">Each step changes one dimension and ignores the global best, so convergence is slow in high dimensions.</span></li>
+          <li><span class="vi"><strong>GABC</strong> (Zhu và Kwong, 2010) thêm số hạng hướng về lời giải tốt nhất để tăng khai thác.</span><span class="en"><strong>GABC</strong> (Zhu and Kwong, 2010) adds a term toward the global best to boost exploitation.</span></li>
+          <li><span class="vi">Còn có ABC nhị phân, ABC rời rạc cho lập lịch, ABC đa mục tiêu.</span><span class="en">There are also binary ABC, discrete ABC for scheduling, and multi-objective ABC.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Ba nguồn có <span class="m">f = (0, 1, 3)</span>. Tính <span class="m">fit<sub>i</sub></span> và <span class="m">p<sub>i</sub></span>.</span><span class="en">Three sources have <span class="m">f = (0, 1, 3)</span>. Compute <span class="m">fit<sub>i</sub></span> and <span class="m">p<sub>i</sub></span>.</span></li>
+          <li><span class="vi">Nếu <span class="m">limit = ∞</span>, ABC còn cơ chế khám phá nào?</span><span class="en">If <span class="m">limit = ∞</span>, what exploration mechanism remains?</span></li>
+          <li><span class="vi">Vì sao mỗi bước chỉ đổi một chiều? Hệ quả với bài toán nhiều chiều là gì?</span><span class="en">Why change only one dimension per step? What follows in high dimensions?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài ABC cho hàm Rastrigin 10 chiều.</span><span class="en">Implement ABC for the 10-D Rastrigin function.</span></li>
+          <li><span class="vi">Khảo sát <span class="m">limit ∈ {SN·D/2, SN·D, 2·SN·D}</span> trên 30 lần chạy.</span><span class="en">Study <span class="m">limit ∈ {SN·D/2, SN·D, 2·SN·D}</span> over 30 runs.</span></li>
+          <li><span class="vi">Cài GABC và so sánh tốc độ hội tụ với ABC gốc.</span><span class="en">Implement GABC and compare its convergence with the original ABC.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>D. Karaboga, “An idea based on honey bee swarm for numerical optimization,” Erciyes Univ., Kayseri, Turkey, Tech. Rep. TR06, 2005.</li>
+        <li>D. Pham, A. Ghanbarzadeh, E. Koç, S. Otri, S. Rahim, and M. Zaidi, “The Bees Algorithm — A Novel Tool for Complex Optimisation Problems,” in <em>Intelligent Production Machines and Systems</em>, Elsevier, 2006, pp. 454–459, doi: <a href="https://doi.org/10.1016/B978-008045157-2/50081-X">10.1016/B978-008045157-2/50081-X</a>.</li>
+        <li>D. Karaboga and B. Basturk, “A powerful and efficient algorithm for numerical function optimization: artificial bee colony (ABC) algorithm,” <em>J Glob Optim</em>, vol. 39, no. 3, pp. 459–471, 2007, doi: <a href="https://doi.org/10.1007/s10898-007-9149-x">10.1007/s10898-007-9149-x</a>.</li>
+        <li>X.-S. Yang, <em>Nature-Inspired Metaheuristic Algorithms</em>. Frome, U.K.: Luniver Press, 2008.</li>
+        <li>X.-S. Yang, “Firefly Algorithms for Multimodal Optimization,” in <em>Lecture Notes in Computer Science</em>, Springer Berlin Heidelberg, 2009, pp. 169–178, doi: <a href="https://doi.org/10.1007/978-3-642-04944-6_14">10.1007/978-3-642-04944-6_14</a>.</li>
+        <li>G. Zhu and S. Kwong, “Gbest-guided artificial bee colony algorithm for numerical function optimization,” <em>Applied Mathematics and Computation</em>, vol. 217, no. 7, pp. 3166–3173, 2010, doi: <a href="https://doi.org/10.1016/j.amc.2010.08.049">10.1016/j.amc.2010.08.049</a>.</li>
+        <li>D. Karaboga and B. Akay, “A modified Artificial Bee Colony (ABC) algorithm for constrained optimization problems,” <em>Applied Soft Computing</em>, vol. 11, no. 3, pp. 3021–3031, 2011, doi: <a href="https://doi.org/10.1016/j.asoc.2010.12.001">10.1016/j.asoc.2010.12.001</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>X. S. Yang and X. He, “Firefly algorithm: recent advances and applications,” <em>IJSI</em>, vol. 1, no. 1, pp. 36, 2013, doi: <a href="https://doi.org/10.1504/IJSI.2013.055801">10.1504/IJSI.2013.055801</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Ong thợ · ong quan sát · ong trinh sát</span><span class="en">Employed · onlooker · scout</span></span>
+      <span><span class="m">v<sub>ij</sub> = x<sub>ij</sub> + φ(x<sub>ij</sub> − x<sub>kj</sub>)</span></span>
+      <span><span class="vi"><span class="m">limit</span> quyết định khi nào bỏ nguồn</span><span class="en"><span class="m">limit</span> decides when to abandon</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Karaboga &amp; Basturk, <em>Journal of Global Optimization</em> 39, 2007</span><span class="en">Original paper: Karaboga &amp; Basturk, <em>Journal of Global Optimization</em> 39, 2007</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* ABC trên địa hình chung (cực tiểu). Mỗi bước mô phỏng = một chu kỳ đủ ba pha. */
+new SI.Field2D(document.getElementById('abc-field'), {
+  n: 10, T: 60, seed: 13, limit: 8,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), trial: 0, scout: 0 }); },
+  fit(v) { return v >= 0 ? 1 / (1 + v) : 1 + Math.abs(v); },
+  tryNeighbour(S, i) {
+    const P = S.pop, rnd = S.rnd;
+    let k; do { k = Math.floor(rnd() * P.length); } while (k === i);
+    const j = Math.floor(rnd() * 2), phi = 2 * rnd() - 1;
+    const v = P[i].x.slice(); v[j] = SI.clamp(v[j] + phi * (v[j] - P[k].x[j]));
+    if (SI.f(v) < SI.f(P[i].x)) { P[i].x = v; P[i].trial = 0; } else P[i].trial++;
+  },
+  step(S) {
+    const P = S.pop, rnd = S.rnd;
+    P.forEach((b) => (b.scout = Math.max(0, b.scout - 1)));
+    for (let i = 0; i < P.length; i++) this.tryNeighbour(S, i);          // ong thợ
+    const fits = P.map((b) => this.fit(SI.f(b.x))), sum = fits.reduce((a, c) => a + c, 0);
+    for (let m = 0; m < P.length; m++) {                                  // ong quan sát (roulette)
+      let r = rnd() * sum, i = 0; while (r > fits[i] && i < P.length - 1) { r -= fits[i]; i++; }
+      this.tryNeighbour(S, i);
+    }
+    // ghi nhớ tốt nhất trước khi trinh sát thay nguồn
+    P.forEach((b) => { const v = SI.f(b.x); if (v < S.bestF) { S.bestF = v; S.best = b.x.slice(); } });
+    const w = P.reduce((m, b, i) => (b.trial > P[m].trial ? i : m), 0);   // trinh sát
+    if (P[w].trial > this.limit) { P[w].x = SI.randPos(rnd); P[w].trial = 0; P[w].scout = 3; P[w].prev = P[w].x.slice(); }
+  },
+  draw(g, S, P) {
+    for (const b of S.pop) SI.trail(g, P, b, 'rgba(28,42,46,0.4)');
+    for (const b of S.pop) {
+      const [x, y] = P.at(b);
+      g.lineWidth = 3; g.strokeStyle = 'rgba(28,42,46,0.15)'; g.beginPath(); g.arc(x, y, 11, 0, Math.PI * 2); g.stroke();
+      g.strokeStyle = '#d9562f'; g.beginPath(); g.arc(x, y, 11, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, b.trial / this.limit)); g.stroke();
+      if (b.scout) { g.strokeStyle = '#4b8f45'; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, 17, 0, Math.PI * 2); g.stroke(); }
+      SI.dot(g, x, y, 5.5, '#f0cf7a');
+    }
+    const [bx, by] = P.pt(S.best);
+    g.fillStyle = '#d9562f'; g.fillRect(bx - 4, by - 4, 8, 8);
+  },
+  status(S, en) { const s = S.pop.filter((b) => b.scout === 3).length; return `<span><b>limit</b> = ${this.limit}</span>${s ? `<span style="color:#4b8f45"><b style="color:#4b8f45">${en ? 'scout!' : 'trinh sát!'}</b></span>` : ''}`; },
+});
+SI.boot();
+</script>
+</body>
+</html>

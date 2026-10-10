@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu kiếm ăn của vi khuẩn (BFO)" data-title-en="Bacterial Foraging Optimization (BFO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu kiếm ăn của vi khuẩn (BFO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 13 · Mục 13.1</span><span class="en">Chapter 13 · Section 13.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu kiếm ăn của vi khuẩn</span><span class="en">Bacterial Foraging Optimization</span><span class="sub"><span class="vi">Bacterial Foraging Optimization — BFO</span><span class="en">BFO — swim, tumble, reproduce, disperse</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả vòng đời kiếm ăn của E. coli: hóa hướng động, sinh sản, loại bỏ – phát tán.</span><span class="en">Describe E. coli foraging: chemotaxis, reproduction, elimination–dispersal.</span></li>
+        <li class="reveal d3"><span class="vi">Viết bước nhào lộn và bơi với độ dài bước <span class="m">C</span>.</span><span class="en">Write the tumble and swim steps with run length <span class="m">C</span>.</span></li>
+        <li class="reveal d4"><span class="vi">Giải thích ba vòng lặp lồng nhau <span class="m">N<sub>ed</sub> ⊃ N<sub>re</sub> ⊃ N<sub>c</sub></span>.</span><span class="en">Explain the three nested loops <span class="m">N<sub>ed</sub> ⊃ N<sub>re</sub> ⊃ N<sub>c</sub></span>.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả: vì sao BFO gốc kém trên bộ hàm chuẩn.</span><span class="en">Read the results: why the original BFO performs poorly on the benchmark suite.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">E. coli tìm thức ăn bằng hóa hướng động</span><span class="en">E. coli forages by chemotaxis</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Kevin Passino</strong> đề xuất năm 2002 (<em>IEEE Control Systems Magazine</em> 22(3)).</span><span class="en">Proposed by <strong>Kevin Passino</strong> in 2002 (<em>IEEE Control Systems Magazine</em> 22(3)).</span></li>
+          <li class="reveal d3"><span class="vi">Vi khuẩn E. coli quay roi theo hai kiểu: <strong>bơi</strong> thẳng khi môi trường đang tốt lên, <strong>nhào lộn</strong> đổi hướng ngẫu nhiên khi không.</span><span class="en">E. coli rotates its flagella in two modes: <strong>swim</strong> straight while conditions improve, <strong>tumble</strong> to a random new direction otherwise.</span></li>
+          <li class="reveal d4"><span class="vi">Vi khuẩn khỏe sinh sản bằng phân đôi; vi khuẩn yếu chết.</span><span class="en">Healthy bacteria reproduce by splitting; weak ones die.</span></li>
+          <li class="reveal d5"><span class="vi">Biến cố môi trường có thể giết hoặc mang vi khuẩn đi xa: loại bỏ và phát tán.</span><span class="en">Environmental events can kill or carry bacteria away: elimination and dispersal.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 230" role="img" aria-label="Bơi và nhào lộn"><path d="M30,190 l60,-20 l50,-15 l40,-12 l-10,-40 l50,-20 l40,-10 l-5,-40 l60,-15" fill="none" stroke="#1f6f78" stroke-width="2" class="draw" style="--len:600"/><g fill="#d9562f"><circle cx="180" cy="143" r="4"/><circle cx="270" cy="73" r="4"/></g><circle cx="335" cy="25" r="16" fill="#f6e6b8"/><text x="20" y="220" font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a"><tspan class="vi">đoạn thẳng: bơi · chấm đỏ: nhào lộn</tspan><tspan class="en">straight runs: swims · red dots: tumbles</tspan></text></svg>
+        <figcaption><span class="vi">Bơi và nhào lộn về phía nguồn thức ăn</span><span class="en">Swims and tumbles toward food</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Vi khuẩn <span class="hl c-in">bơi tiếp</span> khi môi trường tốt lên và <span class="hl c-soc">nhào lộn</span> khi không. Định kỳ, nửa khỏe <span class="hl c-cog">phân đôi</span> và một số con bị <span class="hl c-sea">phát tán</span> tới nơi xa.</span><span class="en">Bacteria <span class="hl c-in">keep swimming</span> while things improve and <span class="hl c-soc">tumble</span> when not. Periodically the healthy half <span class="hl c-cog">splits</span> and some are <span class="hl c-sea">dispersed</span> far away.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Hóa hướng động</span><span class="en">Chemotaxis</span></b><span><span class="vi">bơi / nhào lộn, <span class="m">N<sub>c</sub></span> bước</span><span class="en">swim / tumble, <span class="m">N<sub>c</sub></span> steps</span></span></div>
+      <div class="force reveal d4" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Sinh sản</span><span class="en">Reproduction</span></b><span><span class="vi">nửa khỏe phân đôi, <span class="m">N<sub>re</sub></span> lần</span><span class="en">healthy half splits, <span class="m">N<sub>re</sub></span> times</span></span></div>
+      <div class="force reveal d5" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Loại bỏ – phát tán</span><span class="en">Elimination–dispersal</span></b><span><span class="vi">xác suất <span class="m">P<sub>ed</sub></span>, <span class="m">N<sub>ed</sub></span> lần</span><span class="en">probability <span class="m">P<sub>ed</sub></span>, <span class="m">N<sub>ed</sub></span> times</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba vòng lặp lồng nhau</span><span class="en">Three nested loops</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Vi khuẩn</span><span class="en">Bacterium</span></span><span class="en"><span class="vi">Vi khuẩn</span><span class="en">Bacterium</span></span></dt><dd><span class="vi">Lời giải <span class="m">θ<sup>i</sup>(j, k, l)</span> ở bước hóa hướng động <span class="m">j</span>, sinh sản <span class="m">k</span>, phát tán <span class="m">l</span></span><span class="en">Solution <span class="m">θ<sup>i</sup>(j, k, l)</span> at chemotaxis step <span class="m">j</span>, reproduction <span class="m">k</span>, dispersal <span class="m">l</span></span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Sức khỏe</span><span class="en">Health</span></span><span class="en"><span class="vi">Sức khỏe</span><span class="en">Health</span></span></dt><dd><span class="vi"><span class="m">J<sub>health</sub> = Σ<sub>j</sub> J</span> trong một vòng sinh sản</span><span class="en"><span class="m">J<sub>health</sub> = Σ<sub>j</sub> J</span> over one reproduction cycle</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Tín hiệu bầy</span><span class="en">Swarming</span></span><span class="en"><span class="vi">Tín hiệu bầy</span><span class="en">Swarming</span></span></dt><dd><span class="vi"><span class="m">J<sub>cc</sub></span>: hút ở xa, đẩy ở gần</span><span class="en"><span class="m">J<sub>cc</sub></span>: attract far, repel near</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Bước nhào lộn</span><span class="en">Tumble step</span></h3><span class="m">θ ← θ + C Δ / √(Δ<sup>T</sup>Δ)</span></div>
+        <div class="card ember mathcard reveal d4"><h3><span class="vi">Chi phí</span><span class="en">Cost</span></h3><span class="m">S · N<sub>c</sub> · N<sub>re</sub> · N<sub>ed</sub> · (1 + N<sub>s</sub>)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của BFO</span><span class="en">BFO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ba vòng lặp lồng nhau thay cho một vòng lặp đơn.</span><span class="en">Three nested loops instead of a single loop.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">S</span> vi khuẩn ngẫu nhiên.</span><span class="en">Initialize <span class="m">S</span> bacteria at random.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Hóa hướng động: mỗi vi khuẩn nhào lộn rồi bơi tối đa <span class="m">N<sub>s</sub></span> bước khi còn cải thiện.</span><span class="en">Chemotaxis: each bacterium tumbles, then swims up to <span class="m">N<sub>s</sub></span> steps while improving.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Lặp <span class="m">N<sub>c</sub></span> bước hóa hướng động, cộng dồn sức khỏe.</span><span class="en">Repeat <span class="m">N<sub>c</sub></span> chemotactic steps, accumulating health.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Sinh sản: nửa khỏe nhất phân đôi, nửa còn lại chết.</span><span class="en">Reproduction: the healthiest half splits, the rest die.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Sau <span class="m">N<sub>re</sub></span> lần sinh sản: mỗi vi khuẩn bị phát tán với xác suất <span class="m">P<sub>ed</sub></span>.</span><span class="en">After <span class="m">N<sub>re</sub></span> reproductions: each bacterium is dispersed with probability <span class="m">P<sub>ed</sub></span>.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">vi khuẩn</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">bacteria</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="78">Nhào lộn</text></g><g class="en"><text x="375" y="78">Tumble</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Bơi khi còn</text><text x="625" y="89">tốt lên</text></g><g class="en"><text x="625" y="67">Swim while</text><text x="625" y="89">improving</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Cộng dồn</text><text x="875" y="89">sức khỏe</text></g><g class="en"><text x="875" y="67">Accumulate</text><text x="875" y="89">health</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Sinh sản</text><text x="875" y="259">(phân đôi)</text></g><g class="en"><text x="875" y="237">Reproduction</text><text x="875" y="259">(split)</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Loại bỏ –</text><text x="625" y="259">phát tán</text></g><g class="en"><text x="625" y="237">Elimination–</text><text x="625" y="259">dispersal</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn vòng?</text></g><g class="en"><text x="385" y="248" font-size="15">loops left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="237">Trả về</text><text x="125" y="259">tốt nhất</text></g><g class="en"><text x="125" y="237">Return</text><text x="125" y="259">best</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Hóa hướng động" data-label-en="Chemotaxis">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Nhào lộn, rồi bơi theo cùng hướng</span><span class="en">Tumble, then swim in the same direction</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">θ<sup>i</sup>(j+1, k, l) = θ<sup>i</sup>(j, k, l) + C(i) · Δ(i) / √(Δ(i)<sup>T</sup>Δ(i))</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">J<sub>cc</sub>(θ, P) = Σ<sub>i</sub> [ −d<sub>a</sub> e<sup>−w<sub>a</sub>‖θ − θ<sup>i</sup>‖²</sup> + h<sub>r</sub> e<sup>−w<sub>r</sub>‖θ − θ<sup>i</sup>‖²</sup> ]</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi"><span class="m">Δ(i)</span>: vector ngẫu nhiên trong <span class="m">[−1, 1]<sup>D</sup></span>; chia cho độ dài để được hướng đơn vị.</span><span class="en"><span class="m">Δ(i)</span>: a random vector in <span class="m">[−1, 1]<sup>D</sup></span>, normalized to a unit direction.</span></li>
+          <li class="reveal d4"><span class="vi">Nếu bước vừa đi làm <span class="m">J + J<sub>cc</sub></span> giảm, vi khuẩn bơi tiếp cùng hướng, tối đa <span class="m">N<sub>s</sub></span> bước.</span><span class="en">If the step lowers <span class="m">J + J<sub>cc</sub></span>, the bacterium keeps swimming the same way, up to <span class="m">N<sub>s</sub></span> steps.</span></li>
+          <li class="reveal d5"><span class="vi"><span class="m">J<sub>cc</sub></span> với <span class="m">d<sub>a</sub> = 0.1, w<sub>a</sub> = 0.2, h<sub>r</sub> = 0.1, w<sub>r</sub> = 10</span> (Passino, 2002).</span><span class="en"><span class="m">J<sub>cc</sub></span> with <span class="m">d<sub>a</sub> = 0.1, w<sub>a</sub> = 0.2, h<sub>r</sub> = 0.1, w<sub>r</sub> = 10</span> (Passino, 2002).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Sinh sản và phát tán" data-label-en="Reproduction and dispersal">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Chọn lọc theo sức khỏe, rồi phát tán ngẫu nhiên</span><span class="en">Selection by health, then random dispersal</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">J<span class="ss"><i>i</i><i>health</i></span> = Σ<sub>j=1</sub><sup>N<sub>c</sub>+1</sup> J(i, j, k, l)</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &lt; P<sub>ed</sub>: θ<sup>i</sup> ← <span class="vi">vị trí ngẫu nhiên mới</span><span class="en">a new random position</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Sắp xếp theo <span class="m">J<sub>health</sub></span> tăng dần (cực tiểu); <span class="m">S<sub>r</sub> = S/2</span> con khỏe nhất phân đôi tại chỗ.</span><span class="en">Sort by ascending <span class="m">J<sub>health</sub></span> (minimization); the <span class="m">S<sub>r</sub> = S/2</span> healthiest split in place.</span></li>
+          <li class="reveal d4"><span class="vi">Phát tán giữ đa dạng và giúp thoát cực trị, nhưng cũng có thể vứt bỏ lời giải tốt.</span><span class="en">Dispersal maintains diversity and escapes local optima, but may also discard good solutions.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của BFO (Passino, 2002)</span><span class="en">BFO parameters (Passino, 2002)</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">S</span></td><td><span class="vi">Số vi khuẩn</span><span class="en">Number of bacteria</span></td><td>50 (bài gốc) / 30 (giáo trình)</td></tr>
+        <tr><td><span class="m">N<sub>c</sub>, N<sub>s</sub></span></td><td><span class="vi">Bước hóa hướng động; bước bơi tối đa</span><span class="en">Chemotactic steps; max swim length</span></td><td>100; 4</td></tr>
+        <tr><td><span class="m">N<sub>re</sub>, N<sub>ed</sub></span></td><td><span class="vi">Số lần sinh sản; số lần phát tán</span><span class="en">Reproductions; dispersals</span></td><td>4; 2</td></tr>
+        <tr><td><span class="m">P<sub>ed</sub></span></td><td><span class="vi">Xác suất phát tán</span><span class="en">Dispersal probability</span></td><td>0.25</td></tr>
+        <tr><td><span class="m">C</span></td><td><span class="vi">Độ dài bước</span><span class="en">Run length</span></td><td>0.1 (miền ~10) → 0.01(ub − lb)</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Trong giáo trình, <span class="m">N<sub>c</sub></span> được chọn để vừa ngân sách 20 000 lần đánh giá.</span><span class="en">In the textbook <span class="m">N<sub>c</sub></span> is chosen to fit the 20,000-evaluation budget.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 vi khuẩn trên địa hình chung</span><span class="en">12 bacteria on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Mỗi bước mô phỏng là một bước hóa hướng động. Cứ 10 bước có một lần sinh sản (viền xanh lá), cứ 40 bước có phát tán (viền cam).</span><span class="en">Each step is one chemotactic step. Every 10 steps comes a reproduction (green outline), every 40 a dispersal (orange outline).</span></p>
+        <p class="note"><span class="vi">Độ dài bước <span class="m">C = 0.01 (ub − lb)</span> như cài đặt thực nghiệm.</span><span class="en">Run length <span class="m">C = 0.01 (ub − lb)</span> as in the experiments.</span></p>
+        <div class="key">
+          <span><i style="background:#3a7fc1"></i><span class="vi">vi khuẩn</span><span class="en">bacteria</span></span>
+          <span><i style="background:#4b8f45"></i><span class="vi">vừa sinh sản</span><span class="en">just reproduced</span></span>
+          <span><i style="background:#e6904f"></i><span class="vi">vừa phát tán</span><span class="en">just dispersed</span></span>
+        </div>
+      </div>
+      <div class="field" id="bfo-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · hàm <span class="m">J = θ<sub>1</sub>² + θ<sub>2</sub>²</span></span><span class="en">Worked example · <span class="m">J = θ<sub>1</sub>² + θ<sub>2</sub>²</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước hóa hướng động với bơi tiếp</span><span class="en">One chemotactic step with swimming</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">θ = (1, 1), &nbsp; J = 2, &nbsp; C = 0.1</span></div>
+          <div class="eq"><span class="m">Δ = (0.6, −0.8), &nbsp; ‖Δ‖ = 1</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Nhào lộn: <span class="m">θ = (1.06, 0.92)</span>, <span class="m">J = 1.97</span> &lt; 2 nên bơi tiếp.</span><span class="en">Tumble: <span class="m">θ = (1.06, 0.92)</span>, <span class="m">J = 1.97</span> &lt; 2, so swim on.</span></li>
+          <li><span class="vi">Bơi 1: <span class="m">θ = (1.12, 0.84)</span>, <span class="m">J = 1.96</span> &lt; 1.97 nên bơi tiếp.</span><span class="en">Swim 1: <span class="m">θ = (1.12, 0.84)</span>, <span class="m">J = 1.96</span> &lt; 1.97, swim on.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Bơi 2: <span class="m">θ = (1.18, 0.76)</span>, <span class="m">J = 1.97</span> không tốt hơn nên dừng bơi.</span><span class="en">Swim 2: <span class="m">θ = (1.18, 0.76)</span>, <span class="m">J = 1.97</span> is not better, so swimming stops.</span></li>
+          <li><span class="vi">Theo Passino, vi khuẩn ở lại vị trí cuối <span class="m">(1.18, 0.76)</span>; sức khỏe cộng thêm <span class="m">J = 1.97</span>.</span><span class="en">Per Passino, the bacterium stays at the last position <span class="m">(1.18, 0.76)</span>; health adds <span class="m">J = 1.97</span>.</span></li>
+          <li><span class="vi">Bước <span class="m">C = 0.1</span> cố định nên tiến rất chậm: lý do chính khiến BFO kém trên miền rộng.</span><span class="en">The fixed step <span class="m">C = 0.1</span> makes progress slow: the main reason BFO struggles on wide domains.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng cải tiến</span><span class="en">Directions of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">Độ dài bước thích nghi</span><span class="en">Adaptive run length</span></h3><p><span class="vi">Cho <span class="m">C</span> giảm theo thời gian hoặc theo sức khỏe.</span><span class="en">Let <span class="m">C</span> shrink over time or with health.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">BFO lai PSO</span><span class="en">BFO–PSO hybrid</span></h3><p><span class="vi">Dùng hướng của PSO thay cho hướng ngẫu nhiên khi nhào lộn.</span><span class="en">Use PSO's direction instead of a random one when tumbling.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">Bỏ <span class="m">J<sub>cc</sub></span></span><span class="en">Dropping <span class="m">J<sub>cc</sub></span></span></h3><p><span class="vi">Nhiều bản cài đặt bỏ tín hiệu bầy để giảm chi phí <span class="m">O(S²)</span>.</span><span class="en">Many implementations drop swarming to cut the <span class="m">O(S²)</span> cost.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">BFO đa mục tiêu</span><span class="en">Multi-objective BFO</span></h3><p><span class="vi">Sức khỏe theo thứ hạng Pareto.</span><span class="en">Health by Pareto rank.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của BFO</span><span class="en">BFO applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">BFO ra đời từ lý thuyết điều khiển nên được dùng nhiều trong điều khiển và hệ thống điện.</span><span class="en">BFO grew out of control theory, so it is common in control and power systems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Điều khiển</span><span class="en">Control</span></h3><p><span class="vi">Chỉnh tham số bộ điều khiển PID.</span><span class="en">PID controller tuning.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Hệ thống điện</span><span class="en">Power systems</span></h3><p><span class="vi">Điều độ kinh tế, giảm tổn thất.</span><span class="en">Economic dispatch, loss reduction.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Lọc tín hiệu</span><span class="en">Signal processing</span></h3><p><span class="vi">Thiết kế bộ lọc thích nghi.</span><span class="en">Adaptive filter design.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Phân cụm</span><span class="en">Clustering</span></h3><p><span class="vi">Tìm tâm cụm dữ liệu.</span><span class="en">Finding cluster centres.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BFO</span><span class="en">Experiment · BFO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">2.43e+1</td><td class="num">7.06e+0</td><td class="num">2.66e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">6.17e+2</td><td class="num">5.02e+2</td><td class="num">4.96e+2</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">3.68e+1</td><td class="num">6.30e+0</td><td class="num">3.66e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">1.30e+1</td><td class="num">3.13e+0</td><td class="num">1.35e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">1.19e+0</td><td class="num">8.22e−2</td><td class="num">1.18e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">2.70e+1</td><td class="num">9.41e+0</td><td class="num">2.49e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">4.38e+1</td><td class="num">6.48e+0</td><td class="num">4.31e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>16.14</b>, đứng thứ <b>18/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>16.14</b>, position <b>18/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">BFO đứng cuối (18/18): bước cố định <span class="m">C</span> và ngân sách bị chia cho ba vòng lặp lồng nhau làm tiến độ rất chậm trong 20 000 lần đánh giá.</span><span class="en">BFO ranks last (18/18): the fixed step <span class="m">C</span> and a budget split across three nested loops make progress very slow within 20,000 evaluations.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BFO</span><span class="en">Experiment · BFO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/BFO.svg" alt="convergence BFO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/bfo.py" class="c-sea">code/si/algorithms/bfo.py</a></p>
+    <pre class="codeblock reveal d2">                    <span class="k">for</span> i <span class="k">in</span> range(n):
+                        <span class="k">if</span> prob.done:
+                            <span class="k">return</span> prob.best_x, prob.best_f
+                        Jlast = J[i] + _jcc(X, i)
+                        delta = rng.uniform(-1, 1, prob.dim)
+                        step = C * delta / np.linalg.norm(delta)
+                        X[i] = prob.clip(X[i] + step); J[i] = prob(X[i])[0]
+                        Ji = J[i] + _jcc(X, i)
+                        m = 0
+                        <span class="k">while</span> m &lt; Ns <span class="k">and</span> Ji &lt; Jlast <span class="k">and</span> <span class="k">not</span> prob.done:     <span class="c"># bơi tiếp khi còn tốt lên</span>
+                            Jlast = Ji
+                            X[i] = prob.clip(X[i] + step); J[i] = prob(X[i])[0]
+                            Ji = J[i] + _jcc(X, i)
+                            m += 1
+                        health[i] += J[i]
+                o = np.argsort(health)                                   <span class="c"># sinh sản</span>
+                half = n // 2
+                X = np.vstack([X[o[:half]], X[o[:half]]])[:n]
+                J = np.concatenate([J[o[:half]], J[o[:half]]])[:n]
+            disperse = rng.random(n) &lt; Ped                               <span class="c"># loại bỏ – phát tán</span></pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Gần sinh học, nhưng chậm</span><span class="en">Biologically faithful, but slow</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Mô hình sát với hành vi thật của vi khuẩn; dễ giảng dạy.</span><span class="en">A model close to real bacterial behaviour; easy to teach.</span></li>
+          <li><span class="vi">Phát tán giữ đa dạng quần thể.</span><span class="en">Dispersal maintains population diversity.</span></li>
+          <li><span class="vi">Là nền cho nhiều biến thể lai mạnh hơn.</span><span class="en">A base for many stronger hybrids.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Nhiều tham số (<span class="m">S, N<sub>c</sub>, N<sub>s</sub>, N<sub>re</sub>, N<sub>ed</sub>, P<sub>ed</sub>, C</span> và 4 hệ số bầy).</span><span class="en">Many parameters (<span class="m">S, N<sub>c</sub>, N<sub>s</sub>, N<sub>re</sub>, N<sub>ed</sub>, P<sub>ed</sub>, C</span> and 4 swarming coefficients).</span></li>
+          <li><span class="vi">Bước cố định không tự thu nhỏ: khó đạt độ chính xác cao.</span><span class="en">The fixed step never shrinks: high precision is hard to reach.</span></li>
+          <li><span class="vi">Kém nhất trong thực nghiệm của giáo trình.</span><span class="en">Worst in the textbook's experiments.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính tổng số lần đánh giá tối đa với <span class="m">S = 50, N<sub>c</sub> = 100, N<sub>s</sub> = 4, N<sub>re</sub> = 4, N<sub>ed</sub> = 2</span>.</span><span class="en">Compute the maximum evaluations with <span class="m">S = 50, N<sub>c</sub> = 100, N<sub>s</sub> = 4, N<sub>re</sub> = 4, N<sub>ed</sub> = 2</span>.</span></li>
+          <li><span class="vi">Lặp lại ví dụ tính tay với <span class="m">Δ = (−0.8, −0.6)</span>.</span><span class="en">Redo the worked example with <span class="m">Δ = (−0.8, −0.6)</span>.</span></li>
+          <li><span class="vi">Vì sao chọn nửa khỏe theo <span class="m">J<sub>health</sub></span> thay vì giá trị cuối?</span><span class="en">Why select by <span class="m">J<sub>health</sub></span> rather than the final value?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài độ dài bước giảm tuyến tính và so sánh trên F1, F3.</span><span class="en">Implement a linearly decreasing run length and compare on F1, F3.</span></li>
+          <li><span class="vi">Bỏ <span class="m">J<sub>cc</sub></span> và đo thay đổi về thời gian và chất lượng.</span><span class="en">Drop <span class="m">J<sub>cc</sub></span> and measure the change in time and quality.</span></li>
+          <li><span class="vi">Dùng BFO chỉnh bộ PID cho hệ bậc hai.</span><span class="en">Use BFO to tune a PID for a second-order plant.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>K. M. Passino, “Biomimicry of bacterial foraging for distributed optimization and control,” <em>IEEE Control Syst.</em>, vol. 22, no. 3, pp. 52–67, 2002, doi: <a href="https://doi.org/10.1109/MCS.2002.1004010">10.1109/MCS.2002.1004010</a>.</li>
+        <li>X.-S. Yang and S. Deb, “Cuckoo Search via Lévy flights,” in <em>2009 World Congress on Nature & Biologically Inspired Computing (NaBIC)</em>, 2009, pp. 210–214, doi: <a href="https://doi.org/10.1109/NABIC.2009.5393690">10.1109/NABIC.2009.5393690</a>.</li>
+        <li>X. S. Yang and S. Deb, “Engineering optimisation by cuckoo search,” <em>IJMMNO</em>, vol. 1, no. 4, pp. 330, 2010, doi: <a href="https://doi.org/10.1504/IJMMNO.2010.035430">10.1504/IJMMNO.2010.035430</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Bơi · nhào lộn · sinh sản · phát tán</span><span class="en">Swim · tumble · reproduce · disperse</span></span>
+      <span><span class="vi">Ba vòng lặp lồng nhau</span><span class="en">Three nested loops</span></span>
+      <span><span class="vi">Bước cố định là điểm yếu chính</span><span class="en">The fixed step is the main weakness</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Passino, <em>IEEE Control Systems Magazine</em> 22(3), 2002</span><span class="en">Original paper: Passino, <em>IEEE Control Systems Magazine</em> 22(3), 2002</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+new SI.Field2D(document.getElementById('bfo-field'), {
+  n: 12, T: 80, seed: 4, Ns: 4,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), h: 0, flag: 0 }); },
+  step(S) {
+    const C = 0.01 * (SI.HI - SI.LO) * 3, rnd = S.rnd;
+    S.pop.forEach((b) => {
+      b.flag = 0; let dx = [2 * rnd() - 1, 2 * rnd() - 1]; const L = Math.hypot(...dx); dx = dx.map((v) => C * v / L);
+      let last = SI.f(b.x); b.x = b.x.map((v, d) => SI.clamp(v + dx[d])); let J = SI.f(b.x), m = 0;
+      while (m < this.Ns && J < last) { last = J; b.x = b.x.map((v, d) => SI.clamp(v + dx[d])); J = SI.f(b.x); m++; }
+      b.h += J;
+    });
+    if (S.t % 10 === 0) { const o = S.pop.map((b, i) => i).sort((p, q) => S.pop[p].h - S.pop[q].h), half = this.n / 2;
+      for (let k = 0; k < half; k++) { S.pop[o[half + k]].x = S.pop[o[k]].x.slice(); S.pop[o[half + k]].flag = 1; }
+      S.pop.forEach((b) => (b.h = 0)); }
+    if (S.t % 40 === 0) S.pop.forEach((b) => { if (rnd() < 0.25) { b.x = SI.randPos(rnd); b.prev = b.x.slice(); b.flag = 2; } });
+  },
+  draw(g, S, P) {
+    for (const b of S.pop) SI.trail(g, P, b, 'rgba(28,42,46,0.35)');
+    for (const b of S.pop) { const [x, y] = P.at(b); SI.dot(g, x, y, 4.5, '#3a7fc1', b.flag === 1 ? '#4b8f45' : b.flag === 2 ? '#e6904f' : 'rgba(28,42,46,0.85)'); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return `<span>${SI.lang() === 'en' ? 'reproduce every 10, disperse every 40' : 'sinh sản mỗi 10, phát tán mỗi 40'}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

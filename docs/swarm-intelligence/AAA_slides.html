@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Thuật toán tảo nhân tạo (AAA)" data-title-en="Artificial Algae Algorithm (AAA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thuật toán tảo nhân tạo (AAA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 12 · Mục 12.2</span><span class="en">Chapter 12 · Section 12.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Thuật toán tảo nhân tạo</span><span class="en">Artificial Algae Algorithm</span><span class="sub"><span class="vi">Artificial Algae Algorithm — AAA</span><span class="en">AAA — colonies that grow, swim and adapt</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả ba quá trình của AAA: chuyển động xoắn ốc, tiến hóa, thích nghi.</span><span class="en">Describe AAA's three processes: helical movement, evolution, adaptation.</span></li>
+        <li class="reveal d3"><span class="vi">Giải thích vai trò của kích thước khuẩn lạc, năng lượng và bề mặt ma sát.</span><span class="en">Explain colony size, energy and friction surface.</span></li>
+        <li class="reveal d4"><span class="vi">Viết công thức chuyển động xoắn ốc trên ba chiều ngẫu nhiên.</span><span class="en">Write the helical movement on three random dimensions.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả: AAA thuộc nhóm tốt nhất trong thực nghiệm của giáo trình.</span><span class="en">Read the results: AAA is among the best in the textbook's experiments.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Vi tảo: lớn lên, bơi xoắn và thích nghi với ánh sáng</span><span class="en">Microalgae: grow, swim helically and adapt to light</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Uymaz, Tezel và Yel</strong> đề xuất năm 2015 (<em>Applied Soft Computing</em> 31).</span><span class="en">Proposed by <strong>Uymaz, Tezel and Yel</strong> in 2015 (<em>Applied Soft Computing</em> 31).</span></li>
+          <li class="reveal d3"><span class="vi">Vi tảo quang hợp sống thành <strong>khuẩn lạc</strong>; khuẩn lạc ở nơi đủ dinh dưỡng và ánh sáng thì lớn nhanh (mô hình Monod).</span><span class="en">Photosynthetic microalgae live in <strong>colonies</strong>; colonies with enough nutrients and light grow fast (Monod model).</span></li>
+          <li class="reveal d4"><span class="vi">Tảo bơi theo đường <strong>xoắn ốc</strong> về phía nguồn sáng; khuẩn lạc càng lớn thì ma sát càng nhiều nên bơi càng chậm.</span><span class="en">Algae swim along a <strong>helix</strong> toward light; bigger colonies have more friction and swim slower.</span></li>
+          <li class="reveal d5"><span class="vi">Khuẩn lạc “đói” sẽ thích nghi bằng cách tiến về khuẩn lạc lớn nhất.</span><span class="en">A “starving” colony adapts by moving toward the largest colony.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 240" role="img" aria-label="Đường bơi xoắn ốc"><path id="aaa-helix" fill="none" stroke="#4b8f45" stroke-width="2.2" class="draw" style="--len:1200"/><circle cx="350" cy="40" r="22" fill="#f6e6b8"/><text x="330" y="80" font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a"><tspan class="vi">nguồn sáng</tspan><tspan class="en">light</tspan></text></svg>
+        <figcaption><span class="vi">Bơi xoắn ốc về phía nguồn sáng</span><span class="en">A helical swim toward light</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi <span class="hl c-cog">khuẩn lạc</span> là một lời giải. Khuẩn lạc tốt <span class="hl c-sea">lớn lên</span>, nhưng lớn thì bơi chậm; khuẩn lạc kém thì <span class="hl c-soc">đói</span> và phải thích nghi.</span><span class="en">Each <span class="hl c-cog">colony</span> is a solution. Good colonies <span class="hl c-sea">grow</span>, but big ones swim slowly; poor colonies <span class="hl c-soc">starve</span> and must adapt.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Xoắn ốc</span><span class="en">Helical movement</span></b><span><span class="vi">dò tìm trên 3 chiều ngẫu nhiên</span><span class="en">search on 3 random dimensions</span></span></div>
+      <div class="force reveal d4" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Tiến hóa</span><span class="en">Evolution</span></b><span><span class="vi">khuẩn lạc nhỏ nhất nhận một ô của khuẩn lạc lớn nhất</span><span class="en">the smallest colony copies one cell of the largest</span></span></div>
+      <div class="force reveal d5" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Thích nghi</span><span class="en">Adaptation</span></b><span><span class="vi">khuẩn lạc đói nhất tiến về khuẩn lạc lớn nhất</span><span class="en">the most starved colony moves toward the largest</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Bốn đại lượng của một khuẩn lạc</span><span class="en">Four quantities per colony</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Vị trí</span><span class="en">Position</span></span><span class="en"><span class="vi">Vị trí</span><span class="en">Position</span></span></dt><dd><span class="vi">Lời giải <span class="m">x<sub>i</sub> ∈ ℝ<sup>D</sup></span></span><span class="en">The solution <span class="m">x<sub>i</sub> ∈ ℝ<sup>D</sup></span></span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Kích thước G</span><span class="en">Size G</span></span><span class="en"><span class="vi">Kích thước G</span><span class="en">Size G</span></span></dt><dd><span class="vi">Tăng theo độ thích nghi (Monod)</span><span class="en">Grows with fitness (Monod)</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Năng lượng E</span><span class="en">Energy E</span></span><span class="en"><span class="vi">Năng lượng E</span><span class="en">Energy E</span></span></dt><dd><span class="vi">Tỉ lệ với kích thước; quyết định số bước bơi</span><span class="en">Proportional to size; sets the number of swims</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="vi">Độ đói A</span><span class="en">Starvation A</span></span><span class="en"><span class="vi">Độ đói A</span><span class="en">Starvation A</span></span></dt><dd><span class="vi">Tăng khi khuẩn lạc không cải thiện</span><span class="en">Grows when the colony fails to improve</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Tăng trưởng Monod</span><span class="en">Monod growth</span></h3><span class="m">μ = μ<sub>max</sub> S / (K<sub>s</sub> + S)</span></div>
+        <div class="card sea mathcard reveal d4"><h3><span class="vi">Bề mặt ma sát</span><span class="en">Friction surface</span></h3><span class="m">τ(x<sub>i</sub>) = 2π (∛(3G<sub>i</sub>/4π))²</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của AAA</span><span class="en">AAA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Mỗi vòng: tăng trưởng, bơi tới khi hết năng lượng, rồi tiến hóa và thích nghi.</span><span class="en">Each iteration: grow, swim until out of energy, then evolve and adapt.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo khuẩn lạc; kích thước ban đầu bằng 1.</span><span class="en">Initialize colonies; initial size 1.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính kích thước, năng lượng, ma sát từ độ thích nghi.</span><span class="en">Compute size, energy and friction from fitness.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Mỗi khuẩn lạc chọn nguồn sáng (giải đấu) và bơi xoắn ốc khi còn năng lượng.</span><span class="en">Each colony picks a light source (tournament) and swims helically while it has energy.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Tiến hóa: một ô của khuẩn lạc nhỏ nhất lấy từ khuẩn lạc lớn nhất.</span><span class="en">Evolution: one cell of the smallest colony is copied from the largest.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Thích nghi với xác suất <span class="m">Ap</span>: khuẩn lạc đói nhất tiến về khuẩn lạc lớn nhất.</span><span class="en">Adaptation with probability <span class="m">Ap</span>: the most starved colony moves toward the largest.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">khuẩn lạc</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">colonies</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="78">Tính G, E, τ</text></g><g class="en"><text x="375" y="78">Compute G, E, τ</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Bơi xoắn ốc</text><text x="625" y="89">khi còn E</text></g><g class="en"><text x="625" y="67">Helical swim</text><text x="625" y="89">while E > 0</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="78">Tiến hóa</text></g><g class="en"><text x="875" y="78">Evolution</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Thích nghi</text><text x="875" y="259">(xác suất Ap)</text></g><g class="en"><text x="875" y="237">Adaptation</text><text x="875" y="259">(prob. Ap)</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Cập nhật</text><text x="625" y="259">lời giải tốt nhất</text></g><g class="en"><text x="625" y="237">Update</text><text x="625" y="259">best</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="237">Trả về</text><text x="125" y="259">tốt nhất</text></g><g class="en"><text x="125" y="237">Return</text><text x="125" y="259">best</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Chuyển động xoắn ốc" data-label-en="Helical movement">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bơi xoắn ốc trên ba chiều <span class="m">m, k, l</span> khác nhau</span><span class="en">A helical swim on three distinct dimensions <span class="m">m, k, l</span></span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">x<sub>im</sub> ← x<sub>im</sub> + (x<sub>jm</sub> − x<sub>im</sub>)(Δ − τ<sub>i</sub>) p</span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">x<sub>ik</sub> ← x<sub>ik</sub> + (x<sub>jk</sub> − x<sub>ik</sub>)(Δ − τ<sub>i</sub>) cos α</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">x<sub>il</sub> ← x<sub>il</sub> + (x<sub>jl</sub> − x<sub>il</sub>)(Δ − τ<sub>i</sub>) sin β</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi"><span class="m">j</span>: khuẩn lạc nguồn sáng chọn bằng giải đấu; <span class="m">Δ</span>: lực cắt; <span class="m">τ<sub>i</sub></span>: bề mặt ma sát.</span><span class="en"><span class="m">j</span>: the light-source colony picked by tournament; <span class="m">Δ</span>: shear force; <span class="m">τ<sub>i</sub></span>: friction surface.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">p ~ U(−1, 1)</span>, <span class="m">α, β ~ U(0, 2π)</span>: ba chiều tạo thành một bước xoắn trong không gian.</span><span class="en"><span class="m">p ~ U(−1, 1)</span>, <span class="m">α, β ~ U(0, 2π)</span>: the three dimensions form one helical step.</span></li>
+          <li class="reveal d5"><span class="vi">Mỗi bước bơi tốn <span class="m">e/2</span> năng lượng; nếu không cải thiện thì mất thêm <span class="m">e/2</span>.</span><span class="en">Each swim costs <span class="m">e/2</span> energy; a failed swim costs another <span class="m">e/2</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Tiến hóa và thích nghi" data-label-en="Evolution and adaptation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Khuẩn lạc nhỏ học từ khuẩn lạc lớn</span><span class="en">Small colonies learn from big ones</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">smallest<sub>m</sub> ← biggest<sub>m</sub>, &nbsp; m <span class="vi">ngẫu nhiên</span><span class="en">random</span></span></div></div>
+          <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &lt; Ap: &nbsp; starving ← starving + (biggest − starving) · rand</div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Tiến hóa chỉ đổi <strong>một</strong> chiều mỗi vòng, nên thay đổi rất nhẹ.</span><span class="en">Evolution changes only <strong>one</strong> dimension per iteration, a gentle change.</span></li>
+          <li class="reveal d4"><span class="vi">Thích nghi kéo khuẩn lạc kém nhất về phía khuẩn lạc tốt nhất: một bước khai thác mạnh.</span><span class="en">Adaptation pulls the worst colony toward the best: a strong exploitation step.</span></li>
+          <li class="reveal d5"><span class="vi">Cài đặt trong giáo trình chuẩn hóa <span class="m">G, E, τ</span> về [0, 1]; các bản cài đặt công khai khác nhau ở bước chuẩn hóa này.</span><span class="en">The textbook's code normalizes <span class="m">G, E, τ</span> to [0, 1]; public implementations differ in this step.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của AAA</span><span class="en">AAA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">n</span></td><td><span class="vi">Số khuẩn lạc</span><span class="en">Number of colonies</span></td><td>40 (bài gốc) / 30 (giáo trình)</td></tr>
+        <tr><td><span class="m">Δ</span></td><td><span class="vi">Lực cắt</span><span class="en">Shear force</span></td><td>2</td></tr>
+        <tr><td><span class="m">e</span></td><td><span class="vi">Mất năng lượng</span><span class="en">Energy loss</span></td><td>0.3</td></tr>
+        <tr><td><span class="m">Ap</span></td><td><span class="vi">Xác suất thích nghi</span><span class="en">Adaptation probability</span></td><td>0.5</td></tr>
+        <tr><td><span class="m">K<sub>s</sub></span></td><td><span class="vi">Hằng số bán bão hòa Monod (lựa chọn cài đặt)</span><span class="en">Monod half-saturation constant (implementation choice)</span></td><td>0.5</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Số lần đánh giá mỗi vòng thay đổi theo năng lượng của từng khuẩn lạc, nên AAA phải được so sánh theo ngân sách đánh giá hàm.</span><span class="en">Evaluations per iteration depend on each colony's energy, so AAA must be compared by evaluation budget.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">10 khuẩn lạc trên địa hình chung</span><span class="en">10 colonies on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Kích thước chấm tỉ lệ với kích thước khuẩn lạc <span class="m">G</span>. Viền đỏ là khuẩn lạc đói nhất.</span><span class="en">Dot size scales with colony size <span class="m">G</span>. The red outline marks the most starved colony.</span></p>
+        <p class="note"><span class="vi">Trên 2 chiều, ba chiều <span class="m">m, k, l</span> được chọn có lặp lại.</span><span class="en">In 2-D the three dimensions <span class="m">m, k, l</span> are drawn with repetition.</span></p>
+        <div class="key">
+          <span><i style="background:#4b8f45"></i><span class="vi">khuẩn lạc</span><span class="en">colonies</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">đói nhất / tốt nhất</span><span class="en">most starved / best</span></span>
+        </div>
+      </div>
+      <div class="field" id="aaa-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước bơi xoắn ốc trong 3 chiều</span><span class="en">One helical swim in 3-D</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">x<sub>i</sub> = (1, 2, 3), &nbsp; x<sub>j</sub> = (2, 0, 4), &nbsp; τ<sub>i</sub> = 0.4, &nbsp; Δ = 2</span></div>
+          <div class="eq"><span class="m">p = 0.5, &nbsp; α = π/3, &nbsp; β = π/2</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">Δ − τ<sub>i</sub> = 1.6</span>; <span class="m">cos α = 0.5</span>, <span class="m">sin β = 1</span>.</span><span class="en"><span class="m">Δ − τ<sub>i</sub> = 1.6</span>; <span class="m">cos α = 0.5</span>, <span class="m">sin β = 1</span>.</span></li>
+          <li><span class="vi">Tăng trưởng Monod với độ thích nghi chuẩn hóa 0.8: <span class="m">0.8 / (0.5 + 0.8) = 0.615</span>.</span><span class="en">Monod growth with normalized fitness 0.8: <span class="m">0.8 / (0.5 + 0.8) = 0.615</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">x<sub>i1</sub> = 1 + (2 − 1)·1.6·0.5 = 1.8</span></span><span class="en"><span class="m">x<sub>i1</sub> = 1 + (2 − 1)·1.6·0.5 = 1.8</span></span></li>
+          <li><span class="vi"><span class="m">x<sub>i2</sub> = 2 + (0 − 2)·1.6·0.5 = 0.4</span></span><span class="en"><span class="m">x<sub>i2</sub> = 2 + (0 − 2)·1.6·0.5 = 0.4</span></span></li>
+          <li><span class="vi"><span class="m">x<sub>i3</sub> = 3 + (4 − 3)·1.6·1 = 4.6</span> → vị trí mới <span class="m">(1.8, 0.4, 4.6)</span>.</span><span class="en"><span class="m">x<sub>i3</sub> = 3 + (4 − 3)·1.6·1 = 4.6</span> → new position <span class="m">(1.8, 0.4, 4.6)</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng cải tiến</span><span class="en">Directions of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">AAA nhiều nguồn sáng</span><span class="en">Multi-light-source AAA</span></h3><p><span class="vi">Mỗi chiều chọn một nguồn sáng riêng bằng giải đấu (Uymaz, Tezel & Yel, 2015, Biosystems).</span><span class="en">Each dimension picks its own light source by tournament (Uymaz, Tezel & Yel, 2015, Biosystems).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">AAA hỗn loạn</span><span class="en">Chaotic AAA</span></h3><p><span class="vi">Ánh xạ hỗn loạn cho <span class="m">p, α, β</span>.</span><span class="en">Chaotic maps for <span class="m">p, α, β</span>.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">AAA nhị phân</span><span class="en">Binary AAA</span></h3><p><span class="vi">Cho chọn đặc trưng và bài toán tổ hợp.</span><span class="en">For feature selection and combinatorial problems.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">AAA đa mục tiêu</span><span class="en">Multi-objective AAA</span></h3><p><span class="vi">Kho Pareto như chương 14.</span><span class="en">A Pareto archive as in chapter 14.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của AAA</span><span class="en">AAA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">AAA được dùng cho các bài toán liên tục nhiều chiều trong kỹ thuật.</span><span class="en">AAA is used for high-dimensional continuous engineering problems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Điều độ kinh tế, ước lượng tham số pin quang điện.</span><span class="en">Economic dispatch, PV parameter estimation.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Thiết kế</span><span class="en">Design</span></h3><p><span class="vi">Bình áp lực, kết cấu.</span><span class="en">Pressure vessels, structures.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Quỹ đạo không gian</span><span class="en">Space trajectories</span></h3><p><span class="vi">Thiết kế quỹ đạo tàu vũ trụ (bản AAA hỗn loạn).</span><span class="en">Spacecraft trajectory design (chaotic AAA).</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chọn đặc trưng, huấn luyện mạng.</span><span class="en">Feature selection, network training.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · AAA</span><span class="en">Experiment · AAA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">4.77e+0</td><td class="num">4.28e+0</td><td class="num">5.06e+0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">2.65e−1</td><td class="num">4.48e−1</td><td class="num">6.08e−9</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">9.00e−3</td><td class="num">8.77e−3</td><td class="num">7.82e−3</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">3.99e−1</td><td class="num">6.72e−1</td><td class="num">1.38e−7</td><td><span class="sg-plus">+</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>5.21</b>, đứng thứ <b>2/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>5.21</b>, position <b>2/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">AAA giải được F6, F7 gần như bằng F1, F3: không thấy thiên lệch gốc tọa độ.</span><span class="en">AAA solves F6, F7 about as well as F1, F3: no origin bias observed.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · AAA</span><span class="en">Experiment · AAA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/AAA.svg" alt="convergence AAA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/aaa.py" class="c-sea">code/si/algorithms/aaa.py</a></p>
+    <pre class="codeblock reveal d2">        <span class="k">for</span> i <span class="k">in</span> range(n):
+            starving = True
+            <span class="k">while</span> energy[i] &gt; 0 <span class="k">and</span> <span class="k">not</span> prob.done:
+                a, b = rng.integers(n, size=2)                  <span class="c"># tournament chọn nguồn sáng</span>
+                j = a <span class="k">if</span> fx[a] &lt; fx[b] <span class="k">else</span> b
+                <span class="k">if</span> j == i:
+                    j = (i + 1) % n
+                m, k, l = rng.choice(D, 3, replace=D &lt; 3)
+                y = X[i].copy()
+                y[m] += (X[j, m] - X[i, m]) * (delta - tau[i]) * rng.uniform(-1, 1)
+                y[k] += (X[j, k] - X[i, k]) * (delta - tau[i]) * np.cos(rng.uniform(0, 2 * np.pi))
+                y[l] += (X[j, l] - X[i, l]) * (delta - tau[i]) * np.sin(rng.uniform(0, 2 * np.pi))
+                y = prob.clip(y)
+                fy = prob(y)[0]
+                energy[i] -= e / 2
+                <span class="k">if</span> fy &lt; fx[i]:
+                    X[i], fx[i] = y, fy
+                    starving = False</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Mạnh nhưng nhiều chi tiết cài đặt</span><span class="en">Strong, but many implementation details</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Thứ hạng Friedman 5.21, ngang MPA, chỉ sau ABC trong thực nghiệm của giáo trình.</span><span class="en">Friedman rank 5.21, tied with MPA, behind only ABC in the textbook's experiments.</span></li>
+          <li><span class="vi">Bơi theo năng lượng: khuẩn lạc tốt được tìm kiếm nhiều hơn.</span><span class="en">Energy-driven swimming: good colonies are searched more.</span></li>
+          <li><span class="vi">Ba cơ chế khác nhau cân bằng khám phá và khai thác.</span><span class="en">Three distinct mechanisms balance exploration and exploitation.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Mô tả trong bài gốc để ngỏ cách chuẩn hóa kích thước, năng lượng, ma sát; các bản cài đặt cho kết quả khác nhau.</span><span class="en">The original description leaves the normalization of size, energy and friction open; implementations differ.</span></li>
+          <li><span class="vi">Số lần đánh giá mỗi vòng không cố định; phải so sánh theo ngân sách.</span><span class="en">Evaluations per iteration vary; compare by budget.</span></li>
+          <li><span class="vi">Cần ít nhất 3 chiều cho bước xoắn ốc.</span><span class="en">The helical step needs at least 3 dimensions.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">τ</span> cho <span class="m">G = 1, 8, 27</span> (chưa chuẩn hóa).</span><span class="en">Compute <span class="m">τ</span> for <span class="m">G = 1, 8, 27</span> (unnormalized).</span></li>
+          <li><span class="vi">Với <span class="m">e = 0.3</span> và năng lượng 1, khuẩn lạc bơi tối đa bao nhiêu bước?</span><span class="en">With <span class="m">e = 0.3</span> and energy 1, at most how many swims?</span></li>
+          <li><span class="vi">Vì sao khuẩn lạc lớn lại bơi bước ngắn hơn?</span><span class="en">Why do big colonies take shorter steps?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy AAA với <span class="m">Ap ∈ {0, 0.5, 1}</span> trên Rastrigin.</span><span class="en">Run AAA with <span class="m">Ap ∈ {0, 0.5, 1}</span> on Rastrigin.</span></li>
+          <li><span class="vi">Thử bỏ chuẩn hóa năng lượng và quan sát số lần đánh giá mỗi vòng.</span><span class="en">Remove energy normalization and observe evaluations per iteration.</span></li>
+          <li><span class="vi">Cài bản nhiều nguồn sáng và so sánh.</span><span class="en">Implement the multi-light-source version and compare.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. A. Uymaz, G. Tezel, and E. Yel, “Artificial algae algorithm (AAA) for nonlinear global optimization,” <em>Applied Soft Computing</em>, vol. 31, pp. 153–171, 2015, doi: <a href="https://doi.org/10.1016/j.asoc.2015.03.003">10.1016/j.asoc.2015.03.003</a>.</li>
+        <li>S. Mirjalili, A. H. Gandomi, S. Z. Mirjalili, S. Saremi, H. Faris, and S. M. Mirjalili, “Salp Swarm Algorithm: A bio-inspired optimizer for engineering design problems,” <em>Advances in Engineering Software</em>, vol. 114, pp. 163–191, 2017, doi: <a href="https://doi.org/10.1016/j.advengsoft.2017.07.002">10.1016/j.advengsoft.2017.07.002</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Lớn lên · bơi xoắn · thích nghi</span><span class="en">Grow · swim helically · adapt</span></span>
+      <span><span class="vi">Năng lượng quyết định số bước</span><span class="en">Energy sets the number of swims</span></span>
+      <span><span class="vi">Đọc kỹ chi tiết cài đặt</span><span class="en">Check implementation details</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Uymaz, Tezel &amp; Yel, <em>Applied Soft Computing</em> 31, 2015</span><span class="en">Original paper: Uymaz, Tezel &amp; Yel, <em>Applied Soft Computing</em> 31, 2015</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () { let d = ''; for (let i = 0; i <= 300; i++) { const t = i / 300, x = 20 + t * 320, y = 200 - t * 150 + 25 * Math.sin(t * 28); d += `${i ? 'L' : 'M'}${x.toFixed(1)},${y.toFixed(1)}`; } document.getElementById('aaa-helix').setAttribute('d', d); })();
+new SI.Field2D(document.getElementById('aaa-field'), {
+  n: 10, T: 50, seed: 2, delta: 2, e: 0.3, Ap: 0.5,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), G: 1, A: 0 }); },
+  step(S) {
+    const P = S.pop, rnd = S.rnd, fs = P.map((a) => SI.f(a.x)), lo = Math.min(...fs), hi = Math.max(...fs);
+    P.forEach((a, i) => { const fit = hi > lo ? 1 - (fs[i] - lo) / (hi - lo) : 1; a.G += fit / (0.5 + fit); });
+    const Gs = P.map((a) => a.G), gl = Math.min(...Gs), gh = Math.max(...Gs);
+    const tau = P.map((a) => 2 * Math.PI * Math.pow(Math.cbrt(3 * a.G / (4 * Math.PI)), 2)), tl = Math.min(...tau), th = Math.max(...tau);
+    P.forEach((a, i) => {
+      let E = gh > gl ? (a.G - gl) / (gh - gl) + 1e-9 : 1, starving = true, k = 0;
+      const ti = th > tl ? (tau[i] - tl) / (th - tl) : 0;
+      while (E > 0 && k++ < 6) {
+        const p = Math.floor(rnd() * P.length), q = Math.floor(rnd() * P.length); let j = SI.f(P[p].x) < SI.f(P[q].x) ? p : q; if (j === i) j = (i + 1) % P.length;
+        const y = a.x.slice(), dm = Math.floor(rnd() * 2), dk = Math.floor(rnd() * 2), dl = Math.floor(rnd() * 2);
+        y[dm] += (P[j].x[dm] - a.x[dm]) * (this.delta - ti) * (2 * rnd() - 1);
+        y[dk] += (P[j].x[dk] - a.x[dk]) * (this.delta - ti) * Math.cos(rnd() * 2 * Math.PI);
+        y[dl] += (P[j].x[dl] - a.x[dl]) * (this.delta - ti) * Math.sin(rnd() * 2 * Math.PI);
+        const yc = y.map(SI.clamp); E -= this.e / 2;
+        if (SI.f(yc) < SI.f(a.x)) { a.x = yc; starving = false; } else E -= this.e / 2;
+      }
+      if (starving) a.A++;
+    });
+    const big = P.reduce((m, a, i) => (a.G > P[m].G ? i : m), 0), small = P.reduce((m, a, i) => (a.G < P[m].G ? i : m), 0);
+    const d = Math.floor(rnd() * 2); P[small].x[d] = P[big].x[d];
+    if (rnd() < this.Ap) { const s = P.reduce((m, a, i) => (a.A > P[m].A ? i : m), 0); P[s].x = P[s].x.map((v, dd) => SI.clamp(v + (P[big].x[dd] - v) * rnd())); P[s].A = 0; S.starved = s; }
+  },
+  draw(g, S, P) {
+    const Gs = S.pop.map((a) => a.G), gh = Math.max(...Gs), gl = Math.min(...Gs);
+    for (const a of S.pop) SI.trail(g, P, a, 'rgba(28,42,46,0.3)');
+    S.pop.forEach((a, i) => { const [x, y] = P.at(a); SI.dot(g, x, y, 4 + 7 * (gh > gl ? (a.G - gl) / (gh - gl) : 0.5), '#4b8f45', i === S.starved ? '#d9562f' : 'rgba(28,42,46,0.85)'); });
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return ''; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

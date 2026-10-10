@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Thuật toán đom đóm (FA)" data-title-en="Firefly Algorithm (FA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thuật toán đom đóm (FA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 5 · Mục 5.2</span><span class="en">Chapter 5 · Section 5.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Thuật toán đom đóm</span><span class="en">Firefly Algorithm</span><span class="sub"><span class="vi">Firefly Algorithm — FA</span><span class="en">FA — every light pulls the dimmer ones closer</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Phát biểu ba quy tắc lý tưởng hóa của FA.</span><span class="en">State the three idealized rules of FA.</span></li>
+          <li class="reveal d3"><span class="vi">Viết công thức độ hấp dẫn và phương trình di chuyển.</span><span class="en">Write the attractiveness formula and the movement equation.</span></li>
+          <li class="reveal d4"><span class="vi">Giải thích vai trò của <span class="m">γ</span> và <span class="m">α</span>, và vì sao bầy tự chia nhóm.</span><span class="en">Explain the roles of <span class="m">γ</span> and <span class="m">α</span>, and why the swarm self-divides.</span></li>
+          <li class="reveal d5"><span class="vi">Ước lượng chi phí tính toán <span class="m">O(n²)</span> mỗi vòng lặp.</span><span class="en">Estimate the <span class="m">O(n²)</span> cost per iteration.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Ánh sáng nhấp nháy của đom đóm</span><span class="en">The flashing light of fireflies</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Xin-She Yang</strong> đề xuất năm 2008.</span><span class="en">Proposed by <strong>Xin-She Yang</strong> in 2008.</span></li>
+          <li class="reveal d3"><span class="vi">Đom đóm phát sáng để thu hút bạn tình và con mồi; con sáng hơn hấp dẫn hơn.</span><span class="en">Fireflies flash to attract mates and prey; brighter ones are more attractive.</span></li>
+          <li class="reveal d4"><span class="vi">Cường độ sáng mà con khác nhìn thấy giảm theo khoảng cách, vì ánh sáng tỏa ra và bị không khí hấp thụ.</span><span class="en">The intensity others perceive fades with distance, since light spreads out and is absorbed by the air.</span></li>
+          <li class="reveal d5"><span class="vi">Vì vậy mỗi con chỉ “thấy” rõ hàng xóm gần, và cả bầy tự chia thành nhiều nhóm nhỏ.</span><span class="en">So each firefly mainly “sees” nearby neighbours, and the swarm splits itself into small groups.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 360 300" role="img" aria-label="Đom đóm phát sáng với cường độ khác nhau" id="fa-art"></svg>
+        <figcaption><span class="vi">Con sáng nhất kéo những con mờ hơn ở gần nó</span><span class="en">The brightest pulls in the dimmer ones nearby</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. THREE RULES -->
+<section class="slide" aria-label="Ba quy tắc lý tưởng hóa" data-label-en="Three idealized rules">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba quy tắc lý tưởng hóa</span><span class="en">Three idealized rules</span></h2>
+    </header>
+    <div class="forces">
+      <div class="force reveal d2" style="border-color: var(--sea)"><b class="c-sea">1</b><span><span class="vi">Mọi con đom đóm đều “đơn tính”: con nào cũng có thể bị con khác hấp dẫn.</span><span class="en">All fireflies are unisex: any one can be attracted to any other.</span></span></div>
+      <div class="force reveal d3" style="border-color: var(--ember)"><b class="c-soc">2</b><span><span class="vi">Độ hấp dẫn tỉ lệ với độ sáng và giảm theo khoảng cách. Con mờ bay về con sáng; con sáng nhất bay ngẫu nhiên.</span><span class="en">Attractiveness is proportional to brightness and fades with distance. Dimmer ones fly to brighter ones; the brightest moves randomly.</span></span></div>
+      <div class="force reveal d4" style="border-color: var(--moss)"><b class="c-cog">3</b><span><span class="vi">Độ sáng được xác định bởi hàm mục tiêu: với bài toán cực tiểu, giá trị càng nhỏ càng sáng.</span><span class="en">Brightness is set by the objective: for minimization, a smaller value means a brighter light.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4. ATTRACTIVENESS -->
+<section class="slide" aria-label="Độ hấp dẫn" data-label-en="Attractiveness">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Độ hấp dẫn giảm theo bình phương khoảng cách</span><span class="en">Attractiveness fades with squared distance</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">β(r) = β<sub>0</sub> e<sup>−γr²</sup></span></div></div>
+        <div class="eq-box sand reveal d3"><div class="eq"><span class="m">r<sub>ij</sub> = ‖ x<sub>i</sub> − x<sub>j</sub> ‖</span></div></div>
+        <ul class="bullets">
+          <li class="reveal d3"><span class="m">β<sub>0</sub></span><span class="vi">: độ hấp dẫn tại </span><span class="en">: attractiveness at </span><span class="m">r = 0</span><span class="vi">, thường lấy 1.</span><span class="en">, usually 1.</span></li>
+          <li class="reveal d4"><span class="m">γ</span><span class="vi">: hệ số hấp thụ ánh sáng, quyết định “tầm nhìn” của đom đóm.</span><span class="en">: light absorption coefficient, setting how far a firefly can “see”.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 420 250" role="img" aria-label="Đường cong beta theo r với ba giá trị gamma" id="fa-beta"></svg>
+        <figcaption><span class="vi">γ càng lớn, sức hút càng tắt nhanh theo khoảng cách. Yang cũng dùng dạng xấp xỉ rẻ hơn β = β<sub>0</sub> / (1 + γr²).</span><span class="en">The larger γ, the faster attraction dies off with distance. Yang also uses the cheaper approximation β = β<sub>0</sub> / (1 + γr²).</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 5. MOVEMENT -->
+<section class="slide" aria-label="Phương trình di chuyển" data-label-en="Movement equation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Con mờ <span class="m">i</span> bay về con sáng hơn <span class="m">j</span></span><span class="en">Dimmer firefly <span class="m">i</span> flies toward brighter <span class="m">j</span></span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="eq">
+        <span class="term"><span class="tm">x<sub>i</sub></span></span><span class="op">←</span>
+        <span class="term"><span class="tm">x<sub>i</sub></span></span><span class="op">+</span>
+        <span class="term t-soc"><span class="tm">β<sub>0</sub> e<sup>−γr²<sub>ij</sub></sup> (x<sub>j</sub> − x<sub>i</sub>)</span><span class="lbl"><span class="vi">Lực hút</span><span class="en">Attraction</span></span></span>
+        <span class="op">+</span>
+        <span class="term t-in"><span class="tm">α ε<sub>i</sub></span><span class="lbl"><span class="vi">Ngẫu nhiên</span><span class="en">Randomization</span></span></span>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="vi">Lực hút kéo <span class="m">i</span> về phía <span class="m">j</span>, mạnh khi hai con ở gần, yếu khi ở xa.</span><span class="en">The attraction term pulls <span class="m">i</span> toward <span class="m">j</span>: strong when close, weak when far.</span></li>
+      <li class="reveal d4"><span class="m">ε<sub>i</sub></span><span class="vi">: vector ngẫu nhiên, ví dụ đều trên [−0.5, 0.5] hoặc chuẩn; </span><span class="en">: random vector, e.g. uniform on [−0.5, 0.5] or Gaussian; </span><span class="m">α</span><span class="vi">: biên độ bước ngẫu nhiên, thường giảm dần theo vòng lặp.</span><span class="en">: step size of the random walk, usually reduced over the iterations.</span></li>
+      <li class="reveal d5"><span class="vi">Mỗi cặp <span class="m">(i, j)</span> đều được so sánh, nên một vòng lặp tốn <span class="m">O(n²)</span> phép so sánh.</span><span class="en">Every pair <span class="m">(i, j)</span> is compared, so one iteration costs <span class="m">O(n²)</span> comparisons.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- 6. ROLE OF GAMMA -->
+<section class="slide" aria-label="Vai trò của gamma" data-label-en="The role of gamma">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi"><span class="m">γ</span> nằm giữa hai thái cực</span><span class="en"><span class="m">γ</span> sits between two extremes</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Giá trị</span><span class="en">Value</span></th><th><span class="vi">Đom đóm thấy gì</span><span class="en">What a firefly sees</span></th><th><span class="vi">Hành vi của bầy</span><span class="en">Swarm behaviour</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">γ → 0</span></td><td><span class="vi">Mọi con khác, rõ như nhau</span><span class="en">Every other firefly, equally clearly</span></td><td><span class="vi">Cả bầy cùng bay về con sáng nhất, gần giống một dạng PSO</span><span class="en">The whole swarm heads to the brightest, close to a form of PSO</span></td></tr>
+        <tr><td><span class="m">γ → ∞</span></td><td><span class="vi">Không thấy ai, như trong sương mù dày</span><span class="en">Nobody, as if in thick fog</span></td><td><span class="vi">Mỗi con đi ngẫu nhiên, thành tìm kiếm ngẫu nhiên</span><span class="en">Each moves randomly: pure random search</span></td></tr>
+        <tr><td><span class="vi">ở giữa</span><span class="en">in between</span></td><td><span class="vi">Chỉ hàng xóm gần</span><span class="en">Only close neighbours</span></td><td><span class="vi">Bầy tự chia nhóm, mỗi nhóm bám một cực trị: hợp với bài toán đa cực trị</span><span class="en">The swarm self-divides, each group settling on one optimum: good for multimodal problems</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Gợi ý thực hành: chọn <em>γ</em> theo cỡ miền tìm kiếm <em>L</em>, ví dụ <em>γ ≈ 1 / L²</em> đến <em>1 / L</em>, rồi tinh chỉnh.</span><span class="en">Practical hint: scale <em>γ</em> with the size of the search domain <em>L</em>, e.g. <em>γ ≈ 1 / L²</em> to <em>1 / L</em>, then tune.</span></p>
+  </div>
+</section>
+
+<!-- 7. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của FA</span><span class="en">FA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Theo mã minh họa của Yang (2010); mỗi vòng tốn <span class="m">n</span> lần đánh giá.</span><span class="en">Following Yang's reference code (2010); each iteration costs <span class="m">n</span> evaluations.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> đom đóm; độ sáng = giá trị hàm mục tiêu.</span><span class="en">Initialize <span class="m">n</span> fireflies; brightness = objective value.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Với mỗi cặp <span class="m">(i, j)</span>: nếu <span class="m">j</span> sáng hơn, <span class="m">i</span> bay về <span class="m">j</span> với độ hấp dẫn <span class="m">β(r)</span>.</span><span class="en">For each pair <span class="m">(i, j)</span>: if <span class="m">j</span> is brighter, <span class="m">i</span> moves toward <span class="m">j</span> with attractiveness <span class="m">β(r)</span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Thêm bước ngẫu nhiên <span class="m">α(rand − ½)</span> nhân với độ rộng miền.</span><span class="en">Add a random step <span class="m">α(rand − ½)</span> scaled by the domain width.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Đánh giá lại toàn bộ; giảm <span class="m">α</span> 3% mỗi vòng.</span><span class="en">Re-evaluate everyone; reduce <span class="m">α</span> by 3% per iteration.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Ghi nhớ đom đóm sáng nhất; lặp đến hết ngân sách.</span><span class="en">Memorize the brightest firefly; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n đom đóm</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n fireflies</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Tính</text><text x="875" y="89">độ sáng</text></g><g class="en"><text x="875" y="67">Compute</text><text x="875" y="89">brightness</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Bay về con</text><text x="875" y="259">sáng hơn</text></g><g class="en"><text x="875" y="237">Move toward</text><text x="875" y="259">brighter ones</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Đánh giá;</text><text x="625" y="259">α ← 0.97α</text></g><g class="en"><text x="625" y="237">Evaluate;</text><text x="625" y="259">α ← 0.97α</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về con sáng nhất</text></g><g class="en"><text x="125" y="248">Return brightest</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của FA</span><span class="en">FA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">β<sub>0</sub>, β<sub>min</sub></span></td><td><span class="vi">Độ hấp dẫn tại r = 0 và nhỏ nhất</span><span class="en">Attractiveness at r = 0 and its minimum</span></td><td>1, 0.2</td></tr>
+        <tr><td><span class="m">γ</span></td><td><span class="vi">Hệ số hấp thụ ánh sáng</span><span class="en">Light absorption coefficient</span></td><td>1 (khoảng cách chuẩn hóa)</td></tr>
+        <tr><td><span class="m">α<sub>0</sub></span></td><td><span class="vi">Độ lớn bước ngẫu nhiên ban đầu</span><span class="en">Initial random step size</span></td><td>0.2, giảm 3%/vòng</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Mã của giáo trình chuẩn hóa khoảng cách theo độ rộng miền để <span class="m">γ = 1</span> có cùng ý nghĩa trên mọi hàm.</span><span class="en">The textbook code normalizes distances by the domain width so that <span class="m">γ = 1</span> means the same on every function.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán FA</span><span class="en">The FA algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Hai vòng lặp lồng nhau so sánh từng cặp đom đóm.</span><span class="en">Two nested loops compare every pair of fireflies.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">n</span> đom đóm; độ sáng <span class="m">I<sub>i</sub></span> theo <span class="m">f(x<sub>i</sub>)</span></span><span class="en">Initialize <span class="m">n</span> fireflies; brightness <span class="m">I<sub>i</sub></span> from <span class="m">f(x<sub>i</sub>)</span></span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="m">i = 1 … n</span></span></li>
+        <li style="--ind:2"><span><span class="kw">for</span> <span class="m">j = 1 … n</span></span></li>
+        <li style="--ind:3"><span><span class="kw">if</span> <span class="m">I<sub>j</sub> &gt; I<sub>i</sub></span>:</span> <span class="vi">di chuyển <span class="m">i</span> về <span class="m">j</span>, đánh giá lại <span class="m">I<sub>i</sub></span></span><span class="en">move <span class="m">i</span> toward <span class="m">j</span>, re-evaluate <span class="m">I<sub>i</sub></span></span></li>
+        <li style="--ind:1"><span class="vi">Con sáng nhất đi một bước ngẫu nhiên</span><span class="en">The brightest takes a random step</span></li>
+        <li style="--ind:1"><span class="vi">Giảm <span class="m">α</span>, ví dụ <span class="m">α ← 0.97 α</span></span><span class="en">Reduce <span class="m">α</span>, e.g. <span class="m">α ← 0.97 α</span></span></li>
+        <li><span><span class="kw">return</span> <span class="vi">con sáng nhất</span><span class="en">the brightest</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">15 đom đóm trên cùng địa hình</span><span class="en">15 fireflies on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Quầng sáng càng lớn, lời giải càng tốt. Với <span class="m">γ = 0.2</span>, mỗi con chủ yếu bị hút bởi hàng xóm gần, nên bầy có thể chia ra bám vài hố cùng lúc.</span><span class="en">Bigger glow means a better solution. With <span class="m">γ = 0.2</span>, each firefly is mainly pulled by close neighbours, so the swarm may split across several basins at once.</span></p>
+        <p class="note"><span class="vi">Tham số: <em>β<sub>0</sub> = 1, γ = 0.2, α<sub>0</sub> = 0.25 · L</em>, giảm 3% mỗi vòng.</span><span class="en">Settings: <em>β<sub>0</sub> = 1, γ = 0.2, α<sub>0</sub> = 0.25 · L</em>, reduced 3% per iteration.</span></p>
+      </div>
+      <div class="field" id="fa-field">
+        <canvas aria-label="FA simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. ASSESSMENT -->
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một đom đóm bay về đom đóm sáng hơn</span><span class="en">One firefly moving toward a brighter one</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">β(r) = (β<sub>0</sub> − β<sub>min</sub>) e<sup>−γr²</sup> + β<sub>min</sub></span></div>
+          <div class="eq"><span class="m">x<sub>i</sub> ← x<sub>i</sub> + β(r)(x<sub>j</sub> − x<sub>i</sub>) + α(rand − ½)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">x<sub>i</sub> = (0, 0), x<sub>j</sub> = (1, 1)</span>: <span class="m">r² = 2</span>.</span><span class="en"><span class="m">x<sub>i</sub> = (0, 0), x<sub>j</sub> = (1, 1)</span>: <span class="m">r² = 2</span>.</span></li>
+          <li><span class="vi"><span class="m">β = 0.8 e<sup>−2</sup> + 0.2 = 0.308</span>.</span><span class="en"><span class="m">β = 0.8 e<sup>−2</sup> + 0.2 = 0.308</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Bỏ qua bước ngẫu nhiên: <span class="m">x<sub>i</sub> ← (0.308, 0.308)</span>.</span><span class="en">Ignoring the random step: <span class="m">x<sub>i</sub> ← (0.308, 0.308)</span>.</span></li>
+          <li><span class="vi">Nếu <span class="m">γ = 10</span> thì <span class="m">β ≈ 0.2</span>: đom đóm ở xa gần như chỉ thấy <span class="m">β<sub>min</sub></span>.</span><span class="en">With <span class="m">γ = 10</span>, <span class="m">β ≈ 0.2</span>: distant fireflies see only <span class="m">β<sub>min</sub></span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của FA</span><span class="en">FA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">FA hợp với bài toán đa đỉnh nhờ tự chia bầy thành các nhóm con.</span><span class="en">FA suits multimodal problems because the swarm splits into subgroups.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế kỹ thuật</span><span class="en">Engineering design</span></h3><p><span class="vi">Bình áp lực, dầm hàn, lò xo.</span><span class="en">Pressure vessel, welded beam, spring.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Xử lý ảnh</span><span class="en">Image processing</span></h3><p><span class="vi">Phân ngưỡng đa mức, nén ảnh.</span><span class="en">Multi-level thresholding, image compression.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Bản rời rạc cho job-shop.</span><span class="en">Discrete versions for job-shop.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Tối ưu đa phương thức</span><span class="en">Multimodal optimization</span></h3><p><span class="vi">Tìm nhiều cực trị cùng lúc.</span><span class="en">Finding several optima at once.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · FA</span><span class="en">Experiment · FA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.57e+2</td><td class="num">3.93e+2</td><td class="num">8.76e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">1.84e+1</td><td class="num">6.14e+0</td><td class="num">1.79e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">2.40e−8</td><td class="num">4.05e−9</td><td class="num">2.43e−8</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">3.11e−2</td><td class="num">1.71e−2</td><td class="num">2.83e−2</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">2.05e+1</td><td class="num">8.92e+0</td><td class="num">2.04e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>8.64</b>, đứng thứ <b>9/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>8.64</b>, position <b>9/18</b> among the textbook’s 18 algorithms.</span></li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · FA</span><span class="en">Experiment · FA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/FA.svg" alt="convergence FA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/fa.py" class="c-sea">code/si/algorithms/fa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        Xn = X.copy()
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            <span class="k">for</span> j <span class="k">in</span> range(n):
+                <span class="k">if</span> f[j] &lt; f[i]:
+                    r2 = np.sum(((X[i] - X[j]) / scale) ** 2)
+                    beta = (beta0 - beta_min) * np.exp(-gamma * r2) + beta_min
+                    Xn[i] = Xn[i] * (1 - beta) + X[j] * beta + alpha * (rng.random(prob.dim) - 0.5) * scale
+        b = int(np.argmin(f))
+        Xn[b] = X[b] + alpha * (rng.random(prob.dim) - 0.5) * scale   <span class="c"># con sáng nhất đi ngẫu nhiên</span>
+        X = prob.clip(Xn)
+        f = prob(X)
+        alpha *= decay
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá và biến thể" data-label-en="Assessment and variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Mạnh ở bài toán đa cực trị, nhưng tốn phép so sánh</span><span class="en">Strong on multimodal problems, but comparison-hungry</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Tự chia nhóm, có thể tìm nhiều cực trị cùng lúc.</span><span class="en">Self-grouping lets it find several optima at once.</span></li>
+          <li><span class="vi">Không cần thông tin toàn cục như gbest, dễ chạy song song.</span><span class="en">Needs no global information such as gbest; easy to parallelize.</span></li>
+          <li><span class="vi">Biến thể: FA rời rạc cho lập lịch và TSP, FA hỗn loạn, FA đa mục tiêu.</span><span class="en">Variants: discrete FA for scheduling and TSP, chaotic FA, multi-objective FA.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế</span><span class="en">Limitations</span></h3>
+        <ul class="bullets">
+          <li><span class="vi"><span class="m">O(n²)</span> phép so sánh mỗi vòng; nếu đánh giá lại sau mỗi lần di chuyển, số lần gọi hàm mục tiêu cũng tăng theo.</span><span class="en"><span class="m">O(n²)</span> comparisons per iteration; re-evaluating after every move also multiplies objective calls.</span></li>
+          <li><span class="vi">Nhạy với <span class="m">γ</span> và <span class="m">α</span>; <span class="m">γ</span> phải theo tỉ lệ miền tìm kiếm.</span><span class="en">Sensitive to <span class="m">γ</span> and <span class="m">α</span>; <span class="m">γ</span> must match the domain scale.</span></li>
+          <li><span class="vi">Nếu <span class="m">α</span> không giảm, bầy dao động quanh nghiệm mà không hội tụ chính xác.</span><span class="en">Without reducing <span class="m">α</span>, the swarm jitters around the optimum without converging precisely.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">β<sub>0</sub> = 1, γ = 1</span>, tính <span class="m">β</span> tại <span class="m">r = 1</span> và <span class="m">r = 2</span>. Nhận xét.</span><span class="en">With <span class="m">β<sub>0</sub> = 1, γ = 1</span>, compute <span class="m">β</span> at <span class="m">r = 1</span> and <span class="m">r = 2</span>. Comment.</span></li>
+          <li><span class="vi">Mô tả hành vi của bầy khi <span class="m">γ → 0</span> và khi <span class="m">γ → ∞</span>.</span><span class="en">Describe the swarm when <span class="m">γ → 0</span> and when <span class="m">γ → ∞</span>.</span></li>
+          <li><span class="vi">Với <span class="m">n = 20</span>, tối đa bao nhiêu lần đánh giá hàm mỗi vòng nếu đánh giá lại sau mỗi lần di chuyển?</span><span class="en">With <span class="m">n = 20</span>, at most how many evaluations per iteration if you re-evaluate after every move?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài FA cho hàm Ackley 10 chiều.</span><span class="en">Implement FA for the 10-D Ackley function.</span></li>
+          <li><span class="vi">Khảo sát <span class="m">γ ∈ {0.01, 0.1, 1, 10}</span> và ghi số nhóm hình thành.</span><span class="en">Study <span class="m">γ ∈ {0.01, 0.1, 1, 10}</span> and record how many groups form.</span></li>
+          <li><span class="vi">Mục 5.3: so sánh ABC và FA với <strong>cùng số lần đánh giá hàm</strong>, 30 lần chạy, kiểm định Wilcoxon.</span><span class="en">Section 5.3: compare ABC and FA under the <strong>same evaluation budget</strong>, 30 runs, Wilcoxon test.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>D. Karaboga, “An idea based on honey bee swarm for numerical optimization,” Erciyes Univ., Kayseri, Turkey, Tech. Rep. TR06, 2005.</li>
+        <li>D. Pham, A. Ghanbarzadeh, E. Koç, S. Otri, S. Rahim, and M. Zaidi, “The Bees Algorithm — A Novel Tool for Complex Optimisation Problems,” in <em>Intelligent Production Machines and Systems</em>, Elsevier, 2006, pp. 454–459, doi: <a href="https://doi.org/10.1016/B978-008045157-2/50081-X">10.1016/B978-008045157-2/50081-X</a>.</li>
+        <li>D. Karaboga and B. Basturk, “A powerful and efficient algorithm for numerical function optimization: artificial bee colony (ABC) algorithm,” <em>J Glob Optim</em>, vol. 39, no. 3, pp. 459–471, 2007, doi: <a href="https://doi.org/10.1007/s10898-007-9149-x">10.1007/s10898-007-9149-x</a>.</li>
+        <li>X.-S. Yang, <em>Nature-Inspired Metaheuristic Algorithms</em>. Frome, U.K.: Luniver Press, 2008.</li>
+        <li>X.-S. Yang, “Firefly Algorithms for Multimodal Optimization,” in <em>Lecture Notes in Computer Science</em>, Springer Berlin Heidelberg, 2009, pp. 169–178, doi: <a href="https://doi.org/10.1007/978-3-642-04944-6_14">10.1007/978-3-642-04944-6_14</a>.</li>
+        <li>G. Zhu and S. Kwong, “Gbest-guided artificial bee colony algorithm for numerical function optimization,” <em>Applied Mathematics and Computation</em>, vol. 217, no. 7, pp. 3166–3173, 2010, doi: <a href="https://doi.org/10.1016/j.amc.2010.08.049">10.1016/j.amc.2010.08.049</a>.</li>
+        <li>D. Karaboga and B. Akay, “A modified Artificial Bee Colony (ABC) algorithm for constrained optimization problems,” <em>Applied Soft Computing</em>, vol. 11, no. 3, pp. 3021–3031, 2011, doi: <a href="https://doi.org/10.1016/j.asoc.2010.12.001">10.1016/j.asoc.2010.12.001</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>X. S. Yang and X. He, “Firefly algorithm: recent advances and applications,” <em>IJSI</em>, vol. 1, no. 1, pp. 36, 2013, doi: <a href="https://doi.org/10.1504/IJSI.2013.055801">10.1504/IJSI.2013.055801</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Độ sáng = hàm mục tiêu</span><span class="en">Brightness = objective</span></span>
+      <span><span class="m">β(r) = β<sub>0</sub>e<sup>−γr²</sup></span></span>
+      <span><span class="vi"><span class="m">γ</span> điều chỉnh tầm nhìn, chia nhóm tự nhiên</span><span class="en"><span class="m">γ</span> sets visibility and natural grouping</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: X.-S. Yang, <em>Nature-Inspired Metaheuristic Algorithms</em>, Luniver Press, 2008</span><span class="en">Original source: X.-S. Yang, <em>Nature-Inspired Metaheuristic Algorithms</em>, Luniver Press, 2008</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* Hình minh họa (slide 2) và đồ thị β(r) (slide 4) */
+(function faFigures() {
+  const art = document.getElementById('fa-art'), rnd = SI.rng(4);
+  let h = '<defs><radialGradient id="glow"><stop offset="0" stop-color="#f6d26b" stop-opacity="0.95"/><stop offset="0.4" stop-color="#f0cf7a" stop-opacity="0.45"/><stop offset="1" stop-color="#f0cf7a" stop-opacity="0"/></radialGradient></defs>';
+  h += '<rect width="360" height="300" rx="16" fill="#1c2a2e"/>';
+  const pts = [[180, 140, 1]];
+  for (let i = 0; i < 16; i++) pts.push([30 + rnd() * 300, 30 + rnd() * 240, 0.25 + rnd() * 0.5]);
+  for (const [x, y, b] of pts) {
+    if (b < 1 && Math.hypot(x - 180, y - 140) < 120) h += `<line x1="${x}" y1="${y}" x2="${(x + (180 - x) * 0.35).toFixed(1)}" y2="${(y + (140 - y) * 0.35).toFixed(1)}" stroke="#f0cf7a" stroke-opacity="0.5" stroke-width="1.2"/>`;
+    h += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(10 + 34 * b).toFixed(1)}" fill="url(#glow)"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(2 + 2.5 * b).toFixed(1)}" fill="#fff6d6"/>`;
+  }
+  art.innerHTML = h;
+  // β(r) với ba giá trị γ
+  const svg = document.getElementById('fa-beta'), X = (r) => 50 + r * 70, Y = (b) => 210 - b * 170;
+  let s = `<line x1="50" y1="210" x2="410" y2="210" stroke="#1c2a2e"/><line x1="50" y1="25" x2="50" y2="215" stroke="#1c2a2e"/>`;
+  [[0.1, '#1f6f78'], [1, '#e6904f'], [5, '#d9562f']].forEach(([gm, c], k) => {
+    let d = ''; for (let i = 0; i <= 100; i++) { const r = i / 20; d += `${i ? 'L' : 'M'}${X(r).toFixed(1)},${Y(Math.exp(-gm * r * r)).toFixed(1)}`; }
+    s += `<path class="draw d${k + 1}" style="--len:600" d="${d}" fill="none" stroke="${c}" stroke-width="2.5"/>`;
+    s += `<text x="300" y="${50 + k * 22}" font-family="STIX Two Text, serif" font-style="italic" font-size="16" fill="${c}">γ = ${gm}</text>`;
+  });
+  s += `<g font-family="STIX Two Text, serif" font-style="italic" font-size="15" fill="#1c2a2e"><text x="28" y="${Y(1) + 5}">1</text><text x="28" y="214">0</text><text x="400" y="232">r</text><text x="58" y="30">β</text>`;
+  for (let r = 1; r <= 5; r++) s += `<text x="${X(r) - 4}" y="230" font-style="normal">${r}</text>`;
+  s += '</g>';
+  svg.innerHTML = s;
+})();
+
+/* FA trên địa hình chung (cực tiểu): độ sáng I = −f; cập nhật tuần tự như mã của Yang */
+new SI.Field2D(document.getElementById('fa-field'), {
+  n: 15, T: 50, seed: 8, beta0: 1, gamma: 0.2,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) }); S.alpha = 0.25 * (SI.HI - SI.LO); },
+  step(S) {
+    const P = S.pop, rnd = S.rnd;
+    P.forEach((a) => (a.f = SI.f(a.x)));
+    for (let i = 0; i < P.length; i++) for (let j = 0; j < P.length; j++) {
+      if (P[j].f < P[i].f) {
+        const r2 = (P[i].x[0] - P[j].x[0]) ** 2 + (P[i].x[1] - P[j].x[1]) ** 2;
+        const b = this.beta0 * Math.exp(-this.gamma * r2);
+        P[i].x = P[i].x.map((v, d) => SI.clamp(v + b * (P[j].x[d] - v) + S.alpha * (rnd() - 0.5)));
+        P[i].f = SI.f(P[i].x);
+      }
+    }
+    // con sáng nhất đi ngẫu nhiên
+    const k = P.reduce((m, a, i) => (a.f < P[m].f ? i : m), 0);
+    P[k].x = P[k].x.map((v) => SI.clamp(v + S.alpha * (rnd() - 0.5)));
+    S.alpha *= 0.97;
+  },
+  draw(g, S, P) {
+    const fs = S.pop.map((a) => SI.f(a.x)), lo = Math.min(...fs), hi = Math.max(...fs);
+    S.pop.forEach((a, i) => {
+      const [x, y] = P.at(a), b = hi > lo ? 1 - (fs[i] - lo) / (hi - lo) : 1;
+      const R = 6 + 22 * b, gr = g.createRadialGradient(x, y, 0, x, y, R);
+      gr.addColorStop(0, 'rgba(246,210,107,0.95)'); gr.addColorStop(0.45, 'rgba(240,207,122,0.45)'); gr.addColorStop(1, 'rgba(240,207,122,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, R, 0, Math.PI * 2); g.fill();
+      SI.dot(g, x, y, 3.2, '#fff6d6', 'rgba(28,42,46,0.9)');
+    });
+  },
+  status(S) { return `<span><b>α</b> = ${S.alpha.toFixed(2)}</span>`; },
+});
+SI.boot();
+</script>
+</body>
+</html>

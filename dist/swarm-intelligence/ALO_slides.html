@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu kiến sư tử (ALO)" data-title-en="Ant Lion Optimizer (ALO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu kiến sư tử (ALO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 6 · Mục 6.1</span><span class="en">Chapter 6 · Section 6.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu kiến sư tử</span><span class="en">Ant Lion Optimizer</span><span class="sub"><span class="vi">Ant Lion Optimizer — ALO</span><span class="en">ALO — a funnel-shaped sand trap</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả năm bước săn của kiến sư tử: kiến đi ngẫu nhiên, đào bẫy, kiến sa bẫy, bắt mồi, dựng lại bẫy.</span><span class="en">Describe the five hunting steps: ant random walk, trap building, entrapment, catching prey, rebuilding the trap.</span></li>
+        <li class="reveal d3"><span class="vi">Viết bước đi ngẫu nhiên tích lũy và phép chuẩn hóa vào miền <span class="m">[c, d]</span>.</span><span class="en">Write the cumulative random walk and its normalization into <span class="m">[c, d]</span>.</span></li>
+        <li class="reveal d4"><span class="vi">Giải thích cơ chế thu hẹp bẫy bằng tỉ số <span class="m">I</span> và vai trò của cá thể ưu tú.</span><span class="en">Explain trap shrinking through the ratio <span class="m">I</span> and the role of the elite.</span></li>
+        <li class="reveal d5"><span class="vi">Ước lượng chi phí tính toán của ALO và so sánh với PSO.</span><span class="en">Estimate ALO's computational cost and compare it with PSO.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Ấu trùng kiến sư tử đào bẫy hình phễu</span><span class="en">Antlion larvae dig funnel-shaped traps</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Seyedali Mirjalili</strong> đề xuất năm 2015 (<em>Advances in Engineering Software</em> 83).</span><span class="en">Proposed by <strong>Seyedali Mirjalili</strong> in 2015 (<em>Advances in Engineering Software</em> 83).</span></li>
+          <li class="reveal d3"><span class="vi">Ấu trùng kiến sư tử (họ Myrmeleontidae) đào hố hình nón trong cát mềm, rồi nằm chờ ở đáy.</span><span class="en">Antlion larvae (family Myrmeleontidae) dig cone-shaped pits in soft sand and wait at the bottom.</span></li>
+          <li class="reveal d4"><span class="vi">Khi con kiến trượt vào miệng hố, kiến sư tử hất cát lên để con mồi trượt xuống đáy. Ăn xong, nó sửa lại bẫy.</span><span class="en">When an ant slips over the rim, the antlion throws sand so the prey slides to the bottom. After feeding, it rebuilds the pit.</span></li>
+          <li class="reveal d5"><span class="vi">Kiến sư tử khỏe hơn đào hố lớn hơn nên bắt được nhiều mồi hơn. ALO mô phỏng điều này bằng chọn lọc roulette.</span><span class="en">Fitter antlions dig larger pits and catch more prey. ALO models this with roulette-wheel selection.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 280" role="img" aria-label="Hố cát hình phễu của kiến sư tử">
+          <path d="M20,60 L360,60 L200,230 L180,230 Z" fill="#f0e2bf"/>
+          <path d="M20,60 L180,230 M360,60 L200,230" stroke="#c9a227" stroke-width="2" fill="none"/>
+          <g fill="#c9a227" opacity="0.55"><circle cx="40" cy="70" r="1.6"/><circle cx="77" cy="93" r="1.6"/><circle cx="114" cy="116" r="1.6"/><circle cx="151" cy="139" r="1.6"/><circle cx="188" cy="162" r="1.6"/><circle cx="225" cy="185" r="1.6"/><circle cx="262" cy="208" r="1.6"/><circle cx="299" cy="91" r="1.6"/><circle cx="336" cy="114" r="1.6"/><circle cx="73" cy="137" r="1.6"/><circle cx="110" cy="160" r="1.6"/><circle cx="147" cy="183" r="1.6"/><circle cx="184" cy="206" r="1.6"/><circle cx="221" cy="89" r="1.6"/><circle cx="258" cy="112" r="1.6"/><circle cx="295" cy="135" r="1.6"/><circle cx="332" cy="158" r="1.6"/><circle cx="69" cy="181" r="1.6"/><circle cx="106" cy="204" r="1.6"/><circle cx="143" cy="87" r="1.6"/><circle cx="180" cy="110" r="1.6"/><circle cx="217" cy="133" r="1.6"/><circle cx="254" cy="156" r="1.6"/><circle cx="291" cy="179" r="1.6"/><circle cx="328" cy="202" r="1.6"/><circle cx="65" cy="85" r="1.6"/><circle cx="102" cy="108" r="1.6"/><circle cx="139" cy="131" r="1.6"/><circle cx="176" cy="154" r="1.6"/><circle cx="213" cy="177" r="1.6"/><circle cx="250" cy="200" r="1.6"/><circle cx="287" cy="83" r="1.6"/><circle cx="324" cy="106" r="1.6"/><circle cx="61" cy="129" r="1.6"/><circle cx="98" cy="152" r="1.6"/><circle cx="135" cy="175" r="1.6"/><circle cx="172" cy="198" r="1.6"/><circle cx="209" cy="81" r="1.6"/><circle cx="246" cy="104" r="1.6"/><circle cx="283" cy="127" r="1.6"/></g>
+          <ellipse cx="190" cy="228" rx="16" ry="8" fill="#7a2b1e"/>
+          <path d="M178,222 l-10,-12 M202,222 l10,-12" stroke="#7a2b1e" stroke-width="3"/>
+          <path class="draw" style="--len:400" d="M60,40 l20,6 l-8,12 l18,4 l6,14 l22,10 l10,22 l18,16 l14,30 l12,36" stroke="#1c2a2e" stroke-width="1.6" stroke-dasharray="3 4" fill="none"/>
+          <circle cx="60" cy="40" r="4" fill="#1c2a2e"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" fill="#56676a">
+            <text x="70" y="30"><tspan class="vi">kiến đi ngẫu nhiên</tspan><tspan class="en">ant random walk</tspan></text>
+            <text x="215" y="250"><tspan class="vi">kiến sư tử chờ ở đáy</tspan><tspan class="en">antlion waits at the bottom</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Kiến đi ngẫu nhiên, rơi vào miệng phễu và trượt về phía kiến sư tử</span><span class="en">An ant wanders, falls over the rim and slides toward the antlion</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Kiến là các lời giải đi dò đường ngẫu nhiên, nhưng luôn bị giam trong miệng hố của một <span class="hl c-soc">kiến sư tử</span>. Hố <span class="hl c-sea">co dần</span> theo thời gian, kéo kiến về sát kiến sư tử; con kiến nào tốt hơn sẽ <span class="hl c-cog">chiếm chỗ</span> kiến sư tử.</span><span class="en">Ants are solutions that wander at random, yet always confined to the rim of an <span class="hl c-soc">antlion</span>'s pit. The pit <span class="hl c-sea">shrinks</span> over time, pulling ants close to the antlion; an ant that does better <span class="hl c-cog">takes its place</span>.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Kiến</span><span class="en">Ants</span></b><span><span class="vi">đi ngẫu nhiên quanh kiến sư tử: khám phá</span><span class="en">random walks around antlions: exploration</span></span></div>
+      <div class="force reveal d4" style="border-color: #c9a227"><b style="color:#c9a227"><span class="vi">Kiến sư tử</span><span class="en">Antlions</span></b><span><span class="vi">giữ các lời giải tốt, đặt bẫy</span><span class="en">hold good solutions and set the traps</span></span></div>
+      <div class="force reveal d5" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Ưu tú</span><span class="en">Elite</span></b><span><span class="vi">kiến sư tử tốt nhất, ảnh hưởng tới mọi con kiến</span><span class="en">the best antlion, influencing every ant</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bước đi ngẫu nhiên" data-label-en="Random walk">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bước đi ngẫu nhiên tích lũy, rồi ép vào miệng hố</span><span class="en">A cumulative random walk, squeezed into the pit</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">X(t) = [0, cumsum(2r(t<sub>1</sub>) − 1), …, cumsum(2r(t<sub>T</sub>) − 1)]</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal">r(t) = 1 <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &gt; 0.5, &nbsp; 0 <span class="up"><span class="vi">ngược lại</span><span class="en">otherwise</span></span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">X<span class="ss"><i>t</i><i>i</i></span> = (X<span class="ss"><i>t</i><i>i</i></span> − a<sub>i</sub>)(d<span class="ss"><i>t</i><i>i</i></span> − c<span class="ss"><i>t</i><i>i</i></span>) / (b<sub>i</sub> − a<sub>i</sub>) + c<span class="ss"><i>t</i><i>i</i></span></span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi">Mỗi bước đi tiến hoặc lùi đúng 1 đơn vị; cộng dồn lại thành một đường đi ngẫu nhiên dài <span class="m">T</span> bước.</span><span class="en">Each step moves +1 or −1; the cumulative sum is a random walk of <span class="m">T</span> steps.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">a<sub>i</sub>, b<sub>i</sub></span>: giá trị nhỏ nhất và lớn nhất của đường đi theo biến thứ <span class="m">i</span>.</span><span class="en"><span class="m">a<sub>i</sub>, b<sub>i</sub></span>: minimum and maximum of the walk in variable <span class="m">i</span>.</span></li>
+          <li class="reveal d5"><span class="vi"><span class="m">c<span class="ss"><i>t</i><i>i</i></span>, d<span class="ss"><i>t</i><i>i</i></span></span>: cận dưới và cận trên của biến <span class="m">i</span> ở vòng <span class="m">t</span>. Phép chuẩn hóa co–giãn tuyến tính đường đi vào đúng miền này.</span><span class="en"><span class="m">c<span class="ss"><i>t</i><i>i</i></span>, d<span class="ss"><i>t</i><i>i</i></span></span>: lower and upper bounds of variable <span class="m">i</span> at iteration <span class="m">t</span>. The normalization rescales the walk linearly into that range.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bẫy, trượt và ưu tú" data-label-en="Traps, sliding and elitism">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bẫy quanh kiến sư tử co lại từng bậc</span><span class="en">The trap around each antlion shrinks in steps</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">c<span class="ss"><i>t</i><i>i</i></span> = Antlion<span class="ss"><i>t</i><i>j</i></span> + c<sup>t</sup>, &nbsp; d<span class="ss"><i>t</i><i>i</i></span> = Antlion<span class="ss"><i>t</i><i>j</i></span> + d<sup>t</sup></span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">c<sup>t</sup> = c<sup>t</sup> / I, &nbsp; d<sup>t</sup> = d<sup>t</sup> / I, &nbsp; I = 10<sup>w</sup> · t / T</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">Ant<span class="ss"><i>t</i><i>i</i></span> = (R<span class="ss"><i>t</i><i>A</i></span> + R<span class="ss"><i>t</i><i>E</i></span>) / 2</span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">w</span> = 2, 3, 4, 5, 6 khi <span class="m">t</span> vượt 10%, 50%, 75%, 90%, 95% của <span class="m">T</span>: miệng hố hẹp lại theo bậc thang.</span><span class="en"><span class="m">w</span> = 2, 3, 4, 5, 6 once <span class="m">t</span> passes 10%, 50%, 75%, 90%, 95% of <span class="m">T</span>: the pit narrows in steps.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">R<sub>A</sub></span>: đường đi quanh kiến sư tử chọn bằng roulette; <span class="m">R<sub>E</sub></span>: đường đi quanh cá thể ưu tú.</span><span class="en"><span class="m">R<sub>A</sub></span>: walk around an antlion picked by roulette; <span class="m">R<sub>E</sub></span>: walk around the elite.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Bắt mồi</strong>: nếu một con kiến tốt hơn kiến sư tử của nó, kiến sư tử dời tới vị trí con kiến đó.</span><span class="en"><strong>Catching prey</strong>: if an ant becomes fitter than its antlion, the antlion moves to that ant's position.</span></li>
+      </ul>
+    </div>
+    <p class="note reveal d6"><span class="vi">Mã nguồn gốc dùng <span class="m">I = 1 + 10<sup>w</sup> · t / T</span> và để <span class="m">I = 1</span> trong 10% vòng lặp đầu, nên miệng hố không bao giờ nở rộng hơn miền tìm kiếm.</span><span class="en">The original code uses <span class="m">I = 1 + 10<sup>w</sup> · t / T</span> and keeps <span class="m">I = 1</span> for the first 10% of iterations, so the pit never exceeds the search range.</span></p>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của ALO</span><span class="en">ALO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Mirjalili (2015); <span class="m">n</span> kiến và <span class="m">n</span> kiến sư tử.</span><span class="en">Mirjalili (2015); <span class="m">n</span> ants and <span class="m">n</span> antlions.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo kiến và kiến sư tử; kiến sư tử tốt nhất là ưu tú.</span><span class="en">Initialize ants and antlions; the best antlion is the elite.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Mỗi kiến chọn một kiến sư tử bằng bánh xe roulette.</span><span class="en">Each ant picks an antlion by roulette wheel.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Bước ngẫu nhiên quanh kiến sư tử đã chọn và quanh ưu tú, trong biên co theo <span class="m">I</span>; lấy trung bình.</span><span class="en">Random walks around the chosen antlion and the elite, within bounds shrunk by <span class="m">I</span>; average them.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Kiến tốt hơn kiến sư tử thì bị “bắt”: kiến sư tử dời tới vị trí đó.</span><span class="en">An ant fitter than its antlion is “caught”: the antlion moves there.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật ưu tú; lặp đến hết ngân sách.</span><span class="en">Update the elite; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo kiến,</text><text x="125" y="89">kiến sư tử</text></g><g class="en"><text x="125" y="67">Initialize ants,</text><text x="125" y="89">antlions</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Chọn</text><text x="875" y="89">ưu tú</text></g><g class="en"><text x="875" y="67">Pick</text><text x="875" y="89">the elite</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Roulette +</text><text x="875" y="259">bước ngẫu nhiên</text></g><g class="en"><text x="875" y="237">Roulette +</text><text x="875" y="259">random walks</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Bắt mồi;</text><text x="625" y="259">cập nhật ưu tú</text></g><g class="en"><text x="625" y="237">Catch prey;</text><text x="625" y="259">update elite</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về ưu tú</text></g><g class="en"><text x="125" y="248">Return elite</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của ALO</span><span class="en">ALO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">I</span></td><td><span class="vi">Hệ số co biên: <span class="m">1 + 10<sup>w</sup> t/T</span></span><span class="en">Bound shrink factor: <span class="m">1 + 10<sup>w</sup> t/T</span></span></td><td><span class="m">w = 2…6</span> theo t/T</td></tr>
+        <tr><td><span class="m">n</span></td><td><span class="vi">Số kiến (= số kiến sư tử)</span><span class="en">Number of ants (= antlions)</span></td><td>30</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">ALO gần như không có tham số tự chỉnh; lịch <span class="m">w</span> cố định trong bài gốc.</span><span class="en">ALO has almost no tunable parameters; the <span class="m">w</span> schedule is fixed in the original paper.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán ALO</span><span class="en">The ALO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Hai quần thể song song: kiến (dò tìm) và kiến sư tử (bộ nhớ). Tham số người dùng chỉ còn <span class="m">n</span> và <span class="m">T</span>.</span><span class="en">Two parallel populations: ants (explorers) and antlions (memory). The user only sets <span class="m">n</span> and <span class="m">T</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo ngẫu nhiên <span class="m">n</span> con kiến và <span class="m">n</span> kiến sư tử; ưu tú ← kiến sư tử tốt nhất</span><span class="en">Randomly initialize <span class="m">n</span> ants and <span class="m">n</span> antlions; elite ← best antlion</span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi con kiến</span><span class="en">each ant</span></span></li>
+        <li style="--ind:2"><span class="vi">Chọn một kiến sư tử bằng roulette; cập nhật <span class="m">c, d</span> theo <span class="m">I</span></span><span class="en">Pick an antlion by roulette; update <span class="m">c, d</span> with <span class="m">I</span></span></li>
+        <li style="--ind:2"><span class="vi">Tạo đường đi quanh kiến sư tử và quanh ưu tú, chuẩn hóa</span><span class="en">Build walks around that antlion and around the elite, normalize</span></li>
+        <li style="--ind:2"><span class="vi">Vị trí kiến ← trung bình hai đường đi</span><span class="en">Ant position ← mean of the two walks</span></li>
+        <li style="--ind:1"><span class="vi">Đánh giá kiến; kiến sư tử chiếm chỗ kiến tốt hơn nó</span><span class="en">Evaluate ants; antlions take over fitter ants</span></li>
+        <li style="--ind:1"><span class="vi">Cập nhật ưu tú</span><span class="en">Update the elite</span></li>
+        <li><span><span class="kw">return</span> <span class="vi">ưu tú</span><span class="en">the elite</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">10 con kiến, 10 kiến sư tử trên cùng địa hình</span><span class="en">10 ants and 10 antlions on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Tam giác vàng là kiến sư tử, tam giác cam là ưu tú, chấm xanh là kiến. Vòng tròn quanh ưu tú cho thấy miệng hố: nó co lại đột ngột mỗi khi <span class="m">w</span> tăng bậc.</span><span class="en">Yellow triangles are antlions, the orange one is the elite, blue dots are ants. The circle around the elite shows the pit: it shrinks abruptly each time <span class="m">w</span> steps up.</span></p>
+        <p class="note"><span class="vi">Cài đặt theo mã nguồn gốc: <span class="m">I = 1 + 10<sup>w</sup>t/T</span>, roulette theo <span class="m">1/f</span>.</span><span class="en">Implemented as in the original code: <span class="m">I = 1 + 10<sup>w</sup>t/T</span>, roulette on <span class="m">1/f</span>.</span></p>
+        <div class="key">
+          <span><i style="background:#3a7fc1"></i><span class="vi">kiến</span><span class="en">ants</span></span>
+          <span><i style="background:#f0cf7a"></i><span class="vi">kiến sư tử</span><span class="en">antlions</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">ưu tú</span><span class="en">elite</span></span>
+        </div>
+      </div>
+      <div class="field" id="alo-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đối chiếu tài liệu tham khảo" data-label-en="Checking the reference book">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ trong sách tham khảo</span><span class="en">Example from the reference book</span></p>
+      <h2 class="reveal d1"><span class="vi">Okwu &amp; Tartibu (2021), chương 9: ví dụ hàm Booth</span><span class="en">Okwu &amp; Tartibu (2021), chapter 9: the Booth function</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Nội dung</span><span class="en">Item</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Nghiệm tốt nhất</span><span class="en">Best solution</span></td><td><span class="vi">[1, 2], f = 2.393·10<sup>−14</sup></span><span class="en">[1, 2], f = 2.393·10<sup>−14</sup></span></td><td><span class="vi">Cực tiểu Booth ở (1, 3) với f = 0; còn f(1, 2) = 5</span><span class="en">The Booth minimum is at (1, 3) with f = 0; f(1, 2) = 5</span></td></tr>
+        <tr><td><span class="vi">Công thức 9.7</span><span class="en">Equation 9.7</span></td><td><span class="vi">thiếu ngoặc ở tử số</span><span class="en">missing parentheses in the numerator</span></td><td><span class="vi">(X − a)(d − c) / (b − a) + c</span><span class="en">(X − a)(d − c) / (b − a) + c</span></td></tr>
+        <tr><td><span class="vi">Công thức 9.12</span><span class="en">Equation 9.12</span></td><td><span class="vi">I = 10w · t/T</span><span class="en">I = 10w · t/T</span></td><td><span class="vi">I = 10<sup>w</sup> · t/T (lũy thừa)</span><span class="en">I = 10<sup>w</sup> · t/T (a power)</span></td></tr>
+        <tr><td><span class="vi">Số tác tử</span><span class="en">Number of agents</span></td><td><span class="vi">“40 search agents (n = 30)”</span><span class="en">“40 search agents (n = 30)”</span></td><td><span class="vi">hai con số mâu thuẫn; cần ghi rõ khi lặp lại thí nghiệm</span><span class="en">the two numbers conflict; state one when replicating</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Ứng dụng HRSG trong sách (entropy nhỏ nhất 58.738 kJ/kg·K) không đủ dữ liệu đầu vào để kiểm lại; nên coi là minh họa.</span><span class="en">The book's HRSG application (minimum entropy 58.738 kJ/kg·K) lacks enough input data to be re-checked; treat it as an illustration.</span></p>
+  </div>
+</section>
+
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Biên co lại bao nhiêu?</span><span class="en">How much do the bounds shrink?</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">I = 1 + 10<sup>w</sup> · t/T</span></div>
+          <div class="eq"><span class="m">w = 3</span><span class="vi"> khi </span><span class="en"> when </span><span class="m">t &gt; 0.5T</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">T = 500, t = 300</span>: <span class="m">t/T = 0.6</span> nên <span class="m">w = 3</span>, <span class="m">I = 1 + 1000 · 0.6 = 601</span>.</span><span class="en"><span class="m">T = 500, t = 300</span>: <span class="m">t/T = 0.6</span> so <span class="m">w = 3</span>, <span class="m">I = 1 + 1000 · 0.6 = 601</span>.</span></li>
+          <li><span class="vi">Miền <span class="m">[−100, 100]</span> co thành <span class="m">[−0.166, 0.166]</span> quanh kiến sư tử.</span><span class="en">The domain <span class="m">[−100, 100]</span> shrinks to <span class="m">[−0.166, 0.166]</span> around the antlion.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Sau nửa quá trình, kiến chỉ còn đi trong vùng nhỏ hơn 600 lần: ALO gần như chỉ khai thác.</span><span class="en">After half the run, ants walk in a region 600× smaller: ALO becomes almost pure exploitation.</span></li>
+          <li><span class="vi">Cuối quá trình <span class="m">w = 6</span>: biên co gần một triệu lần.</span><span class="en">At the end <span class="m">w = 6</span>: bounds shrink nearly a million times.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của ALO</span><span class="en">ALO variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">MOALO</span><span class="en">MOALO</span></h3><p><span class="vi">Bản đa mục tiêu có kho lưu trữ (Mirjalili và cs., 2017).</span><span class="en">Multi-objective version with an archive (Mirjalili et al., 2017).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">BALO</span><span class="en">BALO</span></h3><p><span class="vi">Bản nhị phân cho chọn đặc trưng (Emary và cs., 2016).</span><span class="en">Binary version for feature selection (Emary et al., 2016).</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">ALO + Lévy</span><span class="en">ALO + Lévy</span></h3><p><span class="vi">Thay bước ngẫu nhiên đều bằng bước Lévy.</span><span class="en">Replace uniform walks with Lévy steps.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">ALO hỗn loạn</span><span class="en">Chaotic ALO</span></h3><p><span class="vi">Dùng ánh xạ hỗn loạn thay số ngẫu nhiên.</span><span class="en">Chaotic maps instead of random numbers.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của ALO</span><span class="en">ALO applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán thường gặp với ALO trong tài liệu.</span><span class="en">Problems commonly tackled with ALO.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế kết cấu</span><span class="en">Structural design</span></h3><p><span class="vi">Giàn, dầm, ăng-ten.</span><span class="en">Trusses, beams, antennas.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Điều độ kinh tế, đặt máy phát phân tán.</span><span class="en">Economic dispatch, distributed generator placement.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">BALO trên dữ liệu y sinh.</span><span class="en">BALO on biomedical data.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Điều khiển</span><span class="en">Control</span></h3><p><span class="vi">Chỉnh hệ số PID.</span><span class="en">PID gain tuning.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ALO</span><span class="en">Experiment · ALO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">7.22e−10</td><td class="num">2.75e−9</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.96e+2</td><td class="num">4.74e+2</td><td class="num">8.35e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">1.46e+1</td><td class="num">5.54e+0</td><td class="num">1.44e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">3.32e−5</td><td class="num">4.05e−6</td><td class="num">3.35e−5</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">1.83e−1</td><td class="num">8.27e−2</td><td class="num">1.66e−1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">7.28e−10</td><td class="num">2.77e−9</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">1.29e+1</td><td class="num">5.97e+0</td><td class="num">1.19e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>8.79</b>, đứng thứ <b>10/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>8.79</b>, position <b>10/18</b> among the textbook’s 18 algorithms.</span></li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · ALO</span><span class="en">Experiment · ALO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/ALO.svg" alt="convergence ALO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/alo.py" class="c-sea">code/si/algorithms/alo.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        I = 1.0
+        <span class="k">for</span> thr, w <span class="k">in</span> ((0.1, 2), (0.5, 3), (0.75, 4), (0.9, 5), (0.95, 6)):
+            <span class="k">if</span> t &gt; thr * T:
+                I = 1 + 10 ** w * t / T
+        lb, ub = prob.lb / I, prob.ub / I
+        wts = 1 / (lf - lf.min() + 1e-12) <span class="k">if</span> np.any(lf &lt; 0) <span class="k">else</span> 1 / (lf + 1e-12)
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            j = roulette(rng, wts)
+            RA = _walk(rng, prob, T, min(t, T), lb, ub, L[j])
+            RE = _walk(rng, prob, T, min(t, T), lb, ub, elite)
+            A[i] = (RA + RE) / 2
+        A = prob.clip(A)</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Tự động chuyển từ khám phá sang khai thác</span><span class="en">Automatic shift from exploration to exploitation</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Đường đi ngẫu nhiên quanh nhiều kiến sư tử cho khả năng khám phá tốt ở đầu quá trình.</span><span class="en">Random walks around many antlions explore well early on.</span></li>
+          <li><span class="vi">Miệng hố co theo <span class="m">I</span> tự đẩy thuật toán sang khai thác, không cần chỉnh tay.</span><span class="en">The pit shrinking with <span class="m">I</span> moves the search to exploitation without tuning.</span></li>
+          <li><span class="vi">Ưu tú và cơ chế chiếm chỗ giữ lại lời giải tốt nhất qua các vòng.</span><span class="en">Elitism and the take-over rule keep the best solutions across iterations.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Mỗi con kiến tạo hai đường đi dài <span class="m">T</span> cho từng chiều ở mỗi vòng, nên tốn <span class="m">O(n · T · d)</span> phép sinh số ngẫu nhiên mỗi vòng.</span><span class="en">Each ant builds two length-<span class="m">T</span> walks per dimension per iteration: <span class="m">O(n · T · d)</span> random draws per iteration.</span></li>
+          <li><span class="vi"><span class="m">I</span> tăng theo bậc thang nên bước tìm kiếm co đột ngột; dễ hội tụ sớm.</span><span class="en"><span class="m">I</span> grows in steps, so the search radius collapses abruptly; premature convergence is common.</span></li>
+          <li><span class="vi">Biến thể: ALO nhị phân cho chọn đặc trưng (Emary và cs., 2016), ALO đa mục tiêu MOALO (Mirjalili và cs., 2017).</span><span class="en">Variants: binary ALO for feature selection (Emary et al., 2016), multi-objective MOALO (Mirjalili et al., 2017).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">r = (1, 0, 0, 1, 1)</span>, viết đường đi tích lũy rồi chuẩn hóa vào <span class="m">[c, d] = [2, 4]</span>.</span><span class="en">With <span class="m">r = (1, 0, 0, 1, 1)</span>, write the cumulative walk and normalize it into <span class="m">[c, d] = [2, 4]</span>.</span></li>
+          <li><span class="vi">Với <span class="m">T = 100</span>, tính <span class="m">I</span> theo công thức bài báo tại <span class="m">t = 50, 80, 96</span>.</span><span class="en">With <span class="m">T = 100</span>, compute the paper's <span class="m">I</span> at <span class="m">t = 50, 80, 96</span>.</span></li>
+          <li><span class="vi">Vì sao lấy trung bình <span class="m">R<sub>A</sub></span> và <span class="m">R<sub>E</sub></span> thay vì chỉ đi quanh ưu tú?</span><span class="en">Why average <span class="m">R<sub>A</sub></span> and <span class="m">R<sub>E</sub></span> instead of walking around the elite only?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài ALO và chạy lại ví dụ hàm Booth; kiểm tra nghiệm đúng là (1, 3).</span><span class="en">Implement ALO and rerun the Booth example; confirm the true optimum (1, 3).</span></li>
+          <li><span class="vi">So sánh ALO có và không có thành phần ưu tú trên 30 lần chạy.</span><span class="en">Compare ALO with and without the elite term over 30 runs.</span></li>
+          <li><span class="vi">Cài Binary ALO cho bài toán chọn đặc trưng (liên kết chương 15).</span><span class="en">Implement Binary ALO for feature selection (see chapter 15).</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Mirjalili, “The Ant Lion Optimizer,” <em>Advances in Engineering Software</em>, vol. 83, pp. 80–98, 2015, doi: <a href="https://doi.org/10.1016/j.advengsoft.2015.01.010">10.1016/j.advengsoft.2015.01.010</a>.</li>
+        <li>S. Mirjalili, “Moth-flame optimization algorithm: A novel nature-inspired heuristic paradigm,” <em>Knowledge-Based Systems</em>, vol. 89, pp. 228–249, 2015, doi: <a href="https://doi.org/10.1016/j.knosys.2015.07.006">10.1016/j.knosys.2015.07.006</a>.</li>
+        <li>E. Emary, H. M. Zawbaa, and A. E. Hassanien, “Binary ant lion approaches for feature selection,” <em>Neurocomputing</em>, vol. 213, pp. 54–65, 2016, doi: <a href="https://doi.org/10.1016/j.neucom.2016.03.101">10.1016/j.neucom.2016.03.101</a>.</li>
+        <li>M. Shehab, L. Abualigah, H. Al Hamad, H. Alabool, M. Alshinwan, and A. M. Khasawneh, “Moth–flame optimization algorithm: variants and applications,” <em>Neural Comput & Applic</em>, vol. 32, no. 14, pp. 9859–9884, 2020, doi: <a href="https://doi.org/10.1007/s00521-019-04570-6">10.1007/s00521-019-04570-6</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Kiến đi ngẫu nhiên, kiến sư tử giữ bộ nhớ</span><span class="en">Ants wander, antlions remember</span></span>
+      <span><span class="vi">Miệng hố co theo <span class="m">I = 10<sup>w</sup>t/T</span></span><span class="en">Pit shrinks with <span class="m">I = 10<sup>w</sup>t/T</span></span></span>
+      <span><span class="vi">Ưu tú kéo mọi con kiến</span><span class="en">The elite pulls every ant</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili, <em>Advances in Engineering Software</em> 83, 2015</span><span class="en">Original paper: Mirjalili, <em>Advances in Engineering Software</em> 83, 2015</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* ALO trên địa hình chung (cực tiểu), theo mã nguồn gốc của Mirjalili (2015) */
+function aloWalk(S, T, t, lo, hi, centre) {
+  // bước đi ngẫu nhiên tích lũy dài T, chuẩn hóa vào [lo, hi] dịch theo kiến sư tử, lấy giá trị tại bước t
+  const out = [];
+  for (let d = 0; d < 2; d++) {
+    let c = lo, e = hi;
+    c = S.rnd() < 0.5 ? c + centre[d] : -c + centre[d];
+    e = S.rnd() >= 0.5 ? e + centre[d] : -e + centre[d];
+    if (c > e) [c, e] = [e, c];
+    let x = 0, a = 0, b = 0, xt = 0;
+    for (let k = 1; k <= T; k++) { x += S.rnd() > 0.5 ? 1 : -1; a = Math.min(a, x); b = Math.max(b, x); if (k === t) xt = x; }
+    out.push(SI.clamp(b > a ? (xt - a) * (e - c) / (b - a) + c : c));
+  }
+  return out;
+}
+new SI.Field2D(document.getElementById('alo-field'), {
+  n: 10, T: 60, seed: 4,
+  init(S) {
+    for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) });
+    S.lions = Array.from({ length: this.n }, () => { const x = SI.randPos(S.rnd); return { x, f: SI.f(x) }; }).sort((p, q) => p.f - q.f);
+    S.elite = S.lions[0]; S.I = 1;
+  },
+  step(S) {
+    const t = S.t, T = S.T;
+    let I = 1;
+    if (t > T * 0.1) I = 1 + 100 * t / T;
+    if (t > T * 0.5) I = 1 + 1000 * t / T;
+    if (t > T * 0.75) I = 1 + 10000 * t / T;
+    if (t > T * 0.9) I = 1 + 100000 * t / T;
+    if (t > T * 0.95) I = 1 + 1000000 * t / T;
+    S.I = I;
+    const lo = SI.LO / I, hi = SI.HI / I;
+    const w = S.lions.map((l) => 1 / (l.f + 1e-9)), sw = w.reduce((a, b) => a + b, 0);
+    for (const ant of S.pop) {
+      let r = S.rnd() * sw, j = 0; while (j < w.length - 1 && r > w[j]) { r -= w[j]; j++; }
+      const RA = aloWalk(S, T, t, lo, hi, S.lions[j].x), RE = aloWalk(S, T, t, lo, hi, S.elite.x);
+      ant.x = [0, 1].map((d) => SI.clamp((RA[d] + RE[d]) / 2));
+    }
+    const all = S.lions.concat(S.pop.map((a) => ({ x: a.x.slice(), f: SI.f(a.x) }))).sort((p, q) => p.f - q.f);
+    S.lions = all.slice(0, this.n).map((l) => ({ x: l.x.slice(), f: l.f }));
+    if (S.lions[0].f < S.elite.f) S.elite = S.lions[0];
+    if (S.elite.f < S.bestF) { S.bestF = S.elite.f; S.best = S.elite.x.slice(); }
+  },
+  draw(g, S, P) {
+    const tri = (x, y, r, c) => { g.beginPath(); g.moveTo(x, y - r); g.lineTo(x + r, y + r * 0.8); g.lineTo(x - r, y + r * 0.8); g.closePath(); g.fillStyle = c; g.fill(); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1; g.stroke(); };
+    const [ex, ey] = P.pt(S.elite.x), rad = (SI.HI / S.I) / (SI.HI - SI.LO) * P.s;
+    g.strokeStyle = 'rgba(217,86,47,0.55)'; g.setLineDash([4, 4]); g.beginPath(); g.arc(ex, ey, Math.max(4, rad), 0, Math.PI * 2); g.stroke(); g.setLineDash([]);
+    for (const l of S.lions) { const [x, y] = P.pt(l.x); tri(x, y, 6, '#f0cf7a'); }
+    tri(ex, ey, 8, '#d9562f');
+    for (const a of S.pop) SI.trail(g, P, a, 'rgba(58,127,193,0.35)');
+    for (const a of S.pop) { const [x, y] = P.at(a); SI.dot(g, x, y, 4, '#3a7fc1'); }
+  },
+  status(S) { return `<span><b>I</b> = ${S.I < 1000 ? S.I.toFixed(1) : S.I.toExponential(1)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

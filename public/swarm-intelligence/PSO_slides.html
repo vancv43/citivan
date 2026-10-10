@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy đàn (PSO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<style>
+/* ===========================================
+   THEME — đổi màu / phông toàn bộ deck tại đây
+   =========================================== */
+:root {
+  --paper: #f5f0e6;        /* nền giấy */
+  --paper-2: #ebe3d2;      /* nền thẻ */
+  --paper-3: #e1d6bf;
+  --ink: #1c2a2e;          /* chữ chính */
+  --ink-soft: #56676a;     /* chữ phụ */
+  --sea: #1f6f78;          /* màu nhấn chính (biển) */
+  --sky: #3a7fc1;          /* quán tính */
+  --moss: #4b8f45;         /* nhận thức */
+  --ember: #d9562f;        /* xã hội / gbest / tổng hợp */
+  --sand: #f0cf7a;         /* tô sáng */
+
+  --font-display: "Lora", Georgia, serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+  --font-math: "STIX Two Text", "Times New Roman", serif;
+
+  --title-size: clamp(1.9rem, 5.6vw, 4.6rem);
+  --h2-size: clamp(1.3rem, 3.4vw, 2.6rem);
+  --h3-size: clamp(1rem, 2vw, 1.45rem);
+  --body-size: clamp(0.85rem, 1.55vw, 1.22rem);
+  --small-size: clamp(0.68rem, 1.05vw, 0.9rem);
+  --eq-size: clamp(1rem, 2.5vw, 2rem);
+
+  --slide-padding: clamp(1rem, 5vw, 5rem);
+  --content-gap: clamp(0.6rem, 2.2vh, 1.8rem);
+  --element-gap: clamp(0.3rem, 1vh, 0.9rem);
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 0.7s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body { height: 100%; overflow: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide {
+  width: 100vw; height: 100vh; height: 100dvh;
+  overflow: hidden; scroll-snap-align: start;
+  display: flex; flex-direction: column; position: relative;
+}
+.slide-content {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+  gap: var(--content-gap);
+}
+img { max-width: 100%; object-fit: contain; }
+
+@media (max-height: 700px) {
+  :root {
+    --slide-padding: clamp(0.75rem, 3vw, 2rem);
+    --content-gap: clamp(0.4rem, 1.5vh, 1rem);
+    --title-size: clamp(1.4rem, 4.5vw, 2.8rem);
+    --h2-size: clamp(1.05rem, 3vw, 1.8rem);
+    --eq-size: clamp(0.95rem, 2.2vw, 1.5rem);
+  }
+}
+@media (max-height: 600px) {
+  :root {
+    --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+    --content-gap: clamp(0.3rem, 1vh, 0.75rem);
+    --title-size: clamp(1.2rem, 4vw, 2.2rem);
+    --body-size: clamp(0.72rem, 1.25vw, 0.95rem);
+  }
+  .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+@media (max-height: 500px) {
+  :root {
+    --slide-padding: clamp(0.4rem, 2vw, 1rem);
+    --title-size: clamp(1rem, 3.5vw, 1.6rem);
+    --h2-size: clamp(0.92rem, 2.5vw, 1.25rem);
+    --body-size: clamp(0.66rem, 1.05vw, 0.85rem);
+    --small-size: clamp(0.6rem, 0.9vw, 0.75rem);
+    --eq-size: clamp(0.85rem, 1.9vw, 1.2rem);
+  }
+}
+@media (max-height: 500px) {
+  .fig svg { max-height: 46vh; }
+  #demo-svg { max-height: 50vh; }
+  .demo-desc { min-height: 0; }
+  .bars { row-gap: 0; }
+  .bars .bar i { height: 6px; }
+  .steps { gap: 0.1rem; }
+  .steps li::before { width: 1.5em; height: 1.5em; }
+  .loop-note, .lead.opt { display: none; }
+}
+@media (max-height: 500px) {
+  .slide-content { padding-top: max(var(--slide-padding), 2.4rem); }
+}
+@media (max-width: 600px) {
+  .slide-content { padding-top: max(var(--slide-padding), 3rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SURFACE
+   =========================================== */
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.slide {
+  background:
+    radial-gradient(ellipse 70% 60% at 100% 0%, rgba(31,111,120,0.07), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 0% 100%, rgba(217,86,47,0.05), transparent 70%),
+    var(--paper);
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+h1 { font-size: var(--title-size); }
+h2 { font-size: var(--h2-size); }
+h3 { font-size: var(--h3-size); }
+.kicker {
+  font-size: var(--small-size); font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--sea);
+  display: flex; align-items: center; gap: 0.7em;
+}
+.kicker::before { content: ""; width: 2.2em; height: 2px; background: currentColor; }
+.lead { color: var(--ink-soft); max-width: 46em; }
+.note { font-size: var(--small-size); color: var(--ink-soft); }
+.note em { font-style: normal; color: var(--ink); }
+strong { font-weight: 600; }
+.c-in { color: var(--sky); } .c-cog { color: var(--moss); } .c-soc { color: var(--ember); } .c-sea { color: var(--sea); }
+
+header.slide-head { display: flex; flex-direction: column; gap: 0.35em; }
+
+/* Lists ------------------------------------------------ */
+.bullets { list-style: none; display: flex; flex-direction: column; gap: clamp(0.35rem, 1.2vh, 0.9rem); }
+.bullets li { padding-left: 1.3em; position: relative; }
+.bullets li::before {
+  content: ""; position: absolute; left: 0; top: 0.62em;
+  width: 0.48em; height: 0.48em; border-radius: 50%; background: var(--sea);
+}
+.bullets.sub li::before { background: transparent; border: 1.5px solid var(--sea); }
+
+/* Layout helpers -------------------------------------- */
+.cols { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(1rem, 3.5vw, 3.5rem); align-items: center; min-height: 0; }
+.cols.even { grid-template-columns: 1fr 1fr; }
+.cols.wide-right { grid-template-columns: 0.9fr 1.3fr; }
+@media (max-width: 760px) and (orientation: portrait) {
+  .cols, .cols.even, .cols.wide-right { grid-template-columns: 1fr; }
+  .hide-narrow { display: none !important; }
+}
+.card {
+  background: var(--paper-2); border-radius: 14px;
+  padding: clamp(0.7rem, 1.8vw, 1.5rem);
+  border: 1px solid rgba(28,42,46,0.06);
+}
+.card.sand { background: #f6e6b8; }
+.card.ember { background: #f6d8cb; }
+.card.sea { background: #d5e7e6; }
+.card h3 { margin-bottom: 0.35em; }
+.tag {
+  display: inline-block; font-size: var(--small-size); font-weight: 600;
+  padding: 0.15em 0.65em; border-radius: 99px; background: var(--paper-3); color: var(--ink);
+}
+
+/* Math ---------------------------------------------- */
+.m { font-family: var(--font-math); font-style: italic; white-space: nowrap; }
+.m .up { font-style: normal; }
+.m sub, .m sup { font-size: 0.66em; line-height: 0; }
+/* chỉ số trên + dưới xếp chồng: X<span class="ss"><i>t+1</i><i>i</i></span> */
+.ss { display: inline-flex; flex-direction: column; vertical-align: 0.42em; font-size: 0.64em; line-height: 1.05; margin-left: 0.04em; }
+.ss i:first-child { margin-bottom: 0.05em; }
+.eq {
+  font-family: var(--font-math); font-size: var(--eq-size);
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center;
+  gap: 0.25em 0.3em; line-height: 1.3;
+}
+.eq .op { font-style: normal; padding-top: 0.05em; }
+.term { display: inline-flex; flex-direction: column; align-items: center; }
+.term .tm { font-style: italic; padding: 0.05em 0.25em; border-radius: 6px; white-space: nowrap; }
+.term .lbl {
+  font-family: var(--font-body); font-style: normal; font-weight: 600;
+  font-size: max(0.44em, 0.68rem); margin-top: 0.45em; letter-spacing: 0.02em;
+  border-top: 2px solid currentColor; padding-top: 0.25em; white-space: nowrap;
+}
+.t-in .tm { background: rgba(58,127,193,0.13); } .t-in .lbl { color: var(--sky); }
+.t-cog .tm { background: rgba(75,143,69,0.14); } .t-cog .lbl { color: var(--moss); }
+.t-soc .tm { background: rgba(217,86,47,0.13); } .t-soc .lbl { color: var(--ember); }
+.t-hi .tm { background: rgba(240,207,122,0.6); }
+.eq-box { background: var(--paper-2); border-radius: 14px; padding: clamp(0.6rem, 2vh, 1.4rem) clamp(0.8rem, 2vw, 1.6rem); }
+.eq-box.sand { background: #f6e6b8; }
+.eq-box.outline { background: transparent; border: 2px solid var(--ember); }
+
+/* Figures ------------------------------------------- */
+.fig { display: flex; flex-direction: column; gap: 0.4em; align-items: center; min-height: 0; }
+.fig figcaption { font-size: var(--small-size); color: var(--ink-soft); text-align: center; }
+.fig svg { width: 100%; height: auto; max-height: 58vh; }
+.chart-img { background: #fff; border-radius: 10px; padding: 0.4rem; box-shadow: 0 6px 24px rgba(28,42,46,0.08); }
+
+/* ===========================================
+   REVEAL ANIMATIONS (kích hoạt khi slide hiện)
+   =========================================== */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: none; }
+.slide.visible .reveal.d1 { transition-delay: 0.08s; }
+.slide.visible .reveal.d2 { transition-delay: 0.18s; }
+.slide.visible .reveal.d3 { transition-delay: 0.28s; }
+.slide.visible .reveal.d4 { transition-delay: 0.38s; }
+.slide.visible .reveal.d5 { transition-delay: 0.48s; }
+.slide.visible .reveal.d6 { transition-delay: 0.58s; }
+/* vẽ nét SVG */
+.draw { stroke-dasharray: var(--len, 1000); stroke-dashoffset: var(--len, 1000); transition: stroke-dashoffset 1.4s var(--ease); }
+.slide.visible .draw { stroke-dashoffset: 0; }
+.slide.visible .draw.d2 { transition-delay: 0.3s; } .slide.visible .draw.d3 { transition-delay: 0.6s; }
+.slide.visible .draw.d4 { transition-delay: 0.9s; } .slide.visible .draw.d5 { transition-delay: 1.2s; }
+
+/* ===========================================
+   CHROME: progress, dots, page number
+   =========================================== */
+.progress { position: fixed; left: 0; bottom: 0; height: 3px; background: var(--sea); width: 0; z-index: 50; transition: width 0.4s var(--ease); }
+.nav-dots { position: fixed; right: clamp(0.4rem, 1.2vw, 1.2rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 7px; z-index: 50; }
+.nav-dots button { width: 7px; height: 7px; border-radius: 50%; border: 0; background: rgba(28,42,46,0.2); cursor: pointer; transition: transform 0.3s, background 0.3s; }
+.nav-dots button[aria-current="true"] { background: var(--sea); transform: scale(1.5); }
+.nav-dots button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.page-num { position: fixed; right: clamp(0.8rem, 2.5vw, 2.2rem); bottom: clamp(0.5rem, 1.6vh, 1.2rem); font-size: var(--small-size); color: var(--ink-soft); font-variant-numeric: tabular-nums; z-index: 50; }
+.keyboard-hint { position: fixed; left: clamp(0.8rem, 2.5vw, 2.2rem); bottom: clamp(0.5rem, 1.6vh, 1.2rem); font-size: var(--small-size); color: var(--ink-soft); z-index: 50; opacity: 0.8; transition: opacity 1s; }
+.keyboard-hint.gone { opacity: 0; }
+@media (max-width: 600px) { .nav-dots { display: none; } }
+
+/* ===========================================
+   LANGUAGE SWITCH (VN | EN) — mỗi đoạn chữ có cặp .vi / .en
+   =========================================== */
+html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !important; }
+.lang-switch {
+  position: fixed; top: clamp(0.5rem, 1.6vh, 1.1rem); right: clamp(0.6rem, 2vw, 1.6rem); z-index: 60;
+  display: flex; align-items: center; gap: 0.15em; font-size: var(--small-size); font-weight: 600;
+  background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px;
+  padding: 0.2em 0.35em; color: var(--ink-soft); backdrop-filter: blur(4px);
+}
+.lang-switch button {
+  font: inherit; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer;
+  padding: 0.25em 0.6em; border-radius: 99px; letter-spacing: 0.06em; transition: background 0.2s, color 0.2s;
+}
+.lang-switch button[aria-pressed="true"] { background: var(--sea); color: var(--paper); }
+.lang-switch button:focus-visible { outline: 2px solid var(--ember); outline-offset: 1px; }
+
+.home-link {
+  position: fixed; top: clamp(0.5rem, 1.6vh, 1.1rem); left: clamp(0.6rem, 2vw, 1.6rem); z-index: 60;
+  font-size: var(--small-size); font-weight: 600; color: var(--sea); text-decoration: none;
+  background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px;
+  padding: 0.38em 0.9em; backdrop-filter: blur(4px); transition: background 0.2s, color 0.2s;
+}
+.home-link:hover, .home-link:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+
+.mini-table { border-collapse: collapse; font-size: calc(var(--body-size) * 0.9); width: 100%; }
+.mini-table th, .mini-table td { text-align: left; padding: 0.4em 0.7em; border-bottom: 1px solid rgba(28,42,46,0.12); vertical-align: top; }
+.mini-table th { font-weight: 600; color: var(--sea); font-size: var(--small-size); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ===========================================
+   SLIDE-SPECIFIC
+   =========================================== */
+/* Title & closing ---------------------------------- */
+.swarm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.title-slide .slide-content { position: relative; z-index: 1; justify-content: flex-end; padding-bottom: clamp(2rem, 10vh, 7rem); }
+.title-slide h1 { max-width: 12em; }
+.title-slide h1 .sub { display: block; font-size: 0.42em; font-weight: 500; font-style: italic; color: var(--sea); margin-top: 0.35em; letter-spacing: 0; }
+.credit { font-size: var(--small-size); color: var(--ink-soft); border-top: 1px solid rgba(28,42,46,0.15); padding-top: 0.8em; max-width: 34em; }
+
+/* Inspiration photos -------------------------------- */
+.photos { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.2vw, 1rem); }
+.photos img { width: 100%; height: clamp(120px, 42vh, 420px); object-fit: cover; border-radius: 14px; display: block; }
+.photos figure:nth-child(2) { margin-top: clamp(1rem, 6vh, 4rem); }
+@media (max-width: 760px) and (orientation: portrait) { .photos img { height: clamp(90px, 20vh, 200px); } .photos figure:nth-child(2) { margin-top: 0; } }
+
+/* Big idea ------------------------------------------ */
+.big-quote { font-family: var(--font-display); font-size: clamp(1.25rem, 3.3vw, 2.7rem); line-height: 1.32; max-width: 22em; font-weight: 500; }
+.big-quote .hl { padding: 0 0.15em; border-radius: 4px; }
+.forces { display: flex; flex-wrap: wrap; gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.force { flex: 1 1 13em; border-left: 4px solid; padding: 0.4em 0 0.4em 0.9em; }
+.force b { display: block; font-family: var(--font-display); font-size: var(--h3-size); }
+.force > span { font-size: var(--small-size); color: var(--ink-soft); }
+
+/* Components ---------------------------------------- */
+.defs { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.6vh, 1rem); }
+.def { display: grid; grid-template-columns: minmax(7.5em, auto) 1fr; gap: 0.2em 1em; align-items: baseline; }
+.def dt { font-weight: 600; }
+.def dd { color: var(--ink-soft); }
+.def dd .m { color: var(--ink); font-size: 1.12em; }
+.stack { display: flex; flex-direction: column; gap: clamp(0.5rem, 1.6vh, 1rem); }
+.mathcard .m { font-size: clamp(1rem, 2.1vw, 1.6rem); display: block; line-height: 1.6; }
+
+/* Steps --------------------------------------------- */
+.steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: clamp(0.25rem, 1.1vh, 0.7rem); position: relative; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2.2em 1fr; align-items: baseline; gap: 0.6em; }
+.steps li::before {
+  content: counter(s); font-family: var(--font-display); font-weight: 700; font-size: 1.15em;
+  width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center;
+  background: var(--paper-2); color: var(--sea); align-self: center;
+}
+.steps li.loop-body::before { background: var(--sea); color: var(--paper); }
+.loop-note { display: flex; align-items: center; gap: 0.6em; font-size: var(--small-size); color: var(--sea); font-weight: 600; margin-top: 0.3em; }
+
+/* Interactive example ------------------------------- */
+.demo { display: grid; grid-template-columns: minmax(14em, 0.75fr) 1.6fr; gap: clamp(0.8rem, 2.5vw, 2.5rem); align-items: center; min-height: 0; }
+@media (max-width: 760px) and (orientation: portrait) { .demo { grid-template-columns: 1fr; } }
+.demo-text { display: flex; flex-direction: column; gap: 0.7em; }
+.demo-step-label { font-size: var(--small-size); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sea); }
+.demo-desc { min-height: 6.5em; }
+.demo-desc b { color: var(--ink); }
+.demo-ctrl { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-size: var(--small-size); font-weight: 600; cursor: pointer;
+  border: 1.5px solid var(--sea); color: var(--sea); background: transparent;
+  padding: 0.45em 1em; border-radius: 99px; transition: background 0.2s, color 0.2s;
+}
+.btn:hover, .btn:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+.btn:disabled { opacity: 0.35; cursor: default; background: transparent; color: var(--sea); }
+.pips { display: flex; gap: 5px; }
+.pips span { width: 18px; height: 4px; border-radius: 2px; background: var(--paper-3); transition: background 0.3s; }
+.pips span.on { background: var(--sea); }
+.legend { display: flex; flex-wrap: wrap; gap: 0.3em 1em; font-size: var(--small-size); transition: opacity 0.4s; }
+.legend i { display: inline-block; width: 1.4em; height: 3px; vertical-align: middle; margin-right: 0.35em; border-radius: 2px; }
+#demo-svg { width: 100%; height: auto; max-height: 64vh; }
+#demo-svg text { font-family: var(--font-body); }
+
+/* Binary PSO annotations ---------------------------- */
+.annot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6em; font-size: var(--small-size); }
+.annot div { background: #f6e6b8; border-radius: 10px; padding: 0.5em 0.7em; position: relative; }
+.annot div b { font-family: var(--font-math); font-style: italic; font-size: 1.25em; display: block; font-weight: 400; }
+@media (max-width: 760px) and (orientation: portrait) { .annot { grid-template-columns: 1fr 1fr; } }
+
+/* Variants grid ------------------------------------- */
+.variants { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.variants .card { display: flex; flex-direction: column; gap: 0.3em; }
+.variants .card .num { font-family: var(--font-display); font-size: var(--h2-size); color: var(--sea); line-height: 1; opacity: 0.55; }
+.variants .card p { color: var(--ink-soft); font-size: calc(var(--body-size) * 0.92); }
+@media (max-width: 600px) { .variants { grid-template-columns: 1fr; } .variants .card .num { display: none; } }
+
+/* GA-PSO selection diagram -------------------------- */
+.sel-row { display: flex; align-items: center; gap: 0.6em; }
+.sel-row .lab { width: 7.5em; font-size: var(--small-size); color: var(--ink-soft); }
+.dots { display: flex; gap: clamp(4px, 0.7vw, 9px); }
+.dots i { width: clamp(16px, 2.2vw, 28px); height: clamp(16px, 2.2vw, 28px); border-radius: 50%; display: block; }
+
+/* EPSO cycle ---------------------------------------- */
+.cycle { display: flex; flex-wrap: wrap; gap: 0.4em; align-items: center; font-size: var(--small-size); font-weight: 600; }
+.cycle > span { background: var(--paper-2); padding: 0.35em 0.8em; border-radius: 99px; }
+.cycle .arr { background: none; padding: 0; color: var(--sea); }
+
+/* Chart grids --------------------------------------- */
+.charts3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.4rem, 1vw, 0.9rem); align-items: center; }
+.charts3 img, .charts4 img { width: 100%; max-height: 34vh; }
+.charts4 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.3rem, 0.8vw, 0.8rem); }
+.charts4 img { max-height: 30vh; }
+@media (max-width: 760px) and (orientation: portrait) { .charts3 { grid-template-columns: 1fr; } .charts3 img { max-height: 19vh; } .charts4 img { max-height: 22vh; } }
+
+/* DEPSO alternation ---------------------------------- */
+.alt { display: flex; gap: 5px; flex-wrap: wrap; }
+.alt span { font-size: var(--small-size); font-weight: 600; padding: 0.35em 0; width: 3.7em; text-align: center; border-radius: 8px; color: #fff; }
+.alt .p { background: var(--sea); } .alt .d { background: var(--moss); }
+.alt small { display: block; font-weight: 400; opacity: 0.85; font-size: 0.85em; }
+
+/* Applications bar chart ----------------------------- */
+.bars { display: grid; grid-template-columns: auto 1fr; gap: clamp(1px, 0.45vh, 5px) 0.7em; font-size: var(--small-size); font-variant-numeric: tabular-nums; align-items: center; }
+.bars .yr { color: var(--ink-soft); }
+.bars .bar { display: flex; align-items: center; gap: 0.5em; }
+.bars .bar i { display: block; height: clamp(8px, 1.6vh, 15px); background: var(--sea); border-radius: 0 4px 4px 0; width: 0; transition: width 1.2s var(--ease); min-width: 2px; }
+.bars .bar i.zero { min-width: 0; }
+
+/* Closing ------------------------------------------- */
+.recap { display: flex; flex-wrap: wrap; gap: 0.6em; }
+.recap > span { background: rgba(245,240,230,0.85); border: 1px solid rgba(28,42,46,0.12); border-radius: 99px; padding: 0.4em 1em; font-size: var(--small-size); }
+/* thêm cho slide thực nghiệm, mã nguồn, tài liệu tham khảo */
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.6rem, 2vw, 1.6rem); }
+@media (max-width: 760px) and (orientation: portrait) { .pros-cons { grid-template-columns: 1fr; } }
+.pros-cons h3 { display: flex; align-items: center; gap: 0.4em; }
+.codeblock { font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace; font-size: clamp(0.62rem, 1.05vw, 0.92rem); line-height: 1.5; background: #1c2a2e; color: #e9e4d8; border-radius: 12px; padding: clamp(0.6rem, 1.4vw, 1.1rem) clamp(0.7rem, 1.6vw, 1.3rem); white-space: pre; overflow: hidden; max-width: 100%; }
+.codeblock .c { color: #8fb3a8; } .codeblock .k { color: #f0cf7a; }
+.refs { list-style: none; counter-reset: rf; display: flex; flex-direction: column; gap: clamp(0.2rem, 0.8vh, 0.5rem); font-size: clamp(0.62rem, 0.95vw, 0.86rem); line-height: 1.4; }
+.refs li { counter-increment: rf; padding-left: 2.2em; position: relative; }
+.refs li::before { content: "[" counter(rf) "]"; position: absolute; left: 0; color: var(--sea); font-weight: 600; }
+.refs a { color: var(--sea); text-decoration: none; word-break: break-all; }
+.res-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sg-plus { color: var(--moss); font-weight: 700; } .sg-minus { color: var(--ember); font-weight: 700; } .sg-eq { color: var(--ink-soft); }
+.conv-img { width: 100%; max-height: 52vh; background: #fff; border-radius: 10px; padding: 0.4rem; }
+@media (max-width: 600px) { .codeblock { font-size: 0.55rem; white-space: pre-wrap; } .refs { font-size: 0.6rem; } }
+@media (max-height: 500px) { .codeblock { font-size: 0.5rem; line-height: 1.3; padding: 0.4rem 0.6rem; } }
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language">
+  <button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button>
+</div>
+
+<main>
+
+<!-- ============ 1. TITLE ============ -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 3 · Trí tuệ bầy đàn</span><span class="en">Chapter 3 · Swarm Intelligence</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy đàn</span><span class="en">Particle Swarm Optimization</span><span class="sub"><span class="vi">Particle Swarm Optimization — PSO</span><span class="en">PSO — learning to search from a flock of birds</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Giải thích vì sao mỗi cá thể vừa nhớ <strong>pbest</strong> vừa nhìn về <strong>gbest</strong>.</span><span class="en">Explain why each particle both remembers <strong>pbest</strong> and looks toward <strong>gbest</strong>.</span></li>
+          <li class="reveal d3"><span class="vi">Viết và diễn giải công thức cập nhật vận tốc, vị trí, cùng vai trò của <span class="m">w, c<sub>1</sub>, c<sub>2</sub></span>.</span><span class="en">Write and interpret the velocity and position updates and the roles of <span class="m">w, c<sub>1</sub>, c<sub>2</sub></span>.</span></li>
+          <li class="reveal d4"><span class="vi">Chọn tham số và <span class="m">v<sub>max</sub></span> hợp lý cho một bài toán cụ thể.</span><span class="en">Choose sensible parameters and <span class="m">v<sub>max</sub></span> for a given problem.</span></li>
+          <li class="reveal d5"><span class="vi">Phân biệt PSO liên tục, Binary PSO và các biến thể lai GA-PSO, EPSO, DEPSO.</span><span class="en">Tell apart continuous PSO, Binary PSO and the GA-PSO, EPSO, DEPSO hybrids.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. INSPIRATION ============ -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Ý tưởng đến từ một đàn chim đi kiếm ăn</span><span class="en">The idea comes from a flock of birds looking for food</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Kennedy và Eberhart</strong> đề xuất năm 1995.</span><span class="en">Proposed by <strong>Kennedy and Eberhart</strong> in 1995.</span></li>
+          <li class="reveal d3"><span class="vi">Mô phỏng hành vi xã hội của đàn chim, đàn cá: không con nào biết trước thức ăn ở đâu, nhưng cả đàn vẫn tìm ra nhờ quan sát lẫn nhau.</span><span class="en">Inspired by the social behaviour of bird flocks and fish schools: no individual knows where the food is, yet the group finds it by watching one another.</span></li>
+          <li class="reveal d4"><span class="vi">Thuộc họ thuật toán dùng <strong>trí tuệ bầy đàn</strong> (swarm intelligence).</span><span class="en">Belongs to the family of <strong>swarm intelligence</strong> algorithms.</span></li>
+          <li class="reveal d5"><span class="vi">Là thuật toán tối ưu <strong>dựa trên quần thể</strong>: nhiều lời giải cùng tìm kiếm song song.</span><span class="en">A <strong>population-based</strong> optimizer: many candidate solutions search in parallel.</span></li>
+        </ul>
+      </div>
+      <div class="photos reveal d3">
+        <figure><img src="assets/birds.jpg" alt="Đàn chim / A flock of birds" /></figure>
+        <figure><img src="assets/fish.jpg" alt="Đàn cá xoáy quanh thợ lặn / A school of fish swirling around a diver" /></figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. BIG IDEA ============ -->
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi cá thể di chuyển dưới ba lực kéo: <span class="hl c-in">thói quen</span> của chính nó, <span class="hl c-cog">ký ức</span> về chỗ tốt nhất nó từng đến, và <span class="hl c-soc">tiếng gọi</span> từ chỗ tốt nhất cả bầy đã tìm thấy.</span><span class="en">Each particle moves under three pulls: its own <span class="hl c-in">habit</span>, the <span class="hl c-cog">memory</span> of the best place it has visited, and the <span class="hl c-soc">call</span> of the best place the whole swarm has found.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: var(--sky)"><b class="c-in"><span class="vi">Quán tính</span><span class="en">Inertia</span></b><span><span class="vi">giữ hướng bay hiện tại</span><span class="en">keep flying in the current direction</span></span></div>
+      <div class="force reveal d4" style="border-color: var(--moss)"><b class="c-cog"><span class="vi">Nhận thức</span><span class="en">Cognitive</span></b><span><span class="vi">quay về vị trí tốt nhất của bản thân, pbest</span><span class="en">return to its own best position, pbest</span></span></div>
+      <div class="force reveal d5" style="border-color: var(--ember)"><b class="c-soc"><span class="vi">Xã hội</span><span class="en">Social</span></b><span><span class="vi">hướng về vị trí tốt nhất của cả bầy, gbest</span><span class="en">head toward the swarm's best position, gbest</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4. COMPONENTS ============ -->
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần của PSO</span><span class="en">Components of PSO</span></p>
+      <h2 class="reveal d1"><span class="vi">Bầy, cá thể và hai “ký ức tốt nhất”</span><span class="en">A swarm, its particles and two “best memories”</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi">Bầy (swarm)</span><span class="en">Swarm</span></dt><dd><span class="vi">Tập các cá thể</span><span class="en">The set of particles</span> <span class="m">S</span></dd></div>
+        <div class="def reveal d2"><dt><span class="vi">Cá thể (particle)</span><span class="en">Particle</span></dt><dd><span class="vi">Một lời giải ứng viên của bài toán, mang theo:</span><span class="en">A candidate solution to the problem, carrying:</span></dd></div>
+        <div class="def reveal d3"><dt class="c-sea"><span class="vi">· Vị trí</span><span class="en">· Position</span></dt><dd><span class="m">X<sub>i</sub> = (x<sub>i1</sub>, x<sub>i2</sub>, …, x<sub>in</sub>) ∈ <span class="up">ℝ</span><sup>n</sup></span></dd></div>
+        <div class="def reveal d4"><dt class="c-sea"><span class="vi">· Vận tốc</span><span class="en">· Velocity</span></dt><dd><span class="m">V<sub>i</sub> = (v<sub>i1</sub>, v<sub>i2</sub>, …, v<sub>in</sub>) ∈ <span class="up">ℝ</span><sup>n</sup></span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d4">
+          <h3><span class="vi">Tốt nhất của riêng cá thể</span><span class="en">The particle's own best</span></h3>
+          <span class="m">P<sub>i</sub> = (p<sub>i1</sub>, p<sub>i2</sub>, …, p<sub>in</sub>) ∈ <span class="up">ℝ</span><sup>n</sup></span>
+          <span class="m">pbest<sub>i</sub> = f(P<sub>i</sub>)</span>
+        </div>
+        <div class="card ember mathcard reveal d5">
+          <h3><span class="vi">Tốt nhất của cả bầy</span><span class="en">The swarm's best</span></h3>
+          <span class="m">P<sub>g</sub> ∈ <span class="up">ℝ</span><sup>n</sup>, &nbsp; gbest = f(P<sub>g</sub>)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 5. STEPS ============ -->
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Sáu bước, lặp đi lặp lại</span><span class="en">Six steps, repeated</span></h2>
+        <p class="lead reveal d2"><span class="vi">Bước 2 đến bước 5 tạo thành một vòng lặp. Mỗi vòng, cả bầy nhích lại gần vùng tốt hơn một chút.</span><span class="en">Steps 2 to 5 form a loop. With every pass, the swarm edges a little closer to better regions.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span class="vi">Khởi tạo một bầy gồm <span class="m">N</span> cá thể.</span><span class="en">Initialize a swarm of <span class="m">N</span> particles.</span></li>
+          <li class="reveal d2 loop-body"><span class="vi">Đánh giá độ thích nghi của từng cá thể.</span><span class="en">Evaluate the fitness of every particle.</span></li>
+          <li class="reveal d3 loop-body"><span class="vi">Cập nhật vị trí tốt nhất từng đạt <span class="m">P<sub>i</sub></span> của mỗi cá thể.</span><span class="en">Update each particle's best position so far, <span class="m">P<sub>i</sub></span>.</span></li>
+          <li class="reveal d4 loop-body"><span class="vi">Cập nhật vị trí của cá thể tốt nhất cả bầy <span class="m">P<sub>g</sub></span>.</span><span class="en">Update the position of the swarm's best particle, <span class="m">P<sub>g</sub></span>.</span></li>
+          <li class="reveal d5 loop-body"><span class="vi">Cập nhật vận tốc và vị trí của mỗi cá thể theo <span class="m">P<sub>i</sub></span> và <span class="m">P<sub>g</sub></span>.</span><span class="en">Update each particle's velocity and position using <span class="m">P<sub>i</sub></span> and <span class="m">P<sub>g</sub></span>.</span></li>
+          <li class="reveal d6"><span class="vi">Quay lại bước 2 cho đến khi thỏa điều kiện dừng.</span><span class="en">Go back to step 2 until a stopping criterion is met.</span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. FLOWCHART ============ -->
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="PSO flowchart">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="ah-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="17" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
+          <g class="vi"><text x="125" y="67">Thiết lập</text><text x="125" y="89">tham số PSO</text></g>
+          <g class="en"><text x="125" y="67">Set PSO</text><text x="125" y="89">parameters</text></g>
+          <rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
+          <g class="vi"><text x="375" y="67">Khởi tạo vị trí và</text><text x="375" y="89">vận tốc của bầy</text></g>
+          <g class="en"><text x="375" y="67">Initialize positions</text><text x="375" y="89">and velocities</text></g>
+          <rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
+          <g class="vi"><text x="625" y="67">Đánh giá ban đầu,</text><text x="625" y="89">chọn pbest và gbest</text></g>
+          <g class="en"><text x="625" y="67">Evaluate fitness,</text><text x="625" y="89">select pbest and gbest</text></g>
+          <rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
+          <text x="875" y="78" font-family="STIX Two Text, serif" font-style="italic" font-size="21">k = 1</text>
+          <rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/>
+          <g class="vi"><text x="875" y="237">Cập nhật vận tốc</text><text x="875" y="259">và vị trí</text></g>
+          <g class="en"><text x="875" y="237">Update velocity</text><text x="875" y="259">and position</text></g>
+          <rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/>
+          <g class="vi"><text x="625" y="237">Đánh giá, cập nhật</text><text x="625" y="259">pbest và gbest</text></g>
+          <g class="en"><text x="625" y="237">Evaluate, update</text><text x="625" y="259">pbest and gbest</text></g>
+          <path d="M375,192 L470,242 L375,292 L280,242 z" fill="#f6e6b8"/>
+          <text x="375" y="249" font-family="STIX Two Text, serif" font-style="italic" font-size="20">k &lt; max_iter ?</text>
+          <rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/>
+          <g class="vi"><text x="125" y="237">Trả về gbest</text><text x="125" y="259">làm lời giải tốt nhất</text></g>
+          <g class="en"><text x="125" y="237">Return gbest as</text><text x="125" y="259">the best solution</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#ah)">
+            <path class="draw" style="--len:40" d="M230,72 H268"/>
+            <path class="draw d2" style="--len:40" d="M480,72 H518"/>
+            <path class="draw d3" style="--len:40" d="M730,72 H768"/>
+            <path class="draw d4" style="--len:90" d="M875,114 V198"/>
+            <path class="draw d5" style="--len:40" d="M770,242 H732"/>
+            <path class="draw d5" style="--len:50" d="M520,242 H472"/>
+            <path class="draw d5" style="--len:50" d="M280,242 H232"/>
+          </g>
+          <text x="256" y="230" font-size="15" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <path class="draw d5" style="--len:700" d="M375,292 V360 H955 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-sea)"/>
+          <text x="665" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có</tspan><tspan class="en">Yes</tspan> · <tspan font-family="STIX Two Text, serif" font-style="italic" font-weight="400">k ← k + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<!-- ============ 7. VELOCITY UPDATE ============ -->
+<section class="slide" aria-label="Cập nhật vận tốc" data-label-en="Velocity update">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Cập nhật vận tốc: cộng ba lực lại</span><span class="en">Velocity update: adding up three pulls</span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="eq">
+        <span class="term"><span class="tm">V<span class="ss"><i>t+1</i><i>i</i></span></span></span>
+        <span class="op">=</span>
+        <span class="term t-in"><span class="tm">V<span class="ss"><i>t</i><i>i</i></span></span><span class="lbl"><span class="vi">Quán tính</span><span class="en">Inertia</span></span></span>
+        <span class="op">+</span>
+        <span class="term t-cog"><span class="tm">φ<sub>1</sub>r<sub>1</sub>(P<sub>i</sub> − X<span class="ss"><i>t</i><i>i</i></span>)</span><span class="lbl"><span class="vi">Thành phần nhận thức</span><span class="en">Cognitive component</span></span></span>
+        <span class="op">+</span>
+        <span class="term t-soc"><span class="tm">φ<sub>2</sub>r<sub>2</sub>(P<sub>g</sub> − X<span class="ss"><i>t</i><i>i</i></span>)</span><span class="lbl"><span class="vi">Thành phần xã hội</span><span class="en">Social component</span></span></span>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="m">r<sub>1</sub>, r<sub>2</sub> ~ U(0, 1)</span><span class="vi">: hệ số ngẫu nhiên, rút lại ở mỗi lần cập nhật, giúp bầy không đi theo một khuôn cứng.</span><span class="en">: random coefficients, redrawn at every update so the swarm never moves in a rigid pattern.</span></li>
+      <li class="reveal d4"><span class="m">φ<sub>1</sub>, φ<sub>2</sub></span><span class="vi">: hệ số gia tốc, cho biết cá thể tin vào bản thân hay tin vào bầy nhiều hơn.</span><span class="en">: acceleration coefficients, setting how much a particle trusts itself versus the swarm.</span></li>
+      <li class="reveal d5"><span class="vi">Hai hiệu <span class="m">P<sub>i</sub> − X<sub>i</sub></span> và <span class="m">P<sub>g</sub> − X<sub>i</sub></span> là các vector chỉ từ vị trí hiện tại về hai “ký ức tốt nhất”.</span><span class="en">The differences <span class="m">P<sub>i</sub> − X<sub>i</sub></span> and <span class="m">P<sub>g</sub> − X<sub>i</sub></span> are vectors pointing from the current position to the two “best memories”.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ TRỌNG SỐ QUÁN TÍNH w ============ -->
+<section class="slide" aria-label="Trọng số quán tính" data-label-en="Inertia weight">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán PSO · dạng chuẩn</span><span class="en">The PSO algorithm · standard form</span></p>
+      <h2 class="reveal d1"><span class="vi">Trọng số quán tính <span class="m">w</span>: điều chỉnh đà bay</span><span class="en">Inertia weight <span class="m">w</span>: tuning the momentum</span></h2>
+    </header>
+    <div class="eq-box reveal d2">
+      <div class="eq">
+        <span class="term"><span class="tm">V<span class="ss"><i>t+1</i><i>i</i></span></span></span>
+        <span class="op">=</span>
+        <span class="term t-in"><span class="tm">w · V<span class="ss"><i>t</i><i>i</i></span></span><span class="lbl"><span class="vi">Quán tính có trọng số</span><span class="en">Weighted inertia</span></span></span>
+        <span class="op">+</span>
+        <span class="term t-cog"><span class="tm">c<sub>1</sub>r<sub>1</sub>(P<sub>i</sub> − X<span class="ss"><i>t</i><i>i</i></span>)</span><span class="lbl"><span class="vi">Nhận thức</span><span class="en">Cognitive</span></span></span>
+        <span class="op">+</span>
+        <span class="term t-soc"><span class="tm">c<sub>2</sub>r<sub>2</sub>(P<sub>g</sub> − X<span class="ss"><i>t</i><i>i</i></span>)</span><span class="lbl"><span class="vi">Xã hội</span><span class="en">Social</span></span></span>
+      </div>
+    </div>
+    <ul class="bullets">
+      <li class="reveal d3"><span class="vi">Shi và Eberhart (1998) thêm <span class="m">w</span> vào số hạng quán tính. Đây là dạng PSO được dùng phổ biến nhất hiện nay; <span class="m">c<sub>1</sub>, c<sub>2</sub></span> chính là <span class="m">φ<sub>1</sub>, φ<sub>2</sub></span> ở trang trước.</span><span class="en">Shi and Eberhart (1998) added <span class="m">w</span> to the inertia term. This is the most widely used form of PSO today; <span class="m">c<sub>1</sub>, c<sub>2</sub></span> are the <span class="m">φ<sub>1</sub>, φ<sub>2</sub></span> of the previous slide.</span></li>
+      <li class="reveal d4"><span class="vi"><span class="m">w</span> lớn: giữ đà, bay xa, thiên về <strong>khám phá</strong>. <span class="m">w</span> nhỏ: phanh lại, tìm kỹ quanh vùng tốt, thiên về <strong>khai thác</strong>.</span><span class="en">Large <span class="m">w</span>: keeps momentum and flies far, favouring <strong>exploration</strong>. Small <span class="m">w</span>: brakes and searches locally, favouring <strong>exploitation</strong>.</span></li>
+      <li class="reveal d5"><span class="vi">Lịch thường dùng: giảm tuyến tính <span class="m">w</span> từ 0.9 xuống 0.4 theo số vòng lặp (Shi &amp; Eberhart, 1999). Các biến thể <em>Adaptive PSO</em> chỉnh <span class="m">w</span> theo trạng thái của bầy.</span><span class="en">A common schedule: decrease <span class="m">w</span> linearly from 0.9 to 0.4 over the iterations (Shi &amp; Eberhart, 1999). <em>Adaptive PSO</em> variants tune <span class="m">w</span> from the swarm's state.</span></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ 8. POSITION UPDATE ============ -->
+<section class="slide" aria-label="Cập nhật vị trí" data-label-en="Position update">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+          <h2 class="reveal d1"><span class="vi">Cập nhật vị trí: bước theo vận tốc mới</span><span class="en">Position update: step along the new velocity</span></h2>
+        </header>
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">X<span class="ss"><i>t+1</i><i>i</i></span> = X<span class="ss"><i>t</i><i>i</i></span> + V<span class="ss"><i>t+1</i><i>i</i></span></span></div></div>
+        <p class="lead reveal d3"><span class="vi">Vận tốc mới là tổng của ba vector nối đuôi nhau. Cá thể đi theo vector tổng, tức một hướng dung hòa giữa đà cũ, kinh nghiệm riêng và kinh nghiệm của bầy.</span><span class="en">The new velocity is the sum of three vectors placed head to tail. The particle follows the resultant, a compromise between its momentum, its own experience and the swarm's experience.</span></p>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 520 340" role="img" aria-label="Vector diagram">
+          <defs>
+            <marker id="v-in" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a7fc1"/></marker>
+            <marker id="v-cog" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b8f45"/></marker>
+            <marker id="v-soc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+            <marker id="v-tot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d9562f"/></marker>
+          </defs>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="22">
+            <line x1="100" y1="280" x2="220" y2="120" stroke="#4b8f45" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>
+            <line x1="100" y1="280" x2="430" y2="85" stroke="#d9562f" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>
+            <circle cx="220" cy="120" r="8" fill="none" stroke="#4b8f45" stroke-width="2.5"/><text x="196" y="108" fill="#4b8f45">P<tspan font-size="14" dy="5">i</tspan></text>
+            <rect x="422" y="77" width="16" height="16" fill="#d9562f"/><text x="446" y="80" fill="#d9562f">P<tspan font-size="14" dy="5">g</tspan></text>
+            <path class="draw" style="--len:140" d="M100,280 L228,270" stroke="#3a7fc1" stroke-width="3.5" fill="none" marker-end="url(#v-in)"/>
+            <path class="draw d2" style="--len:110" d="M230,270 L288,193" stroke="#4b8f45" stroke-width="3.5" fill="none" marker-end="url(#v-cog)"/>
+            <path class="draw d3" style="--len:160" d="M290,190 L416,116" stroke="#1c2a2e" stroke-width="3.5" fill="none" marker-end="url(#v-soc)"/>
+            <path class="draw d4" style="--len:380" d="M100,280 L414,116" stroke="#d9562f" stroke-width="3" fill="none" marker-end="url(#v-tot)"/>
+            <circle cx="100" cy="280" r="9" fill="#1c2a2e"/><text x="62" y="312">X<tspan font-size="14" dy="-11">t</tspan><tspan font-size="14" dx="-5" dy="17">i</tspan></text>
+            <circle cx="418" cy="114" r="7" fill="#1c2a2e" opacity="0.85"/>
+            <text x="368" y="152" fill="#1c2a2e" font-size="19">X<tspan font-size="13" dy="-10">t+1</tspan><tspan font-size="13" dx="-19" dy="16">i</tspan></text>
+          </g>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="14" font-weight="600">
+            <text x="132" y="300" fill="#3a7fc1"><tspan class="vi">quán tính</tspan><tspan class="en">inertia</tspan></text>
+            <text x="268" y="250" fill="#4b8f45"><tspan class="vi">nhận thức</tspan><tspan class="en">cognitive</tspan></text>
+            <text x="352" y="188" fill="#1c2a2e"><tspan class="vi">xã hội</tspan><tspan class="en">social</tspan></text>
+            <text x="196" y="182" fill="#d9562f" transform="rotate(-27 196 182)"><tspan class="vi">vận tốc mới</tspan><tspan class="en">new velocity</tspan></text>
+          </g>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. PARAMETERS: ACCELERATION ============ -->
+<section class="slide" aria-label="Tham số: hệ số gia tốc" data-label-en="Parameters: acceleration">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Hệ số gia tốc</span><span class="en">Acceleration coefficients</span> <span class="m">φ<sub>1</sub>, φ<sub>2</sub></span><span class="vi">: không quá rụt rè, không quá liều</span><span class="en">: neither too timid nor too bold</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+        <li class="reveal d2"><span class="vi"><strong>Quá nhỏ</strong>: bước nhảy của các cá thể bị hạn chế, bầy hội tụ chậm.</span><span class="en"><strong>Too small</strong>: particles take tiny steps and the swarm converges slowly.</span></li>
+        <li class="reveal d3"><span class="vi"><strong>Quá lớn</strong>: cá thể văng qua lại ngày càng xa, bầy không hội tụ.</span><span class="en"><strong>Too large</strong>: particles swing back and forth ever wider and the swarm fails to converge.</span></li>
+        <li class="reveal d4"><span class="vi"><strong>Thông thường</strong> chọn</span><span class="en"><strong>A common choice</strong> is</span> <span class="m">φ<sub>1</sub> + φ<sub>2</sub> ≤ 4</span>.</li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 520 260" role="img" aria-label="Damped vs exploding oscillation">
+          <line x1="20" y1="130" x2="505" y2="130" stroke="#1c2a2e" stroke-width="1.5"/>
+          <line x1="40" y1="20" x2="40" y2="240" stroke="#1c2a2e" stroke-width="1.5"/>
+          <path id="osc-good" class="draw" style="--len:1400" fill="none" stroke="#1f6f78" stroke-width="2.5"/>
+          <path id="osc-bad" class="draw d2" style="--len:2400" fill="none" stroke="#d9562f" stroke-width="2.2"/>
+          <circle cx="40" cy="130" r="5" fill="#d9562f"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="14" font-weight="600">
+            <text x="60" y="30" fill="#1f6f78"><tspan class="vi">— hệ số hợp lý: dao động tắt dần, hội tụ</tspan><tspan class="en">— sensible values: damped oscillation, converges</tspan></text>
+            <text x="60" y="52" fill="#d9562f"><tspan class="vi">— hệ số quá lớn: dao động bùng nổ</tspan><tspan class="en">— values too large: oscillation explodes</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Quỹ đạo minh họa của một cá thể quanh điểm hút</span><span class="en">Illustrative trajectory of one particle around its attractor</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 10. PARAMETERS: VMAX ============ -->
+<section class="slide" aria-label="Tham số: vận tốc tối đa" data-label-en="Parameters: maximum velocity">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Vận tốc tối đa: một chiếc phanh cho từng chiều</span><span class="en">Maximum velocity: a brake for every dimension</span></h2>
+    </header>
+    <p class="lead reveal d2"><span class="vi">Vận tốc tối đa của một cá thể ở chiều thứ <span class="m">d</span> lấy bằng độ rộng miền tìm kiếm của chiều đó.</span><span class="en">A particle's maximum velocity in dimension <span class="m">d</span> is set to the width of the search range in that dimension.</span></p>
+    <div class="cols even">
+      <div class="eq-box sand reveal d3"><div class="eq"><span class="m">v<sub>max</sub> = UB<sub>d</sub> − LB<sub>d</sub></span></div></div>
+      <div class="eq-box reveal d4">
+        <div class="m" style="font-size: var(--eq-size); line-height: 1.7; text-align: center; white-space: normal;">
+          <span class="up"><span class="vi">nếu</span><span class="en">if</span></span> v<sub>id</sub> &gt; v<sub>max</sub> <span class="up"><span class="vi">thì</span><span class="en">then</span></span> v<sub>id</sub> = v<sub>max</sub><br />
+          <span class="up"><span class="vi">nếu</span><span class="en">else if</span></span> v<sub>id</sub> &lt; −v<sub>max</sub> <span class="up"><span class="vi">thì</span><span class="en">then</span></span> v<sub>id</sub> = −v<sub>max</sub>
+        </div>
+      </div>
+    </div>
+    <p class="note reveal d5"><em>UB<sub>d</sub>, LB<sub>d</sub></em><span class="vi">: cận trên và cận dưới của chiều thứ <em>d</em>. Kẹp vận tốc giúp cá thể không “bay khỏi” miền tìm kiếm chỉ sau một bước.</span><span class="en">: upper and lower bounds of dimension <em>d</em>. Clamping keeps a particle from “flying out” of the search space in a single step.</span></p>
+  </div>
+</section>
+
+<!-- ============ 11. INTERACTIVE EXAMPLE ============ -->
+<section class="slide" id="demo-slide" aria-label="Ví dụ minh họa từng bước" data-label-en="Step-by-step example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ minh họa</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Bốn cá thể đi tìm đỉnh cao nhất</span><span class="en">Four particles looking for the highest peak</span></h2>
+    </header>
+    <div class="demo reveal d2">
+      <div class="demo-text">
+        <span class="demo-step-label" id="demo-label"></span>
+        <p class="demo-desc" id="demo-desc" aria-live="polite"></p>
+        <div class="legend" id="demo-legend" style="opacity:0">
+          <span><i style="background:#3a7fc1"></i><span class="vi">Quán tính</span><span class="en">Inertia</span></span>
+          <span><i style="background:#4b8f45"></i><span class="vi">Nhận thức</span><span class="en">Cognitive</span></span>
+          <span><i style="background:#1c2a2e"></i><span class="vi">Xã hội</span><span class="en">Social</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">Tổng hợp</span><span class="en">Resultant</span></span>
+        </div>
+        <div class="demo-ctrl">
+          <button class="btn" id="demo-prev" type="button"><span class="vi">← Lùi</span><span class="en">← Back</span></button>
+          <button class="btn" id="demo-next" type="button"></button>
+          <div class="pips" id="demo-pips" aria-hidden="true"></div>
+        </div>
+      </div>
+      <svg id="demo-svg" viewBox="0 0 800 400" role="img" aria-label="Two-peak function with four particles">
+        <defs>
+          <marker id="a-in" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a7fc1"/></marker>
+          <marker id="a-cog" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b8f45"/></marker>
+          <marker id="a-soc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="a-tot" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d9562f"/></marker>
+        </defs>
+        <g id="demo-grid"></g>
+        <path id="demo-curve" fill="none" stroke="#1c2a2e" stroke-width="3" stroke-linecap="round"/>
+        <circle id="demo-valley" cx="0" cy="0" r="52" fill="none" stroke="#d9562f" stroke-width="2" stroke-dasharray="6 6" opacity="0"/>
+        <g id="demo-pbest"></g>
+        <g id="demo-arrows"></g>
+        <g id="demo-gbest" style="transition: transform 0.7s cubic-bezier(0.16,1,0.3,1)">
+          <rect x="-10" y="-10" width="20" height="20" fill="#d9562f" stroke="#1c2a2e" stroke-width="2"/>
+          <text x="0" y="-18" text-anchor="middle" font-size="16" font-weight="600" fill="#d9562f">gbest</text>
+        </g>
+        <g id="demo-particles"></g>
+        <text id="demo-iter" x="760" y="40" text-anchor="end" font-size="16" fill="#56676a"></text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. BINARY PSO ============ -->
+<section class="slide" aria-label="PSO rời rạc" data-label-en="Discrete PSO">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">PSO rời rạc</span><span class="en">Discrete PSO</span></p>
+      <h2 class="reveal d1"><span class="vi">Binary PSO: khi lời giải là một chuỗi bit</span><span class="en">Binary PSO: when a solution is a bit string</span></h2>
+    </header>
+    <ul class="bullets">
+      <li class="reveal d2"><span class="vi">Cũng do Kennedy và Eberhart giới thiệu. Mỗi cá thể là một chuỗi nhị phân 0 – 1.</span><span class="en">Also introduced by Kennedy and Eberhart. Each particle is a 0 – 1 binary string.</span></li>
+      <li class="reveal d3"><span class="vi">Vị trí không còn “di chuyển” được nữa; thay vào đó, ta hỏi <strong>xác suất để mỗi bit bằng 1</strong>:</span><span class="en">A position can no longer “move”; instead we ask for the <strong>probability that each bit equals 1</strong>:</span></li>
+    </ul>
+    <div class="eq-box reveal d3"><div class="eq"><span class="m">P(x<sub>id</sub> = 1) = f(&thinsp;x<span class="ss"><i>t−1</i><i>id</i></span>, v<span class="ss"><i>t−1</i><i>id</i></span>, p<sub>id</sub>, p<sub>gd</sub>&thinsp;), &nbsp; d ∈ {1, …, n}</span></div></div>
+    <div class="annot reveal d4">
+      <div><b>x<sup>t−1</sup><sub>id</sub></b><span class="vi">trạng thái trước đó</span><span class="en">previous state</span></div>
+      <div><b>v<sup>t−1</sup><sub>id</sub></b><span class="vi">vận tốc</span><span class="en">velocity</span></div>
+      <div><b>p<sub>id</sub></b><span class="vi">vị trí tốt nhất trước đó của cá thể</span><span class="en">the particle's best previous position</span></div>
+      <div><b>p<sub>gd</sub></b><span class="vi">vị trí tốt nhất của cá thể tốt nhất cả bầy</span><span class="en">best position of the swarm's best particle</span></div>
+    </div>
+    <div class="reveal d5">
+      <p class="note" style="margin-bottom:0.3em"><span class="vi">Vận tốc vẫn cập nhật như PSO liên tục:</span><span class="en">The velocity is updated just as in continuous PSO:</span></p>
+      <div class="eq"><span class="m">v<span class="ss"><i>t</i><i>id</i></span> = v<span class="ss"><i>t−1</i><i>id</i></span> + φ<sub>1</sub>r<sub>1</sub>(p<sub>id</sub> − x<span class="ss"><i>t−1</i><i>id</i></span>) + φ<sub>2</sub>r<sub>2</sub>(p<sub>gd</sub> − x<span class="ss"><i>t−1</i><i>id</i></span>)</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 13. BINARY PSO: SIGMOID ============ -->
+<section class="slide" aria-label="Binary PSO: hàm sigmoid" data-label-en="Binary PSO: sigmoid">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">PSO rời rạc</span><span class="en">Discrete PSO</span></p>
+      <h2 class="reveal d1"><span class="vi">Ép vận tốc về đoạn [0, 1] bằng hàm sigmoid</span><span class="en">Squashing velocity into [0, 1] with a sigmoid</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <p class="reveal d2"><span class="m">v<sub>id</sub></span><span class="vi"> đóng vai trò một ngưỡng trong hàm xác suất, nên cần được đưa về đoạn [0.0, 1.0]:</span><span class="en"> acts as a threshold in a probability function, so it must be mapped into [0.0, 1.0]:</span></p>
+        <div class="eq-box reveal d2"><div class="eq"><span class="m">sig(v<sub>id</sub>) = 1 / (1 + <span class="up">exp</span>(−v<sub>id</sub>))</span></div></div>
+        <p class="reveal d3"><span class="vi">Trạng thái của chiều thứ <span class="m">d</span> trong cá thể <span class="m">i</span> ở thế hệ <span class="m">t</span>:</span><span class="en">The state of dimension <span class="m">d</span> of particle <span class="m">i</span> at generation <span class="m">t</span>:</span></p>
+        <div class="eq-box sand reveal d4">
+          <div class="m" style="font-size: var(--eq-size); line-height: 1.7; text-align:center;">
+            x<span class="ss"><i>t</i><i>id</i></span> = 1 &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span>&nbsp; ρ<sub>id</sub> &lt; sig(v<span class="ss"><i>t</i><i>id</i></span>)<br />
+            x<span class="ss"><i>t</i><i>id</i></span> = 0 &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span>&nbsp; ρ<sub>id</sub> ≥ sig(v<span class="ss"><i>t</i><i>id</i></span>)
+          </div>
+        </div>
+        <p class="note reveal d5"><span class="vi">với <em class="m">ρ<sub>id</sub></em> là số ngẫu nhiên phân phối đều trên [0, 1].</span><span class="en">where <em class="m">ρ<sub>id</sub></em> is a uniformly distributed random number in [0, 1].</span></p>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 440 260" role="img" aria-label="Sigmoid curve">
+          <line x1="20" y1="210" x2="425" y2="210" stroke="#1c2a2e" stroke-width="1.5"/>
+          <line x1="220" y1="20" x2="220" y2="225" stroke="#1c2a2e" stroke-width="1.5"/>
+          <line x1="20" y1="50" x2="425" y2="50" stroke="#56676a" stroke-dasharray="4 5"/>
+          <line x1="20" y1="130" x2="425" y2="130" stroke="#56676a" stroke-dasharray="2 6" opacity="0.6"/>
+          <path id="sig-path" class="draw d2" style="--len:520" fill="none" stroke="#d9562f" stroke-width="3"/>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="18" fill="#1c2a2e">
+            <text x="205" y="46" text-anchor="end" font-style="normal">1</text>
+            <text x="205" y="126" text-anchor="end" font-style="normal">0.5</text>
+            <text x="415" y="232">v<tspan font-size="13" dy="4">id</tspan></text>
+            <text x="230" y="28">sig(v<tspan font-size="13" dy="4">id</tspan><tspan dy="-4">)</tspan></text>
+          </g>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" fill="#56676a">
+            <text x="36" y="198">v ≪ 0 → bit ≈ 0</text>
+            <text x="300" y="78">v ≫ 0 → bit ≈ 1</text>
+          </g>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 14. VARIANTS ============ -->
+<section class="slide" aria-label="Các biến thể PSO" data-label-en="PSO variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể PSO</span><span class="en">PSO variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Bốn hướng cải tiến chính</span><span class="en">Four main lines of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3>Hybrid PSO</h3><p><span class="vi">Lồng ghép khả năng của các kỹ thuật tính toán tiến hóa khác vào PSO.</span><span class="en">Incorporates the capabilities of other evolutionary computation techniques.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3>Adaptive PSO</h3><p><span class="vi">Tự điều chỉnh tham số của PSO trong quá trình chạy để đạt hiệu năng tốt hơn.</span><span class="en">Adapts PSO's parameters during the run for better performance.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">PSO trong môi trường phức tạp</span><span class="en">PSO in complex environments</span></h3><p><span class="vi">Bài toán đa mục tiêu, có ràng buộc, hoặc bám theo hệ thống động.</span><span class="en">Multi-objective or constrained problems, or tracking dynamic systems.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">Các biến thể khác</span><span class="en">Other variants</span></h3><p><span class="vi">Thay đổi công thức gốc để cải thiện hiệu năng.</span><span class="en">Modifications to the original formulation to improve performance.</span></p></div>
+    </div>
+    <p class="note reveal d6"><span class="vi">Phần tiếp theo đi sâu vào nhánh <em>Hybrid PSO</em>: GA-PSO, EPSO và DEPSO.</span><span class="en">The following slides dig into <em>Hybrid PSO</em>: GA-PSO, EPSO and DEPSO.</span></p>
+  </div>
+</section>
+
+<!-- ============ 15. GA-PSO ============ -->
+<section class="slide" aria-label="Hybrid PSO: GA-PSO" data-label-en="Hybrid PSO: GA-PSO">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO</p>
+      <h2 class="reveal d1"><span class="vi">GA-PSO: thêm chọn lọc tự nhiên vào bầy</span><span class="en">GA-PSO: adding natural selection to the swarm</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+        <li class="reveal d2"><span class="vi">Kết hợp điểm mạnh của trí tuệ bầy đàn với cơ chế <strong>chọn lọc tự nhiên</strong> của giải thuật di truyền.</span><span class="en">Combines the strengths of swarm intelligence with the <strong>natural selection</strong> mechanism of genetic algorithms.</span></li>
+        <li class="reveal d3"><span class="vi">Nhờ chọn lọc, cá thể có thể <strong>nhảy</strong> từ vùng này sang vùng khác, giúp hội tụ nhanh hơn.</span><span class="en">Selection lets particles <strong>jump</strong> from one region to another, which speeds up convergence.</span></li>
+        <li class="reveal d4"><span class="vi">Có khả năng “lai ghép” (breeding) giữa các cá thể.</span><span class="en">Particles gain the ability to “breed”.</span></li>
+        <li class="reveal d5"><span class="vi">Theo một tỉ lệ chọn lọc, vị trí của các cá thể có độ thích nghi thấp được <strong>thay bằng</strong> vị trí của các cá thể có độ thích nghi cao.</span><span class="en">According to a selection rate, positions of low-fitness particles are <strong>replaced by</strong> those of high-fitness particles.</span></li>
+      </ul>
+      <div class="card stack reveal d4">
+        <div class="sel-row"><span class="lab"><span class="vi">Trước chọn lọc</span><span class="en">Before selection</span></span>
+          <div class="dots"><i style="background:#1f6f78"></i><i style="background:#1f6f78;opacity:.85"></i><i style="background:#1f6f78;opacity:.7"></i><i style="background:#1f6f78;opacity:.5"></i><i style="background:#d9562f;opacity:.45"></i><i style="background:#d9562f;opacity:.45"></i><i style="background:#d9562f;opacity:.45"></i></div></div>
+        <div class="sel-row"><span class="lab"><span class="vi">Sau chọn lọc</span><span class="en">After selection</span></span>
+          <div class="dots"><i style="background:#1f6f78"></i><i style="background:#1f6f78;opacity:.85"></i><i style="background:#1f6f78;opacity:.7"></i><i style="background:#1f6f78;opacity:.5"></i><i style="background:#1f6f78"></i><i style="background:#1f6f78;opacity:.85"></i><i style="background:#1f6f78;opacity:.7"></i></div></div>
+        <p class="note"><span class="vi">Màu đậm: độ thích nghi cao. Ba cá thể kém nhất (cam) nhận vị trí của ba cá thể tốt nhất.</span><span class="en">Darker means fitter. The three weakest particles (orange) take over the positions of the three best.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 16. EPSO ============ -->
+<section class="slide" aria-label="Hybrid PSO: EPSO" data-label-en="Hybrid PSO: EPSO">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO · EPSO</p>
+      <h2 class="reveal d1"><span class="vi">Evolutionary PSO: để trọng số tự tiến hóa</span><span class="en">Evolutionary PSO: letting the weights evolve</span></h2>
+    </header>
+    <ul class="bullets">
+      <li class="reveal d2"><span class="vi">Bổ sung một <strong>thủ tục chọn lọc</strong> vào PSO.</span><span class="en">Adds a <strong>selection procedure</strong> to PSO.</span></li>
+      <li class="reveal d3"><span class="vi">Các tham số <strong>tự thích nghi</strong>: mỗi cá thể mang trọng số riêng, và chính trọng số cũng bị đột biến.</span><span class="en"><strong>Self-adaptive</strong> parameters: each particle carries its own weights, and the weights themselves are mutated.</span></li>
+    </ul>
+    <div class="cycle reveal d3">
+      <span><span class="vi">Nhân bản</span><span class="en">Replicate</span></span><span class="arr">→</span><span><span class="vi">Đột biến trọng số</span><span class="en">Mutate weights</span></span><span class="arr">→</span><span><span class="vi">Di chuyển</span><span class="en">Move</span></span><span class="arr">→</span><span><span class="vi">Đánh giá</span><span class="en">Evaluate</span></span><span class="arr">→</span><span><span class="vi">Chọn lọc</span><span class="en">Select</span></span>
+    </div>
+    <p class="reveal d4"><span class="vi">Chuyển động của cá thể:</span><span class="en">The particle movement is defined as:</span></p>
+    <div class="eq-box reveal d4">
+      <div class="eq">
+        <span class="m">V<span class="ss"><i>t</i><i>i</i></span> =</span>
+        <span class="term t-hi"><span class="tm">w′<sub>i1</sub></span></span><span class="m">V<span class="ss"><i>t−1</i><i>i</i></span> +</span>
+        <span class="term t-hi"><span class="tm">w′<sub>i2</sub></span></span><span class="m">r<sub>1</sub>(P<sub>i</sub> − X<span class="ss"><i>t−1</i><i>i</i></span>) +</span>
+        <span class="term t-hi"><span class="tm">w′<sub>i3</sub></span></span><span class="m">r<sub>2</sub>(P′<sub>g</sub> − X<span class="ss"><i>t−1</i><i>i</i></span>)</span>
+      </div>
+      <div class="eq" style="margin-top:0.3em"><span class="m">X<span class="ss"><i>t</i><i>i</i></span> = X<span class="ss"><i>t−1</i><i>i</i></span> + V<span class="ss"><i>t</i><i>i</i></span></span></div>
+    </div>
+    <p class="note reveal d5"><span class="vi">Phần tô vàng là các trọng số <em>đã đột biến</em>; <em>P′<sub>g</sub></em> là gbest đã bị nhiễu. Nguồn: Miranda &amp; Fonseca, 2002.</span><span class="en">Highlighted terms are the <em>mutated</em> weights; <em>P′<sub>g</sub></em> is the perturbed gbest. Source: Miranda &amp; Fonseca, 2002.</span></p>
+  </div>
+</section>
+
+<!-- ============ 17. EPSO MUTATION ============ -->
+<section class="slide" aria-label="EPSO: đột biến và chọn lọc" data-label-en="EPSO: mutation and selection">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO · EPSO</p>
+      <h2 class="reveal d1"><span class="vi">Đột biến trọng số và gbest, rồi chọn lọc</span><span class="en">Mutate the weights and gbest, then select</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <h3 class="reveal d2"><span class="vi">Đột biến</span><span class="en">Mutation</span></h3>
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">w′<sub>ik</sub> = w<sub>ik</sub> + τ · N(0, 1)</span></div>
+          <div class="eq" style="margin-top:0.3em"><span class="m">P′<sub>g</sub> = P<sub>g</sub> + τ′ · N(0, 1)</span></div>
+        </div>
+        <p class="note reveal d3"><span class="vi">Tham số học <em>τ, τ′</em> có thể cố định, hoặc thay đổi động như các tham số chiến lược.</span><span class="en">The learning parameters <em>τ, τ′</em> can be fixed, or change dynamically as strategic parameters.</span></p>
+      </div>
+      <div class="stack">
+        <h3 class="reveal d3"><span class="vi">Chọn lọc sinh tồn</span><span class="en">Survival selection</span></h3>
+        <div class="card sea reveal d4">
+          <p><span class="vi"><strong>Đấu loại ngẫu nhiên</strong> (stochastic tournament): bản gốc và bản đột biến cạnh tranh nhau; bản tốt hơn thường thắng, nhưng bản kém vẫn có một cơ hội nhỏ được giữ lại.</span><span class="en"><strong>Stochastic tournament</strong>: the original and its mutated copy compete; the better one usually wins, but the weaker one still keeps a small chance of surviving.</span></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 18. EPSO RESULTS ============ -->
+<section class="slide" aria-label="EPSO: kết quả" data-label-en="EPSO: results">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO · EPSO</p>
+      <h2 class="reveal d1"><span class="vi">EPSO hội tụ nhanh hơn và sâu hơn PSO</span><span class="en">EPSO converges faster and deeper than PSO</span></h2>
+    </header>
+    <div class="charts3">
+      <img class="chart-img reveal d2" src="assets/epso_schaffer.jpg" alt="Schaffer F6: EPSO vs PSO" />
+      <img class="chart-img reveal d3" src="assets/epso_rosenbrock.jpg" alt="Rosenbrock: EPSO vs PSO" />
+      <img class="chart-img reveal d4" src="assets/epso_sphere.jpg" alt="Sphere: EPSO vs PSO" />
+    </div>
+    <p class="note reveal d5"><span class="vi">Trục tung: độ thích nghi, thang log, càng thấp càng tốt. Trục hoành: số lần đánh giá hàm. Trên cả ba hàm Schaffer F6, Rosenbrock và Sphere, đường EPSO nằm dưới đường PSO.</span><span class="en">Vertical axis: fitness on a log scale, lower is better. Horizontal axis: number of function evaluations. On all three functions, Schaffer F6, Rosenbrock and Sphere, the EPSO curve lies below the PSO curve.</span></p>
+  </div>
+</section>
+
+<!-- ============ 19. DEPSO ============ -->
+<section class="slide" aria-label="Hybrid PSO: DEPSO" data-label-en="Hybrid PSO: DEPSO">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO · DEPSO</p>
+      <h2 class="reveal d1"><span class="vi">DEPSO: PSO và tiến hóa vi phân thay phiên nhau</span><span class="en">DEPSO: PSO and differential evolution take turns</span></h2>
+    </header>
+    <ul class="bullets">
+      <li class="reveal d2"><span class="vi">Lai giữa tiến hóa vi phân (Differential Evolution, DE) và PSO.</span><span class="en">A hybrid of Differential Evolution (DE) and PSO.</span></li>
+      <li class="reveal d3"><span class="vi">Toán tử DE được áp lên <strong>vị trí tốt nhất của cá thể</strong>, nhằm kéo những cá thể đã rơi vào cực tiểu địa phương ra ngoài.</span><span class="en">A DE operator is applied to each <strong>particle's best position</strong> to pull out particles that have fallen into local minima.</span></li>
+      <li class="reveal d4"><span class="vi">Hai cơ chế luân phiên: vòng lặp lẻ chạy PSO gốc, vòng lặp chẵn chạy toán tử DE.</span><span class="en">The two alternate: original PSO at odd iterations, the DE operator at even iterations.</span></li>
+    </ul>
+    <div class="alt reveal d5">
+      <span class="p"><small>t = 1</small>PSO</span><span class="d"><small>t = 2</small>DE</span>
+      <span class="p"><small>t = 3</small>PSO</span><span class="d"><small>t = 4</small>DE</span>
+      <span class="p"><small>t = 5</small>PSO</span><span class="d"><small>t = 6</small>DE</span>
+      <span class="p"><small>t = 7</small>PSO</span><span class="d"><small>t = 8</small>DE</span>
+    </div>
+    <p class="note reveal d6"><span class="vi">Nguồn</span><span class="en">Source</span>: Zhang &amp; Xie, 2003.</p>
+  </div>
+</section>
+
+<!-- ============ 20. DEPSO MUTATION ============ -->
+<section class="slide" aria-label="DEPSO: đột biến DE" data-label-en="DEPSO: DE mutation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal">Hybrid PSO · DEPSO</p>
+      <h2 class="reveal d1"><span class="vi">Đột biến DE trên vị trí tốt nhất của cá thể</span><span class="en">DE mutation on each particle's best position</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <p class="reveal d2"><strong>1.</strong> <span class="vi">Tạo điểm thử từ chính</span><span class="en">Create a trial point from</span> <span class="m">P<sub>i</sub></span>:&nbsp; <span class="m" style="background:#f6e6b8;padding:0.1em 0.4em;border-radius:6px">T<sub>i</sub> = P<sub>i</sub></span></p>
+        <p class="reveal d3"><strong>2.</strong> <span class="vi">Với mỗi chiều thứ</span><span class="en">For each dimension</span> <span class="m">d</span>:</p>
+        <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; white-space:normal;"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> (rand &lt; CR <span class="up"><span class="vi">hoặc</span><span class="en">or</span></span> d = k) <span class="up"><span class="vi">thì</span><span class="en">then</span></span> t<sub>id</sub> = p<sub>gd</sub> + δ<sub>2d</sub></div></div>
+        <p class="note reveal d4"><span class="vi"><em>k</em> là số nguyên ngẫu nhiên trong [1, n], bảo đảm có ít nhất một chiều bị đột biến.</span><span class="en"><em>k</em> is a random integer in [1, n], which guarantees that at least one dimension is mutated.</span></p>
+      </div>
+      <div class="stack">
+        <p class="reveal d4"><strong>3.</strong> <span class="vi">Bước nhảy vi phân lấy từ bốn cá thể ngẫu nhiên:</span><span class="en">The differential step comes from four random particles:</span></p>
+        <div class="eq-box sand reveal d4"><div class="eq"><span class="m">δ<sub>2</sub> = ½ [ (P<sub>r1</sub> − P<sub>r2</sub>) + (P<sub>r3</sub> − P<sub>r4</sub>) ]</span></div></div>
+        <p class="reveal d5"><strong>4.</strong> <span class="vi">Chỉ giữ điểm thử nếu nó tốt hơn:</span><span class="en">Keep the trial point only if it is better:</span></p>
+        <div class="eq-box outline reveal d5"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; white-space:normal;"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> fitness(T<sub>i</sub>) <span class="up"><span class="vi">tốt hơn</span><span class="en">is better than</span></span> fitness(P<sub>i</sub>) <span class="up"><span class="vi">thì</span><span class="en">then</span></span> P<sub>i</sub> ← T<sub>i</sub></div></div>
+      </div>
+    </div>
+    <p class="note reveal d6"><span class="vi">Ghi chú: bản gốc ghi <em>P<sub>r3</sub> − P<sub>r3</sub></em> (luôn bằng 0); ở đây sửa thành <em>P<sub>r3</sub> − P<sub>r4</sub></em> theo công thức DEPSO của Zhang &amp; Xie, 2003.</span><span class="en">Note: the source slide reads <em>P<sub>r3</sub> − P<sub>r3</sub></em> (always zero); corrected here to <em>P<sub>r3</sub> − P<sub>r4</sub></em> following the DEPSO formula of Zhang &amp; Xie, 2003.</span></p>
+  </div>
+</section>
+
+<!-- ============ 21. DEPSO RESULTS ============ -->
+<section class="slide" aria-label="DEPSO: kết quả" data-label-en="DEPSO: results">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal">Hybrid PSO · DEPSO</p>
+        <h2 class="reveal d1"><span class="vi">DEPSO so với PSO và DE</span><span class="en">DEPSO versus PSO and DE</span></h2>
+        <div class="eq reveal d2" style="justify-content:flex-start; margin: 0.4em 0"><span class="m" style="background:#dcefc8; padding:0.15em 0.5em; border-radius:6px">F<sub>norm</sub> = F<sub>mean</sub> − F<sub>opt</sub></span></div>
+        <p class="note reveal d3"><span class="vi">Khoảng cách trung bình tới tối ưu, càng thấp càng tốt. Cấu hình: PSO <em>w = 0.4</em>; DE <em>CR = 0.1</em>; DEPSO <em>w = 0.4, CR = 0.1</em>.</span><span class="en">Mean distance to the optimum, lower is better. Settings: PSO <em>w = 0.4</em>; DE <em>CR = 0.1</em>; DEPSO <em>w = 0.4, CR = 0.1</em>.</span></p>
+        <p class="note reveal d4"><span class="vi">DEPSO tốt nhất trên G<sub>1</sub>, G<sub>2</sub>, G<sub>7</sub>. Riêng G<sub>6</sub>, PSO thuần lại xuống thấp nhất: lai ghép không phải lúc nào cũng thắng.</span><span class="en">DEPSO is best on G<sub>1</sub>, G<sub>2</sub> and G<sub>7</sub>. On G<sub>6</sub>, plain PSO reaches the lowest value: hybridization does not always win.</span></p>
+      </header>
+      <div class="charts4">
+        <img class="chart-img reveal d2" src="assets/depso_g0.jpg" alt="G1" />
+        <img class="chart-img reveal d3" src="assets/depso_g1.jpg" alt="G2" />
+        <img class="chart-img reveal d4" src="assets/depso_g2.jpg" alt="G6" />
+        <img class="chart-img reveal d5" src="assets/depso_g3.jpg" alt="G7" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 22. APPLICATIONS ============ -->
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+          <h2 class="reveal d1"><span class="vi">Vì sao PSO lan rộng nhanh như vậy?</span><span class="en">Why did PSO spread so quickly?</span></h2>
+        </header>
+        <p class="lead reveal d2"><span class="vi">Dễ cài đặt, ít đòi hỏi về tính liên tục của hàm mục tiêu hay cấu trúc không gian tìm kiếm, lại thích nghi được với môi trường động. Nhờ vậy PSO được dùng trong ngày càng nhiều lĩnh vực:</span><span class="en">It is easy to implement, places few demands on the continuity of the objective or the structure of the search space, and adapts to dynamic environments. So PSO keeps finding new fields:</span></p>
+        <ul class="bullets">
+          <li class="reveal d3"><span class="vi">Điện tử và điện từ</span><span class="en">Electronics and electromagnetics</span></li>
+          <li class="reveal d3"><span class="vi">Xử lý tín hiệu, ảnh và video</span><span class="en">Signal, image and video processing</span></li>
+          <li class="reveal d4"><span class="vi">Mạng nơ-ron</span><span class="en">Neural networks</span></li>
+          <li class="reveal d4"><span class="vi">Mạng truyền thông</span><span class="en">Communication networks</span></li>
+          <li class="reveal d5">…</li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3" style="align-items: stretch">
+        <div class="bars" id="bars"></div>
+        <figcaption><span class="vi">Số công bố về PSO trên IEEE Xplore, 1995 – 2006</span><span class="en">PSO publications in IEEE Xplore, 1995 – 2006</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- VÍ DỤ TÍNH TAY (Okwu & Tartibu, 2021) -->
+<section class="slide" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · bài toán có ràng buộc</span><span class="en">Worked example · a constrained problem</span></p>
+      <h2 class="reveal d1"><span class="vi">Một vòng PSO bằng tay, và cái bẫy của ràng buộc</span><span class="en">One PSO iteration by hand, and the constraint trap</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.9em">
+          <div class="eq"><span class="m">min f(x) = 5(x<sub>1</sub> − 1)² + 10x<sub>1</sub>x<sub>2</sub> + (x<sub>3</sub> − 3)²</span></div>
+          <div class="eq" style="margin-top:0.2em"><span class="m">x<sub>1</sub> + x<sub>2</sub> + x<sub>3</sub> ≤ 5, &nbsp; x<sub>1</sub>² + x<sub>2</sub>² ≤ 5, &nbsp; −5 ≤ x<sub>k</sub> ≤ 5</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">5 cá thể, <span class="m">c<sub>1</sub> = c<sub>2</sub> = 1</span>, vận tốc đầu bằng 0, <span class="m">r<sub>1</sub> = 0.25, r<sub>2</sub> = 0.85</span>.</span><span class="en">5 particles, <span class="m">c<sub>1</sub> = c<sub>2</sub> = 1</span>, zero initial velocity, <span class="m">r<sub>1</sub> = 0.25, r<sub>2</sub> = 0.85</span>.</span></li>
+          <li><span class="vi">Giá trị đầu: <span class="m">f = 206, 181, −81, −38.75, 5.25</span>; gbest là <span class="m">(3, −5, −4)</span> với <span class="m">f = −81</span>.</span><span class="en">Initial values: <span class="m">f = 206, 181, −81, −38.75, 5.25</span>; gbest is <span class="m">(3, −5, −4)</span> with <span class="m">f = −81</span>.</span></li>
+          <li><span class="vi">Cá thể 1 tại <span class="m">(−4, −2, 2)</span>: <span class="m">v = 0.85 · ((3, −5, −4) − (−4, −2, 2)) = (5.95, −2.55, −5.1)</span>, nên <span class="m">x = (1.95, −4.55, −3.1)</span>, <span class="m">f = −47.0025</span>.</span><span class="en">Particle 1 at <span class="m">(−4, −2, 2)</span>: <span class="m">v = 0.85 · ((3, −5, −4) − (−4, −2, 2)) = (5.95, −2.55, −5.1)</span>, so <span class="m">x = (1.95, −4.55, −3.1)</span>, <span class="m">f = −47.0025</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d4">
+        <h3><span class="vi">Điều sách tham khảo bỏ qua</span><span class="en">What the reference book overlooks</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.88)">
+          <li><span class="vi">gbest ban đầu đã vi phạm ràng buộc: <span class="m">3² + (−5)² = 34 &gt; 5</span>.</span><span class="en">The initial gbest already violates a constraint: <span class="m">3² + (−5)² = 34 &gt; 5</span>.</span></li>
+          <li><span class="vi">Kết quả cuối “<span class="m">−170</span> tại <span class="m">(5, −5, 5)</span>” sai: <span class="m">f(5, −5, 5) = −166</span>; giá trị <span class="m">−170</span> đạt tại <span class="m">(5, −5, 3)</span>, và điểm này cũng vi phạm ràng buộc.</span><span class="en">The final “<span class="m">−170</span> at <span class="m">(5, −5, 5)</span>” is wrong: <span class="m">f(5, −5, 5) = −166</span>; <span class="m">−170</span> is reached at <span class="m">(5, −5, 3)</span>, which is also infeasible.</span></li>
+          <li><span class="vi">Nghiệm đúng khi giữ ràng buộc: <span class="m">f ≈ −23.67</span> tại <span class="m">(1.454, −1.699, 3)</span> (kiểm bằng SLSQP, 729 điểm khởi đầu).</span><span class="en">The true constrained optimum: <span class="m">f ≈ −23.67</span> at <span class="m">(1.454, −1.699, 3)</span> (checked with SLSQP from 729 starts).</span></li>
+          <li><span class="vi">Bài học: PSO gốc không tự xử lý ràng buộc; cần hàm phạt hoặc sửa nghiệm (chương 1).</span><span class="en">Lesson: plain PSO does not handle constraints; use a penalty or a repair step (chapter 1).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · PSO</span><span class="en">Experiment · PSO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>—</td></tr><tr><td>F2 · Rosenbrock</td><td class="num">3.98e+0</td><td class="num">2.71e+0</td><td class="num">4.34e+0</td><td>—</td></tr><tr><td>F3 · Rastrigin</td><td class="num">4.54e+0</td><td class="num">2.29e+0</td><td class="num">3.98e+0</td><td>—</td></tr><tr><td>F4 · Ackley</td><td class="num">8.67e−9</td><td class="num">1.28e−8</td><td class="num">0</td><td>—</td></tr><tr><td>F5 · Griewank</td><td class="num">1.21e−1</td><td class="num">6.44e−2</td><td class="num">1.10e−1</td><td>—</td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td>—</td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">5.46e+0</td><td class="num">2.98e+0</td><td class="num">4.01e+0</td><td>—</td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>5.93</b>, đứng thứ <b>4/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>5.93</b>, position <b>4/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">PSO là mốc so sánh cho mọi thuật toán khác trong giáo trình (cột “so PSO”).</span><span class="en">PSO is the reference for every other algorithm in this book (the “vs PSO” column).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · PSO</span><span class="en">Experiment · PSO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/PSO.svg" alt="convergence PSO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/pso.py" class="c-sea">code/si/algorithms/pso.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        w = w_max - (w_max - w_min) * t / T
+        r1, r2 = rng.random(X.shape), rng.random(X.shape)
+        V = w * V + c1 * r1 * (P - X) + c2 * r2 * (g - X)
+        V = np.clip(V, -vmax, vmax)
+        X = prob.clip(X + V)
+        f = prob(X)
+        better = f &lt; pf
+        P[better], pf[better] = X[better], f[better]
+        g = P[np.argmin(pf)].copy()
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">PSO: đơn giản, nhanh, là mốc so sánh chuẩn</span><span class="en">PSO: simple, fast, the standard baseline</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Ít tham số, dễ cài đặt, dễ song song hóa.</span><span class="en">Few parameters, easy to implement and parallelize.</span></li>
+          <li><span class="vi">Đứng thứ 4/18 trong giao thức của giáo trình, không thiên lệch gốc tọa độ.</span><span class="en">Ranks 4/18 in this book's protocol, with no origin bias.</span></li>
+          <li><span class="vi">Rất nhiều biến thể và ứng dụng đã được kiểm chứng.</span><span class="en">Many variants and well-tested applications.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Dễ hội tụ sớm trên hàm đa đỉnh (Rastrigin: trung vị 3.98e+0).</span><span class="en">Prone to premature convergence on multimodal functions (Rastrigin median 3.98e+0).</span></li>
+          <li><span class="vi">Nhạy với <span class="m">w, c<sub>1</sub>, c<sub>2</sub>, v<sub>max</sub></span>.</span><span class="en">Sensitive to <span class="m">w, c<sub>1</sub>, c<sub>2</sub>, v<sub>max</sub></span>.</span></li>
+          <li><span class="vi">Thung lũng hẹp vẫn khó: Rosenbrock (F2) trung vị 4.34e+0.</span><span class="en">Narrow valleys stay hard: Rosenbrock (F2) median 4.34e+0.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính tay một bước: <span class="m">X = (1, 2), V = (0.5, −0.5), P<sub>i</sub> = (2, 2), P<sub>g</sub> = (3, 1)</span>, <span class="m">w = 0.7, c<sub>1</sub> = c<sub>2</sub> = 1.5, r<sub>1</sub> = 0.4, r<sub>2</sub> = 0.6</span>. Tìm <span class="m">V′</span> và <span class="m">X′</span>.</span><span class="en">Compute one step by hand: <span class="m">X = (1, 2), V = (0.5, −0.5), P<sub>i</sub> = (2, 2), P<sub>g</sub> = (3, 1)</span>, <span class="m">w = 0.7, c<sub>1</sub> = c<sub>2</sub> = 1.5, r<sub>1</sub> = 0.4, r<sub>2</sub> = 0.6</span>. Find <span class="m">V′</span> and <span class="m">X′</span>.</span></li>
+          <li><span class="vi">Nếu <span class="m">w = 0</span> và <span class="m">c<sub>1</sub> = 0</span>, PSO còn lại hành vi gì? Vì sao dễ hội tụ sớm?</span><span class="en">With <span class="m">w = 0</span> and <span class="m">c<sub>1</sub> = 0</span>, what behaviour is left? Why does it converge prematurely?</span></li>
+          <li><span class="vi">Vì sao cần kẹp <span class="m">v<sub>max</sub></span> khi chưa dùng trọng số quán tính?</span><span class="en">Why is <span class="m">v<sub>max</sub></span> clamping needed when no inertia weight is used?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài PSO bằng Python/NumPy cho hàm Sphere và Rastrigin 10 chiều.</span><span class="en">Implement PSO in Python/NumPy for the 10-D Sphere and Rastrigin functions.</span></li>
+          <li><span class="vi">So sánh <span class="m">w = 0.7</span> cố định với <span class="m">w</span> giảm tuyến tính 0.9 → 0.4 qua 30 lần chạy; báo cáo trung bình ± độ lệch chuẩn và kiểm định Wilcoxon.</span><span class="en">Compare a fixed <span class="m">w = 0.7</span> with a linear 0.9 → 0.4 schedule over 30 runs; report mean ± std and a Wilcoxon test.</span></li>
+          <li><span class="vi">Cài Binary PSO cho bài toán cái túi 0/1 cỡ nhỏ.</span><span class="en">Implement Binary PSO for a small 0/1 knapsack problem.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 23. CLOSING ============ -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>J. Kennedy and R. Eberhart, “Particle swarm optimization,” in <em>Proceedings of ICNN'95 - International Conference on Neural Networks</em>, 1995, pp. 1942–1948, doi: <a href="https://doi.org/10.1109/ICNN.1995.488968">10.1109/ICNN.1995.488968</a>.</li>
+        <li>J. Kennedy and R. Eberhart, “A discrete binary version of the particle swarm algorithm,” in <em>1997 IEEE International Conference on Systems, Man, and Cybernetics. Computational Cybernetics and Simulation</em>, 1997, pp. 4104–4108, doi: <a href="https://doi.org/10.1109/ICSMC.1997.637339">10.1109/ICSMC.1997.637339</a>.</li>
+        <li>Y. Shi and R. Eberhart, “A modified particle swarm optimizer,” in <em>1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)</em>, 1998, pp. 69–73, doi: <a href="https://doi.org/10.1109/ICEC.1998.699146">10.1109/ICEC.1998.699146</a>.</li>
+        <li>J. Kennedy, R. C. Eberhart, and Y. Shi, <em>Swarm Intelligence</em>. San Francisco, CA, USA: Morgan Kaufmann, 2001.</li>
+        <li>M. Clerc and J. Kennedy, “The particle swarm - explosion, stability, and convergence in a multidimensional complex space,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 1, pp. 58–73, 2002, doi: <a href="https://doi.org/10.1109/4235.985692">10.1109/4235.985692</a>.</li>
+        <li>V. Miranda and N. Fonseca, “EPSO - best-of-two-worlds meta-heuristic applied to power system problems,” in <em>Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)</em>, 2002, pp. 1080–1085, doi: <a href="https://doi.org/10.1109/CEC.2002.1004393">10.1109/CEC.2002.1004393</a>.</li>
+        <li>W.-J. Zhang and X.-F. Xie, “DEPSO: hybrid particle swarm with differential evolution operator,” in <em>SMC'03 Conference Proceedings. 2003 IEEE International Conference on Systems, Man and Cybernetics. Conference Theme - System Security and Assurance (Cat. No.03CH37483)</em>, 2003, pp. 3816–3821, doi: <a href="https://doi.org/10.1109/ICSMC.2003.1244483">10.1109/ICSMC.2003.1244483</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>R. Poli, J. Kennedy, and T. Blackwell, “Particle swarm optimization,” <em>Swarm Intell</em>, vol. 1, no. 1, pp. 33–57, 2007, doi: <a href="https://doi.org/10.1007/s11721-007-0002-0">10.1007/s11721-007-0002-0</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Ba lực: quán tính · nhận thức · xã hội</span><span class="en">Three pulls: inertia · cognitive · social</span></span>
+      <span><span class="vi">Kẹp vận tốc bằng</span><span class="en">Clamp velocity with</span> v<sub>max</sub></span>
+      <span><span class="vi">Binary PSO: vận tốc → xác suất qua sigmoid</span><span class="en">Binary PSO: velocity → probability via sigmoid</span></span>
+      <span><span class="vi">Lai ghép</span><span class="en">Hybrids</span>: GA-PSO · EPSO · DEPSO</span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   Phím ← → ↑ ↓ PageUp PageDown Space Home End, cuộn chuột, vuốt.
+   Slide nào có `stepper` (ví dụ minh họa) sẽ được hỏi trước khi chuyển trang.
+   =========================================== */
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.current = 0;
+    this.locked = false;
+    this.progress = document.querySelector('.progress');
+    this.pageNum = document.querySelector('.page-num');
+    this.hint = document.querySelector('.keyboard-hint');
+    this.setupNavDots();
+    this.setupIntersectionObserver();
+    this.setupKeyboardNav();
+    this.setupWheelNav();
+    this.setupTouchNav();
+    window.addEventListener('resize', () => this.go(this.current, true));
+    const start = parseInt(location.hash.slice(1), 10);
+    if (start > 0 && start <= this.slides.length) this.go(start - 1, true);
+    this.update();
+  }
+
+  setupIntersectionObserver() {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && e.intersectionRatio > 0.55) {
+          e.target.classList.add('visible');
+          this.current = this.slides.indexOf(e.target);
+          this.update();
+          e.target.dispatchEvent(new CustomEvent('slideenter'));
+        } else if (!e.isIntersecting) {
+          e.target.dispatchEvent(new CustomEvent('slideleave'));
+        }
+      });
+    }, { threshold: [0, 0.6] });
+    this.slides.forEach((s) => io.observe(s));
+  }
+
+  setupNavDots() {
+    const nav = document.querySelector('.nav-dots');
+    nav.innerHTML = '';
+    this.navDots = nav;
+    this.dots = this.slides.map((s, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', `${i + 1}: ${s.getAttribute('aria-label') || ''}`);
+      b.addEventListener('click', () => this.go(i));
+      nav.appendChild(b);
+      return b;
+    });
+  }
+
+  update() {
+    const n = this.slides.length;
+    this.progress.style.width = `${((this.current + 1) / n) * 100}%`;
+    this.pageNum.textContent = `${String(this.current + 1).padStart(2, '0')} / ${n}`;
+    this.dots.forEach((d, i) => d.setAttribute('aria-current', i === this.current ? 'true' : 'false'));
+    history.replaceState(null, '', `#${this.current + 1}`);
+    if (this.current > 0) this.hint.classList.add('gone');
+  }
+
+  go(i, instant = false) {
+    i = Math.max(0, Math.min(this.slides.length - 1, i));
+    this.slides[i].scrollIntoView({ behavior: instant || reduceMotion ? 'auto' : 'smooth' });
+    this.current = i;
+    this.update();
+  }
+
+  next() {
+    const s = this.slides[this.current].stepper;
+    if (s && s.next()) return;
+    this.go(this.current + 1);
+  }
+
+  prev() {
+    const s = this.slides[this.current].stepper;
+    if (s && s.prev()) return;
+    this.go(this.current - 1);
+  }
+
+  setupKeyboardNav() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+      if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.next(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); this.go(0); }
+      else if (e.key === 'End') { e.preventDefault(); this.go(this.slides.length - 1); }
+    });
+  }
+
+  setupWheelNav() {
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (this.locked || Math.abs(e.deltaY) < 12) return;
+      this.locked = true;
+      e.deltaY > 0 ? this.next() : this.prev();
+      setTimeout(() => (this.locked = false), 750);
+    }, { passive: false });
+  }
+
+  setupTouchNav() {
+    let x0 = 0, y0 = 0;
+    window.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      const d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
+      if (Math.abs(d) < 45) return;
+      d < 0 ? this.next() : this.prev();
+    }, { passive: true });
+  }
+}
+
+/* ===========================================
+   LIVE SWARM BACKGROUND (trang bìa + trang cuối)
+   Một PSO thật trên mục tiêu di động: mỗi khung hình đánh giá lại
+   pbest/gbest nên bầy liên tục bám theo như đàn chim.
+   =========================================== */
+class SwarmCanvas {
+  constructor(canvas) {
+    this.c = canvas; this.ctx = canvas.getContext('2d');
+    this.slide = canvas.closest('.slide');
+    this.running = false; this.t = Math.random() * 100;
+    this.resize(); window.addEventListener('resize', () => this.resize());
+    this.slide.addEventListener('slideenter', () => this.start());
+    this.slide.addEventListener('slideleave', () => this.stop());
+    this.init();
+    this.draw(true);
+  }
+  resize() {
+    const r = this.c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.w = r.width; this.h = r.height;
+    this.c.width = this.w * dpr; this.c.height = this.h * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  target() {
+    // mục tiêu trôi theo đường Lissajous ở nửa trên khung hình
+    return { x: this.w * (0.55 + 0.33 * Math.sin(this.t * 0.31)), y: this.h * (0.36 + 0.2 * Math.sin(this.t * 0.47 + 1)) };
+  }
+  fit(p, g) { const dx = p.x - g.x, dy = p.y - g.y; return dx * dx + dy * dy; }
+  init() {
+    const n = this.w < 600 ? 40 : 70;
+    // khởi tạo thành một đám lỏng, bay cùng hướng, như đàn chim vừa cất cánh
+    const cx = this.w * 0.25, cy = this.h * 0.3, R = Math.min(this.w, this.h) * 0.25;
+    this.ps = Array.from({ length: n }, () => {
+      const a = Math.random() * Math.PI * 2, r = R * Math.sqrt(Math.random());
+      const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a) * 0.6;
+      return { x, y, vx: 1.6 + Math.random(), vy: (Math.random() - 0.5), bx: x, by: y };
+    });
+  }
+  step() {
+    this.t += 0.012;
+    const g0 = this.target();
+    let best = null, bf = Infinity;
+    for (const p of this.ps) {
+      const f = this.fit({ x: p.bx, y: p.by }, g0);
+      // mục tiêu thay đổi → quên dần pbest cũ
+      if (this.fit(p, g0) < f) { p.bx = p.x; p.by = p.y; }
+      const fb = this.fit({ x: p.bx, y: p.by }, g0);
+      if (fb < bf) { bf = fb; best = p; }
+    }
+    const w = 0.93, c1 = 0.5, c2 = 0.32, vmax = 3.2;
+    for (const p of this.ps) {
+      const r1 = Math.random(), r2 = Math.random();
+      p.vx = w * p.vx + c1 * r1 * (p.bx - p.x) * 0.006 + c2 * r2 * (best.bx - p.x) * 0.006 + (Math.random() - 0.5) * 0.6;
+      p.vy = w * p.vy + c1 * r1 * (p.by - p.y) * 0.006 + c2 * r2 * (best.by - p.y) * 0.006 + (Math.random() - 0.5) * 0.6;
+      const sp = Math.hypot(p.vx, p.vy);
+      if (sp > vmax) { p.vx *= vmax / sp; p.vy *= vmax / sp; }
+      // lực tách (kiểu boids): giữ khoảng cách để bầy trông như đàn chim, không co thành một chấm
+      for (const q of this.ps) {
+        if (q === p) continue;
+        const dx = p.x - q.x, dy = p.y - q.y, d2 = dx * dx + dy * dy;
+        if (d2 < 520 && d2 > 0.01) { const k = (520 - d2) / 520 * 0.22 / Math.sqrt(d2); p.vx += dx * k; p.vy += dy * k; }
+      }
+      // căn hướng nhẹ theo cá thể dẫn đầu
+      p.vx += (best.vx - p.vx) * 0.02; p.vy += (best.vy - p.vy) * 0.02;
+      p.x += p.vx; p.y += p.vy;
+      // pbest tự "phai" để bầy không đông cứng
+      p.bx += (p.x - p.bx) * 0.01; p.by += (p.y - p.by) * 0.01;
+    }
+    this.best = best;
+  }
+  draw(clear) {
+    const ctx = this.ctx;
+    if (clear) { ctx.clearRect(0, 0, this.w, this.h); }
+    else { ctx.fillStyle = 'rgba(245,240,230,0.42)'; ctx.fillRect(0, 0, this.w, this.h); }
+    for (const p of this.ps) {
+      const a = Math.atan2(p.vy, p.vx);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a);
+      ctx.fillStyle = 'rgba(28,42,46,0.75)';
+      ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(-4, 3.2); ctx.lineTo(-2, 0); ctx.lineTo(-4, -3.2); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    if (this.best) {
+      ctx.fillStyle = '#d9562f';
+      ctx.fillRect(this.best.bx - 4, this.best.by - 4, 8, 8);
+    }
+  }
+  loop() {
+    if (!this.running) return;
+    this.step(); this.draw(false);
+    requestAnimationFrame(() => this.loop());
+  }
+  start() {
+    if (reduceMotion) { for (let i = 0; i < 200; i++) this.step(); this.draw(true); return; }
+    if (this.running) return;
+    this.running = true; this.loop();
+  }
+  stop() { this.running = false; }
+}
+
+/* ===========================================
+   INTERACTIVE EXAMPLE — 4 cá thể trên hàm một biến (bài toán cực đại)
+   Bước 0..4 tái hiện các trang ví dụ của bài giảng gốc; bước 5 chạy PSO thật.
+   =========================================== */
+function setupDemo() {
+  const slide = document.getElementById('demo-slide');
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = (id) => document.getElementById(id);
+  const sx = (x) => 60 + x * 140, sy = (y) => 360 - y * 110;
+
+  // Đường cong dựng bằng spline Catmull-Rom qua các mốc cách đều 0.3
+  const X0 = 0.3, H = 0.3;
+  const Y = [0.3, 1.3, 1.95, 1.95, 1.6, 1.25, 0.95, 0.72, 0.85, 1.45, 2.3, 2.47, 1.95, 1.2, 0.5];
+  const f = (x) => {
+    x = Math.max(X0, Math.min(X0 + H * (Y.length - 1), x));
+    let k = Math.min(Y.length - 2, Math.floor((x - X0) / H));
+    const t = (x - X0) / H - k;
+    const p0 = Y[Math.max(0, k - 1)], p1 = Y[k], p2 = Y[k + 1], p3 = Y[Math.min(Y.length - 1, k + 2)];
+    return 0.5 * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t * t * t);
+  };
+  const LO = 0.3, HI = 4.5;
+
+  // Lưới + trục
+  const grid = $('demo-grid');
+  for (let y = 0; y <= 3; y += 0.5) {
+    grid.insertAdjacentHTML('beforeend', `<line x1="60" x2="760" y1="${sy(y)}" y2="${sy(y)}" stroke="#1c2a2e" stroke-opacity="${y === 0 ? 0.6 : 0.12}" stroke-dasharray="${y === 0 ? '' : '3 5'}"/>`);
+    grid.insertAdjacentHTML('beforeend', `<text x="48" y="${sy(y) + 5}" text-anchor="end" font-size="14" fill="#56676a">${y}</text>`);
+  }
+  for (let x = 0; x <= 5; x += 0.5) grid.insertAdjacentHTML('beforeend', `<text x="${sx(x)}" y="384" text-anchor="middle" font-size="14" fill="#56676a">${x}</text>`);
+  let d = '';
+  for (let x = LO; x <= HI + 1e-9; x += 0.02) d += `${d ? 'L' : 'M'}${sx(x).toFixed(1)},${sy(f(x)).toFixed(1)}`;
+  $('demo-curve').setAttribute('d', d);
+
+  // Trạng thái các bước (vận tốc minh họa giữ r1, r2 cố định cho dễ theo dõi)
+  const W = 0.5, A1 = 0.5, A2 = 0.35;
+  const S0 = { x: [0.5, 1.0, 3.0, 4.3], v: [0.2, 0.4, -0.7, -0.9] };
+  const S1x = S0.x.map((x, i) => x + S0.v[i]);                  // 0.7, 1.4, 2.3, 3.4
+  const pb1 = S0.x.map((x, i) => (f(S1x[i]) > f(x) ? S1x[i] : x)); // pbest sau khi đánh giá lại
+  const g0 = 1.0, g1 = 3.4;
+  const parts = S1x.map((x, i) => {
+    const inr = W * S0.v[i], cog = A1 * (pb1[i] - x), soc = A2 * (g1 - x);
+    return { inr, cog, soc, tot: inr + cog + soc };
+  });
+
+  const STEPS = [
+    { label: { vi: 'Bước 1 – 3 · t = 0', en: 'Steps 1 – 3 · t = 0' },
+      vi: 'Khởi tạo một bầy <b>4 cá thể</b> ở vị trí ngẫu nhiên, đánh giá độ thích nghi của từng cá thể và đánh dấu <b class="c-soc">gbest</b>. Bài toán ở đây là tìm <b>cực đại</b> của đường cong.',
+      en: 'Initialize a swarm of <b>4 particles</b> at random positions, evaluate each one\'s fitness and mark <b class="c-soc">gbest</b>. The task here is to find the <b>maximum</b> of the curve.' },
+    { label: { vi: 'Bước 4 · t = 0', en: 'Step 4 · t = 0' },
+      vi: 'Mỗi cá thể tính <b>vận tốc mới</b> theo công thức cập nhật. Phần lớn các mũi tên chỉ về phía gbest bên trái.',
+      en: 'Every particle computes its <b>new velocity</b> from the update rule. Most arrows point toward gbest on the left.' },
+    { label: { vi: 'Bước 4 (tiếp) · t = 1', en: 'Step 4 (cont.) · t = 1' },
+      vi: 'Các cá thể <b>di chuyển</b> theo vận tốc vừa tính. Một cá thể rơi xuống thung lũng, một cá thể leo lên sườn đỉnh bên phải.',
+      en: 'The particles <b>move</b> along their new velocities. One drops into the valley, another climbs the slope of the right-hand peak.' },
+    { label: { vi: 'Bước 2 + 3 · t = 1', en: 'Steps 2 + 3 · t = 1' },
+      vi: 'Đánh giá lại và cập nhật vị trí tốt nhất. Cá thể gần <b>x ≈ 3.4</b> giờ cao hơn gbest cũ, nên <b class="c-soc">gbest</b> chuyển sang đỉnh bên phải. Vòng tròn rỗng màu xanh lá là <b class="c-cog">pbest</b> của từng cá thể.',
+      en: 'Re-evaluate and update the best positions. The particle near <b>x ≈ 3.4</b> now beats the old gbest, so <b class="c-soc">gbest</b> moves to the right-hand peak. Hollow green rings mark each particle\'s <b class="c-cog">pbest</b>.' },
+    { label: { vi: 'Bước 4 · t = 1', en: 'Step 4 · t = 1' },
+      vi: 'Vận tốc mới tách thành ba thành phần. Cá thể kẹt ở <b>thung lũng</b> vẫn bị đà cũ kéo sang trái, nhưng lực <b class="c-cog">nhận thức</b> và lực <b class="c-soc">xã hội</b> cộng lại đủ để kéo nó lên.',
+      en: 'The new velocity splits into three components. The particle stuck in the <b>valley</b> is still carried left by its momentum, but the <b class="c-cog">cognitive</b> and <b class="c-soc">social</b> pulls together are enough to lift it out.' },
+    { label: { vi: 'Lặp lại · t = 2, 3, …', en: 'Repeat · t = 2, 3, …' },
+      vi: 'Cứ thế lặp lại với <span class="m">r<sub>1</sub>, r<sub>2</sub></span> ngẫu nhiên. Cả bầy dần dồn về <b>đỉnh toàn cục</b> gần x ≈ 3.5.',
+      en: 'Keep repeating with random <span class="m">r<sub>1</sub>, r<sub>2</sub></span>. The whole swarm gradually gathers at the <b>global peak</b> near x ≈ 3.5.' },
+  ];
+
+  const pips = $('demo-pips');
+  pips.innerHTML = STEPS.map(() => '<span></span>').join('');
+  const partG = $('demo-particles'), arrowG = $('demo-arrows'), pbG = $('demo-pbest');
+  const circles = S0.x.map(() => {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('r', 10); c.setAttribute('fill', '#7a2b1e'); c.setAttribute('stroke', '#1c2a2e'); c.setAttribute('stroke-width', 2);
+    partG.appendChild(c); return c;
+  });
+  let pos = S0.x.slice(), step = 0, anim = null, runTimer = null;
+
+  const place = (xs) => xs.forEach((x, i) => { circles[i].setAttribute('cx', sx(x)); circles[i].setAttribute('cy', sy(f(x))); });
+  const tween = (to, ms, done) => {
+    cancelAnimationFrame(anim);
+    const from = pos.slice(), t0 = performance.now();
+    if (reduceMotion || ms === 0) { pos = to.slice(); place(pos); done && done(); return; }
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / ms), e = 1 - Math.pow(1 - k, 3);
+      pos = from.map((a, i) => a + (to[i] - a) * e); place(pos);
+      if (k < 1) anim = requestAnimationFrame(tick); else done && done();
+    };
+    anim = requestAnimationFrame(tick);
+  };
+  const setG = (x) => $('demo-gbest').setAttribute('transform', `translate(${sx(x)},${sy(f(x)) - 2})`);
+  const arrow = (x0, y0, dx, color, id) => {
+    if (Math.abs(dx) < 0.02) return '';
+    return `<line x1="${sx(x0)}" y1="${y0}" x2="${sx(x0 + dx) - Math.sign(dx) * 4}" y2="${y0}" stroke="${color}" stroke-width="3.5" marker-end="url(#${id})"/>`;
+  };
+  const showPbest = (xs) => { pbG.innerHTML = xs ? xs.map((x) => `<circle cx="${sx(x)}" cy="${sy(f(x))}" r="16" fill="none" stroke="#4b8f45" stroke-width="2.5"/>`).join('') : ''; };
+
+  function stopRun() { clearTimeout(runTimer); runTimer = null; $('demo-iter').textContent = ''; }
+
+  function runPSO() {
+    // PSO thật, tiếp tục từ trạng thái bước 4; hạt giống cố định để lần nào trình chiếu cũng giống nhau
+    let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+    let x = S1x.slice(), v = parts.map((p) => p.tot), pb = pb1.slice(), g = g1, it = 1;
+    const c1 = 1.4, c2 = 1.4, w = 0.6, vmax = 1.2;
+    const iter = () => {
+      if (step !== 5) return;
+      x = x.map((xi, i) => {
+        v[i] = w * v[i] + c1 * rnd() * (pb[i] - xi) + c2 * rnd() * (g - xi);
+        v[i] = Math.max(-vmax, Math.min(vmax, v[i]));
+        return Math.max(LO, Math.min(HI, xi + v[i]));
+      });
+      x.forEach((xi, i) => { if (f(xi) > f(pb[i])) pb[i] = xi; if (f(pb[i]) > f(g)) g = pb[i]; });
+      it++;
+      arrowG.innerHTML = '';
+      showPbest(pb);
+      tween(x, 380, () => setG(g));
+      $('demo-iter').textContent = `t = ${it} · gbest: x ≈ ${g.toFixed(2)}, f ≈ ${f(g).toFixed(2)}`;
+      if (it < 26) runTimer = setTimeout(iter, 520);
+    };
+    runTimer = setTimeout(iter, 300);
+  }
+
+  // chữ của bước hiện tại theo ngôn ngữ đang chọn (gọi lại khi đổi VN | EN)
+  function texts() {
+    const L = document.documentElement.dataset.lang === 'en' ? 'en' : 'vi', st = STEPS[step];
+    $('demo-label').textContent = st.label[L];
+    $('demo-desc').innerHTML = st[L];
+    $('demo-next').textContent = step === STEPS.length - 1 ? (L === 'en' ? 'Run again ↻' : 'Chạy lại ↻') : (L === 'en' ? 'Next step →' : 'Bước tiếp →');
+  }
+  window.demoTexts = texts;
+
+  function render() {
+    stopRun();
+    texts();
+    Array.from(pips.children).forEach((p, i) => p.classList.toggle('on', i <= step));
+    $('demo-prev').disabled = step === 0;
+    $('demo-legend').style.opacity = step === 4 ? 1 : 0;
+    const valley = $('demo-valley');
+    valley.setAttribute('cx', sx(S1x[2])); valley.setAttribute('cy', sy(f(S1x[2])) + 12);
+    valley.style.opacity = step === 4 ? 0.9 : 0;
+    arrowG.innerHTML = '';
+
+    if (step <= 1) {
+      tween(S0.x, 500); setG(g0); showPbest(null);
+      if (step === 1) arrowG.innerHTML = S0.x.map((x, i) => arrow(x, sy(f(x)) - 22, S0.v[i], '#d9562f', 'a-tot')).join('');
+    } else if (step === 2) {
+      showPbest(null); setG(g0); tween(S1x, 900);
+    } else if (step === 3) {
+      tween(S1x, 300); showPbest(pb1); setG(g1);
+    } else if (step === 4) {
+      tween(S1x, 300); showPbest(pb1); setG(g1);
+      arrowG.innerHTML = S1x.map((x, i) => {
+        const y = sy(f(x)), p = parts[i];
+        return arrow(x, y - 40, p.tot, '#d9562f', 'a-tot') +
+          arrow(x, y + 20, p.inr, '#3a7fc1', 'a-in') +
+          arrow(x, y + 31, p.cog, '#4b8f45', 'a-cog') +
+          arrow(x, y + 42, p.soc, '#1c2a2e', 'a-soc');
+      }).join('');
+    } else if (step === 5) {
+      tween(S1x, 200); showPbest(pb1); setG(g1); runPSO();
+    }
+  }
+
+  // Giao diện cho controller: trả về true nếu đã tự xử lý bước
+  slide.stepper = {
+    next() { if (step < STEPS.length - 1) { step++; render(); return true; } return false; },
+    prev() { if (step > 0) { step--; render(); return true; } return false; },
+  };
+  $('demo-next').addEventListener('click', () => { if (step === STEPS.length - 1) { render(); } else { step++; render(); } });
+  $('demo-prev').addEventListener('click', () => { if (step > 0) { step--; render(); } });
+  slide.addEventListener('slideleave', stopRun);
+  place(pos); render();
+}
+
+/* ===========================================
+   STATIC CHART PATHS (dao động tham số, sigmoid, biểu đồ cột)
+   =========================================== */
+function setupCharts() {
+  // dao động tắt dần vs bùng nổ
+  let good = '', bad = '';
+  for (let i = 0; i <= 460; i += 2) {
+    const t = i / 460;
+    const yg = 130 - 90 * Math.exp(-4.2 * t) * Math.cos(t * 26);
+    const yb = 130 - 6 * Math.exp(4.1 * t) * Math.sin(t * 34);
+    good += `${i ? 'L' : 'M'}${40 + i},${yg.toFixed(1)}`;
+    bad += `${i ? 'L' : 'M'}${40 + i},${Math.max(4, Math.min(256, yb)).toFixed(1)}`;
+  }
+  document.getElementById('osc-good').setAttribute('d', good);
+  document.getElementById('osc-bad').setAttribute('d', bad);
+
+  // sigmoid
+  let s = '';
+  for (let px = 20; px <= 420; px += 4) {
+    const v = (px - 220) / 32, y = 210 - 160 / (1 + Math.exp(-v));
+    s += `${px === 20 ? 'M' : 'L'}${px},${y.toFixed(1)}`;
+  }
+  document.getElementById('sig-path').setAttribute('d', s);
+
+  // số công bố PSO trên IEEE Xplore (theo bảng trong bài giảng gốc)
+  const data = [[1995, 0], [1996, 0], [1997, 2], [1998, 3], [1999, 6], [2000, 10], [2001, 13], [2002, 36], [2003, 86], [2004, 270], [2005, 425], [2006, 687]];
+  const bars = document.getElementById('bars');
+  bars.innerHTML = data.map(([y, n]) => `<span class="yr">${y}</span><span class="bar"><i class="${n ? '' : 'zero'}" data-w="${(n / 687) * 85}"></i>${n}</span>`).join('');
+  const barSlide = bars.closest('.slide');
+  const grow = () => bars.querySelectorAll('i').forEach((el, k) => setTimeout(() => (el.style.width = el.dataset.w + '%'), 60 * k));
+  barSlide.addEventListener('slideenter', grow);
+}
+
+setupCharts();
+setupDemo();
+document.querySelectorAll('canvas[data-swarm]').forEach((c) => new SwarmCanvas(c));
+window.deck = new SlidePresentation();
+
+/* ===========================================
+   LANGUAGE SWITCH — nút VN | EN góc trên bên phải, phím L.
+   Lựa chọn được nhớ trong trình duyệt; có thể mở thẳng bằng ?lang=en
+   =========================================== */
+(function setupLang() {
+  const root = document.documentElement;
+  const TITLES = { vi: 'Tối ưu bầy đàn (PSO)', en: 'Particle Swarm Optimization (PSO)' };
+  document.querySelectorAll('.slide').forEach((s) => { s.dataset.labelVi = s.getAttribute('aria-label') || ''; });
+  function setLang(L, save = true) {
+    L = L === 'en' ? 'en' : 'vi';
+    root.dataset.lang = L; root.lang = L;
+    document.title = TITLES[L];
+    document.querySelectorAll('[data-set-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setLang === L)));
+    document.querySelectorAll('.slide').forEach((s, i) => {
+      const lab = L === 'en' ? (s.dataset.labelEn || s.dataset.labelVi) : s.dataset.labelVi;
+      s.setAttribute('aria-label', lab);
+      if (deck.dots[i]) deck.dots[i].setAttribute('aria-label', `${i + 1}: ${lab}`);
+    });
+    if (window.demoTexts) window.demoTexts();
+    document.querySelectorAll('a.lang-link').forEach((a) => { const u = a.getAttribute('href').split('?')[0]; a.setAttribute('href', `${u}?lang=${L}`); });
+    if (save) { try { localStorage.setItem('si-lang', L); } catch (e) { /* bộ nhớ bị chặn: bỏ qua */ } }
+  }
+  document.querySelectorAll('[data-set-lang]').forEach((b) => b.addEventListener('click', (e) => { setLang(b.dataset.setLang); e.currentTarget.blur(); }));
+  document.addEventListener('keydown', (e) => { if (e.key === 'l' || e.key === 'L') setLang(root.dataset.lang === 'en' ? 'vi' : 'en'); });
+  let L = new URLSearchParams(location.search).get('lang');
+  if (!L) { try { L = localStorage.getItem('si-lang'); } catch (e) { L = null; } }
+  setLang(L || 'vi', false);
+})();
+</script>
+</body>
+</html>

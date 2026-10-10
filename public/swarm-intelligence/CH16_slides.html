@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 16: Tiến hóa, lai ghép, lượng tử" data-title-en="Chapter 16: Evolutionary, hybrid and quantum swarms">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 16: Tiến hóa, lai ghép, lượng tử</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 16 · Phần V</span><span class="en">Chapter 16 · Part V</span></p>
+    <h1 class="reveal d1"><span class="vi">Tiến hóa, lai ghép và cảm hứng lượng tử</span><span class="en">Evolutionary, hybrid and quantum-inspired swarms</span><span class="sub"><span class="vi">GA, GA-PSO và QPSO</span><span class="en">GA, GA-PSO and QPSO</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả giải thuật di truyền mã hóa thực: chọn lọc, lai SBX, đột biến đa thức.</span><span class="en">Describe the real-coded genetic algorithm: selection, SBX crossover, polynomial mutation.</span></li>
+        <li class="reveal d3"><span class="vi">Phân loại các cách lai ghép metaheuristic theo Talbi (2002).</span><span class="en">Classify hybrid metaheuristics following Talbi (2002).</span></li>
+        <li class="reveal d4"><span class="vi">Giải thích GA-PSO: bước PSO rồi thay nửa kém bằng con lai.</span><span class="en">Explain GA-PSO: a PSO step, then replace the worse half with offspring.</span></li>
+        <li class="reveal d5"><span class="vi">Giải thích QPSO: hạt không có vận tốc, vị trí lấy mẫu quanh điểm hút.</span><span class="en">Explain QPSO: no velocity; positions are sampled around an attractor.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tiến hóa và bầy đàn" data-label-en="Evolution and swarms">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ý tưởng</span><span class="en">Idea</span></p>
+      <h2 class="reveal d1"><span class="vi">Hai cách nhìn về một quần thể</span><span class="en">Two views of one population</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Giải thuật di truyền</strong> (Holland, 1975): quần thể thay thế theo thế hệ; thông tin truyền qua <em>lai ghép</em> và <em>đột biến</em>.</span><span class="en"><strong>Genetic algorithms</strong> (Holland, 1975): the population is replaced generation by generation; information passes through <em>crossover</em> and <em>mutation</em>.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Bầy đàn</strong>: cá thể sống lâu, có trí nhớ (pbest), học từ cá thể tốt nhất.</span><span class="en"><strong>Swarms</strong>: individuals persist, keep memory (pbest) and learn from the best.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Tìm kiếm Tabu</strong> (Glover, 1989): một lời giải, cấm quay lại các nước đi gần đây; thường dùng để tinh chỉnh trong thuật toán lai.</span><span class="en"><strong>Tabu search</strong> (Glover, 1989): a single solution with forbidden recent moves; often used for refinement inside hybrids.</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Phân loại lai ghép (Talbi, 2002)</span><span class="en">Hybrid taxonomy (Talbi, 2002)</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><strong>Mức thấp / mức cao</strong>: thay một toán tử bên trong, hay ghép hai thuật toán nguyên vẹn.</span><span class="en"><strong>Low / high level</strong>: replace an inner operator, or combine two whole algorithms.</span></li>
+          <li><span class="vi"><strong>Nối tiếp / đồng thời</strong>: chạy lần lượt hay cùng lúc trên các quần thể con.</span><span class="en"><strong>Relay / teamwork</strong>: run one after another, or together on sub-populations.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của GA mã hóa thực</span><span class="en">Real-coded GA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Cài đặt trong giáo trình: giải đấu kích thước 2, SBX <span class="m">η<sub>c</sub> = 20</span>, đột biến đa thức <span class="m">η<sub>m</sub> = 20</span>, 2 cá thể ưu tú.</span><span class="en">This book's implementation: tournament size 2, SBX <span class="m">η<sub>c</sub> = 20</span>, polynomial mutation <span class="m">η<sub>m</sub> = 20</span>, 2 elites.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo ngẫu nhiên <span class="m">n</span> cá thể và đánh giá.</span><span class="en">Initialize <span class="m">n</span> random individuals and evaluate them.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Giữ 2 cá thể tốt nhất sang thế hệ mới.</span><span class="en">Copy the 2 best individuals into the new generation.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Chọn cha mẹ bằng giải đấu nhị phân.</span><span class="en">Pick parents by binary tournament.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Lai SBX với xác suất <span class="m">p<sub>c</sub> = 0.9</span>; đột biến đa thức với xác suất <span class="m">1/D</span> mỗi gen.</span><span class="en">SBX with probability <span class="m">p<sub>c</sub> = 0.9</span>; polynomial mutation with probability <span class="m">1/D</span> per gene.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Đánh giá thế hệ con; lặp đến hết ngân sách.</span><span class="en">Evaluate the offspring; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Toán tử SBX và QPSO" data-label-en="SBX and QPSO operators">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Lai SBX và cập nhật lượng tử</span><span class="en">SBX crossover and the quantum update</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">β = (2u)<sup>1/(η+1)</sup> nếu u ≤ 0.5, &nbsp; ngược lại (1/(2(1−u)))<sup>1/(η+1)</sup></span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">c<sub>1,2</sub> = ½[(1 ± β) a + (1 ∓ β) b]</span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">p = φ·pbest + (1 − φ)·gbest, &nbsp; x = p ± β<sub>Q</sub> |mbest − x| ln(1/u)</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">SBX (Deb &amp; Agrawal, 1995) mô phỏng lai một điểm nhị phân: con nằm gần cha mẹ khi <span class="m">η</span> lớn.</span><span class="en">SBX (Deb &amp; Agrawal, 1995) mimics binary one-point crossover: children stay near parents when <span class="m">η</span> is large.</span></li>
+          <li class="reveal d4"><span class="vi">QPSO (Sun, Feng &amp; Xu, 2004): <span class="m">mbest</span> là trung bình các pbest; <span class="m">β<sub>Q</sub></span> giảm từ 1.0 xuống 0.5.</span><span class="en">QPSO (Sun, Feng &amp; Xu, 2004): <span class="m">mbest</span> is the mean pbest; <span class="m">β<sub>Q</sub></span> decreases from 1.0 to 0.5.</span></li>
+          <li class="reveal d5"><span class="vi">Thừa số <span class="m">ln(1/u)</span> cho phân phối đuôi mũ: đôi khi nhảy rất xa.</span><span class="en">The <span class="m">ln(1/u)</span> factor gives an exponential tail: occasional long jumps.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">bầy</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">swarm</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Đánh giá;</text><text x="875" y="89">pbest, gbest</text></g><g class="en"><text x="875" y="67">Evaluate;</text><text x="875" y="89">pbest, gbest</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Bước PSO;</text><text x="875" y="259">sắp xếp theo f</text></g><g class="en"><text x="875" y="237">PSO step;</text><text x="875" y="259">sort by f</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Nửa kém ← SBX</text><text x="625" y="259">+ đột biến</text></g><g class="en"><text x="625" y="237">Worse half ← SBX</text><text x="625" y="259">+ mutation</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về gbest</text></g><g class="en"><text x="125" y="248">Return gbest</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số GA, GA-PSO, QPSO</span><span class="en">GA, GA-PSO, QPSO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">p<sub>c</sub>, η<sub>c</sub></span></td><td><span class="vi">Xác suất và chỉ số phân phối của SBX</span><span class="en">SBX probability and distribution index</span></td><td>0.9, 20</td></tr>
+        <tr><td><span class="m">p<sub>m</sub>, η<sub>m</sub></span></td><td><span class="vi">Xác suất và chỉ số của đột biến đa thức</span><span class="en">Polynomial mutation probability and index</span></td><td><span class="m">1/D</span>, 20</td></tr>
+        <tr><td><span class="m">sel</span></td><td><span class="vi">Tỉ lệ bầy bị thay trong GA-PSO</span><span class="en">Share of the swarm replaced in GA-PSO</span></td><td>0.5</td></tr>
+        <tr><td><span class="m">w, c<sub>1</sub>, c<sub>2</sub></span></td><td><span class="vi">Hệ số PSO trong GA-PSO</span><span class="en">PSO coefficients in GA-PSO</span></td><td>0.9→0.4, 2, 2</td></tr>
+        <tr><td><span class="m">β<sub>Q</sub></span></td><td><span class="vi">Hệ số co–giãn của QPSO</span><span class="en">QPSO contraction–expansion coefficient</span></td><td>1.0 → 0.5</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">GA trên cùng địa hình</span><span class="en">GA on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Mỗi bước là một thế hệ: hai cá thể ưu tú (viền đậm) được giữ, phần còn lại là con lai SBX và đột biến.</span><span class="en">Each step is one generation: two elites (bold outline) survive; the rest are SBX children with mutation.</span></p>
+        <p class="note"><span class="vi">Quan sát: quần thể co về vài vùng tốt; khi mất đa dạng, chỉ đột biến mới tạo được bước nhảy.</span><span class="en">Watch the population shrink toward a few good regions; once diversity is lost, only mutation can jump.</span></p>
+      </div>
+      <div class="field" id="c16-field"><canvas aria-label="GA"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">SBX với cha mẹ 2 và 4, <span class="m">η = 20</span></span><span class="en">SBX with parents 2 and 4, <span class="m">η = 20</span></span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">u = 0.3: β = 0.6<sup>1/21</sup> = 0.976</span></div>
+          <div class="eq"><span class="m">u = 0.8: β = 2.5<sup>1/21</sup> = 1.0446</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">u = 0.3</span>: <span class="m">c<sub>1</sub> = 2.024, c<sub>2</sub> = 3.976</span> (con nằm trong đoạn cha mẹ).</span><span class="en"><span class="m">u = 0.3</span>: <span class="m">c<sub>1</sub> = 2.024, c<sub>2</sub> = 3.976</span> (children inside the parents' range).</span></li>
+          <li><span class="vi"><span class="m">u = 0.8</span>: <span class="m">c<sub>1</sub> = 1.9554, c<sub>2</sub> = 4.0446</span> (con ra ngoài một chút).</span><span class="en"><span class="m">u = 0.8</span>: <span class="m">c<sub>1</sub> = 1.9554, c<sub>2</sub> = 4.0446</span> (children slightly outside).</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Một bước QPSO</span><span class="en">One QPSO step</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">pbest = 1, gbest = 2, φ = 0.5: <span class="m">p = 1.5</span>.</span><span class="en">pbest = 1, gbest = 2, φ = 0.5: <span class="m">p = 1.5</span>.</span></li>
+          <li><span class="vi">mbest = 2.5, x = 3.5, β = 0.8, u = 0.4: <span class="m">L = 0.8 · 1 · ln 2.5 = 0.733</span>.</span><span class="en">mbest = 2.5, x = 3.5, β = 0.8, u = 0.4: <span class="m">L = 0.8 · 1 · ln 2.5 = 0.733</span>.</span></li>
+          <li><span class="vi">Vị trí mới <span class="m">x = 2.233</span> hoặc <span class="m">0.767</span>, mỗi khả năng xác suất 1/2.</span><span class="en">New position <span class="m">x = 2.233</span> or <span class="m">0.767</span>, each with probability 1/2.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · chương 16</span><span class="en">Experiment · chapter 16</span></p>
+      <h2 class="reveal d1"><span class="vi">Trung vị sai số, D = 10, 20 000 lần đánh giá, 30 lần chạy</span><span class="en">Median error, D = 10, 20,000 evaluations, 30 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Thuật toán</span><span class="en">Algorithm</span></th><th><span class="vi">F2</span><span class="en">F2</span></th><th><span class="vi">F3</span><span class="en">F3</span></th><th><span class="vi">F5</span><span class="en">F5</span></th><th><span class="vi">F7</span><span class="en">F7</span></th><th><span class="vi">Hạng</span><span class="en">Rank</span></th></tr></thead>
+      <tbody>
+        <tr><td>GA</td><td>6.99e+0 <span class="sg-minus">−</span></td><td>7.46e−4 <span class="sg-plus">+</span></td><td>8.18e−2 <span class="sg-plus">+</span></td><td>7.89e−4 <span class="sg-plus">+</span></td><td>12.00</td></tr>
+        <tr><td>QPSO</td><td>5.90e+0 <span class="sg-minus">−</span></td><td>3.75e+0 <span class="sg-eq">≈</span></td><td>5.99e−2 <span class="sg-plus">+</span></td><td>3.78e+0 <span class="sg-eq">≈</span></td><td>7.64</td></tr>
+        <tr><td>PSO</td><td>4.34e+0</td><td>3.98e+0</td><td>1.10e−1</td><td>4.01e+0</td><td>8.21</td></tr>
+        <tr><td>GAPSO</td><td>1.89e+0 <span class="sg-plus">+</span></td><td>0 <span class="sg-plus">+</span></td><td>6.14e−2 <span class="sg-plus">+</span></td><td>0 <span class="sg-plus">+</span></td><td>5.93</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">F2 Rosenbrock, F3 Rastrigin, F5 Griewank, F7 Rastrigin dịch tâm. +/−/≈: tốt hơn / kém hơn / không khác PSO (Wilcoxon, α = 0.05). Hạng Friedman trong 23 phương pháp (GA-PSO thứ 2, PSO thứ 7). GA giải Rastrigin tốt hơn PSO rõ rệt nhưng kém trên các hàm đơn đỉnh (F1, F4, F6 không đạt 10<sup>−8</sup>); GA-PSO kết hợp được cả hai và đứng đầu nhóm này.</span><span class="en">+/−/≈: better / worse / no different from PSO (Wilcoxon, α = 0.05). Friedman rank among 23 methods (GA-PSO places 2, PSO places 7). GA solves Rastrigin far better than PSO but lags on unimodal functions (F1, F4, F6 miss 10<sup>−8</sup>); GA-PSO combines both and leads this group.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm</span><span class="en">Experiment</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ của GA-PSO</span><span class="en">GA-PSO convergence curves</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Trung vị sai số theo số lần đánh giá trên 7 hàm, 30 lần chạy.</span><span class="en">Median error versus evaluations on 7 functions, 30 runs.</span></li>
+          <li class="reveal d3"><span class="vi">Trung vị của GA-PSO đạt <span class="m">10<sup>−8</sup></span> trên F3, F7, nơi PSO kẹt quanh 4.</span><span class="en">GA-PSO's median reaches <span class="m">10<sup>−8</sup></span> on F3 and F7, where PSO stalls near 4.</span></li>
+          <li class="reveal d4"><span class="vi">F2 Rosenbrock vẫn là hàm khó nhất cho cả nhóm.</span><span class="en">F2 Rosenbrock remains the hardest function for the whole group.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <img class="conv-img" src="assets/conv/GAPSO.svg" alt="GA-PSO convergence"/>
+        <figcaption><span class="vi">Nguồn: code/results/summary_all/conv/GAPSO.svg</span><span class="en">Source: code/results/summary_all/conv/GAPSO.svg</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Họ thuật toán lai và lượng tử</span><span class="en">Hybrid and quantum families</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">PSO có chọn lọc</span><span class="en">PSO with selection</span></h3><p><span class="vi">Thay nửa kém bằng bản sao nửa tốt (Angeline, 1998).</span><span class="en">Replace the worse half with copies of the better half (Angeline, 1998).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">HGAPSO</span><span class="en">HGAPSO</span></h3><p><span class="vi">GA và PSO cùng tiến hóa quần thể mạng hồi quy (Juang, 2004).</span><span class="en">GA and PSO jointly evolve recurrent networks (Juang, 2004).</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">QPSO</span><span class="en">QPSO</span></h3><p><span class="vi">Hạt hành xử như trong giếng thế lượng tử (Sun và cs., 2004).</span><span class="en">Particles behave as in a quantum potential well (Sun et al., 2004).</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">QIEA</span><span class="en">QIEA</span></h3><p><span class="vi">Cá thể là chuỗi qubit; cổng xoay cập nhật xác suất (Han &amp; Kim, 2002).</span><span class="en">Individuals are qubit strings; rotation gates update probabilities (Han &amp; Kim, 2002).</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/qpso.py" class="c-sea">code/si/algorithms/qpso.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        beta = b_max - (b_max - b_min) * t / T
+        g = P[np.argmin(pf)]
+        mbest = P.mean(axis=0)
+        phi = rng.random(X.shape)
+        p = phi * P + (1 - phi) * g
+        u = rng.random(X.shape)
+        sign = np.where(rng.random(X.shape) &lt; 0.5, 1, -1)
+        X = prob.clip(p + sign * beta * np.abs(mbest - X) * np.log(1 / u))
+        f = prob(X)
+        better = f &lt; pf
+        P[better], pf[better] = X[better], f[better]</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Lai ghép: hiệu quả nhưng phải chứng minh</span><span class="en">Hybrids: effective, but must be justified</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">GA-PSO đứng thứ 2/23, trên cả GA và PSO gốc.</span><span class="en">GA-PSO ranks 2/23, above both plain GA and PSO.</span></li>
+          <li><span class="vi">QPSO chỉ có một tham số và không cần giới hạn vận tốc.</span><span class="en">QPSO has a single parameter and needs no velocity limit.</span></li>
+          <li><span class="vi">Lai ghép cho phép kết hợp điểm mạnh khám phá và khai thác.</span><span class="en">Hybrids combine exploration and exploitation strengths.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">QPSO không khác PSO có ý nghĩa trên 4/7 hàm trong thực nghiệm này.</span><span class="en">QPSO is not significantly different from PSO on 4/7 functions in this experiment.</span></li>
+          <li><span class="vi">Thêm thành phần là thêm tham số; cần thí nghiệm loại bỏ từng thành phần.</span><span class="en">More components mean more parameters; ablation studies are needed.</span></li>
+          <li><span class="vi">“Lượng tử” ở đây chỉ là phép ẩn dụ; không chạy trên máy tính lượng tử.</span><span class="en">“Quantum” is only a metaphor here; nothing runs on a quantum computer.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính con SBX với cha mẹ 1 và 5, <span class="m">η = 2</span>, <span class="m">u = 0.9</span>.</span><span class="en">Compute SBX children for parents 1 and 5, <span class="m">η = 2</span>, <span class="m">u = 0.9</span>.</span></li>
+          <li><span class="vi">Xếp GA-PSO và QPSO vào phân loại của Talbi.</span><span class="en">Place GA-PSO and QPSO in Talbi's taxonomy.</span></li>
+          <li><span class="vi">Vì sao QPSO không cần <span class="m">v<sub>max</sub></span>?</span><span class="en">Why does QPSO need no <span class="m">v<sub>max</sub></span>?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Thí nghiệm loại bỏ: GA-PSO không đột biến, và với <span class="m">sel = 0.25</span>.</span><span class="en">Ablation: GA-PSO without mutation, and with <span class="m">sel = 0.25</span>.</span></li>
+          <li><span class="vi">Lai PSO với tìm kiếm cục bộ Nelder–Mead ở cuối quá trình.</span><span class="en">Hybridize PSO with a final Nelder–Mead local search.</span></li>
+          <li><span class="vi">So sánh QPSO với PSO trên F1–F7 ở D = 30.</span><span class="en">Compare QPSO and PSO on F1–F7 at D = 30.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>J. H. Holland, <em>Adaptation in Natural and Artificial Systems</em>. Ann Arbor, MI, USA: Univ. Michigan Press, 1975.</li>
+        <li>F. Glover, “Tabu Search—Part I,” <em>ORSA Journal on Computing</em>, vol. 1, no. 3, pp. 190–206, 1989, doi: <a href="https://doi.org/10.1287/ijoc.1.3.190">10.1287/ijoc.1.3.190</a>.</li>
+        <li>K. Deb and R. B. Agrawal, “Simulated binary crossover for continuous search space,” <em>Complex Syst.</em>, vol. 9, no. 2, pp. 115–148, 1995.</li>
+        <li>P. Angeline, “Using selection to improve particle swarm optimization,” in <em>1998 IEEE International Conference on Evolutionary Computation Proceedings. IEEE World Congress on Computational Intelligence (Cat. No.98TH8360)</em>, 1998, pp. 84–89, doi: <a href="https://doi.org/10.1109/ICEC.1998.699327">10.1109/ICEC.1998.699327</a>.</li>
+        <li>K.-H. Han and J.-H. Kim, “Quantum-inspired evolutionary algorithm for a class of combinatorial optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 6, no. 6, pp. 580–593, 2002, doi: <a href="https://doi.org/10.1109/TEVC.2002.804320">10.1109/TEVC.2002.804320</a>.</li>
+        <li>E.-G. Talbi, “A Taxonomy of Hybrid Metaheuristics,” <em>Journal of Heuristics</em>, vol. 8, no. 5, pp. 541–564, 2002, doi: <a href="https://doi.org/10.1023/A:1016540724870">10.1023/A:1016540724870</a>.</li>
+        <li>C.-F. Juang, “A Hybrid of Genetic Algorithm and Particle Swarm Optimization for Recurrent Network Design,” <em>IEEE Trans. Syst., Man, Cybern. B</em>, vol. 34, no. 2, pp. 997–1006, 2004, doi: <a href="https://doi.org/10.1109/TSMCB.2003.818557">10.1109/TSMCB.2003.818557</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>J. Sun, B. Feng, and W. Xu, “Particle swarm optimization with particles having quantum behavior,” in <em>Proceedings of the 2004 Congress on Evolutionary Computation (IEEE Cat. No.04TH8753)</em>, 2004, pp. 325–331, doi: <a href="https://doi.org/10.1109/CEC.2004.1330875">10.1109/CEC.2004.1330875</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">GA: chọn lọc + SBX + đột biến</span><span class="en">GA: selection + SBX + mutation</span></span>
+      <span><span class="vi">GA-PSO: PSO + thay nửa kém</span><span class="en">GA-PSO: PSO + replace the worse half</span></span>
+      <span><span class="vi">QPSO: lấy mẫu quanh điểm hút</span><span class="en">QPSO: sampling around an attractor</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Talbi, <em>Journal of Heuristics</em> 8(5), 2002</span><span class="en">Original paper: Talbi, <em>Journal of Heuristics</em> 8(5), 2002</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+const gaAlgo = {
+  n: 16, T: 60, seed: 9,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) }); },
+  step(S) {
+    const rnd = S.rnd, eta = 20, P = S.pop.slice().sort((a, b) => SI.f(a.x) - SI.f(b.x));
+    const tour = () => { const a = P[Math.floor(rnd() * P.length)], b = P[Math.floor(rnd() * P.length)]; return SI.f(a.x) < SI.f(b.x) ? a : b; };
+    const sbx = (a, b) => { const c1 = [], c2 = []; for (let d = 0; d < 2; d++) { const u = rnd(), be = u <= 0.5 ? Math.pow(2 * u, 1 / (eta + 1)) : Math.pow(1 / (2 * (1 - u)), 1 / (eta + 1)); c1.push(0.5 * ((1 + be) * a[d] + (1 - be) * b[d])); c2.push(0.5 * ((1 - be) * a[d] + (1 + be) * b[d])); } return [c1, c2]; };
+    const mut = (x) => x.map((v) => { if (rnd() >= 0.5) return SI.clamp(v); const u = rnd(), dl = u < 0.5 ? Math.pow(2 * u, 1 / 21) - 1 : 1 - Math.pow(2 * (1 - u), 1 / 21); return SI.clamp(v + dl * 12); });
+    const kids = [{ x: P[0].x.slice(), elite: true, hist: P[0].hist }, { x: P[1].x.slice(), elite: true, hist: P[1].hist }];
+    while (kids.length < this.n) { let a = tour().x, b = tour().x; if (rnd() < 0.9) [a, b] = sbx(a, b); kids.push({ x: mut(a) }); if (kids.length < this.n) kids.push({ x: mut(b) }); }
+    S.pop.length = 0; kids.forEach((k) => S.pop.push(k));
+  },
+  draw(g, S, P) {
+    for (const p of S.pop) { const [x, y] = P.at(p); SI.dot(g, x, y, p.elite ? 6 : 4.5, p.elite ? '#d9562f' : '#3a7fc1', p.elite ? '#1c2a2e' : undefined); }
+    const [bx, by] = P.pt(S.best); g.strokeStyle = '#d9562f'; g.lineWidth = 2; g.strokeRect(bx - 7, by - 7, 14, 14);
+  },
+  status(S, en) { return `<span><b>n</b> = ${this.n}</span>`; },
+};
+new SI.Field2D(document.getElementById('c16-field'), gaAlgo);
+
+SI.boot();
+</script>
+</body>
+</html>

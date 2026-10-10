@@ -1,0 +1,21 @@
+seed,method,mean_current_error
+1,PSO thường,5.3742
+1,PSO + phát hiện và khởi tạo lại,0.3324
+2,PSO thường,16.8212
+2,PSO + phát hiện và khởi tạo lại,0.3362
+3,PSO thường,2.3764
+3,PSO + phát hiện và khởi tạo lại,0.3915
+4,PSO thường,5.0887
+4,PSO + phát hiện và khởi tạo lại,0.4985
+5,PSO thường,12.767
+5,PSO + phát hiện và khởi tạo lại,0.3382
+6,PSO thường,2.3274
+6,PSO + phát hiện và khởi tạo lại,0.2385
+7,PSO thường,8.8486
+7,PSO + phát hiện và khởi tạo lại,0.4116
+8,PSO thường,4.0522
+8,PSO + phát hiện và khởi tạo lại,0.5064
+9,PSO thường,8.3722
+9,PSO + phát hiện và khởi tạo lại,0.2664
+10,PSO thường,15.5692
+10,PSO + phát hiện và khởi tạo lại,0.2934

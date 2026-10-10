@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bầy châu chấu (GOA)" data-title-en="Grasshopper Optimisation Algorithm (GOA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy châu chấu (GOA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 7 · Mục 7.1</span><span class="en">Chapter 7 · Section 7.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy châu chấu</span><span class="en">Grasshopper Optimisation Algorithm</span><span class="sub"><span class="vi">Grasshopper Optimisation Algorithm — GOA</span><span class="en">GOA — attraction, repulsion and a comfort zone</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Phân biệt hai pha của bầy châu chấu: ấu trùng di chuyển chậm, trưởng thành bay xa và đột ngột.</span><span class="en">Distinguish the two swarm phases: slow-moving nymphs and long, abrupt adult flights.</span></li>
+        <li class="reveal d3"><span class="vi">Viết hàm lực xã hội <span class="m">s(r)</span> và giải thích vùng đẩy, vùng thoải mái, vùng hút.</span><span class="en">Write the social force <span class="m">s(r)</span> and explain the repulsion, comfort and attraction zones.</span></li>
+        <li class="reveal d4"><span class="vi">Viết phương trình cập nhật vị trí với hệ số co <span class="m">c</span> và mục tiêu <span class="m">T̂<sub>d</sub></span>.</span><span class="en">Write the position update with the shrinking coefficient <span class="m">c</span> and target <span class="m">T̂<sub>d</sub></span>.</span></li>
+        <li class="reveal d5"><span class="vi">Giải thích vì sao GOA tốn <span class="m">O(n²)</span> phép tính mỗi vòng.</span><span class="en">Explain why GOA costs <span class="m">O(n²)</span> per iteration.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Bầy châu chấu: hút nhau ở xa, đẩy nhau ở gần</span><span class="en">Grasshopper swarms: attract when far, repel when close</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Saremi, Mirjalili và Lewis</strong> đề xuất năm 2017 (<em>Advances in Engineering Software</em> 105).</span><span class="en">Proposed by <strong>Saremi, Mirjalili and Lewis</strong> in 2017 (<em>Advances in Engineering Software</em> 105).</span></li>
+          <li class="reveal d3"><span class="vi">Ấu trùng châu chấu di chuyển chậm, từng bước nhỏ; con trưởng thành bay thành đàn, nhảy xa và đột ngột.</span><span class="en">Nymphs move slowly in small steps; adults swarm in the air with long, abrupt jumps.</span></li>
+          <li class="reveal d4"><span class="vi">Hai con ở quá gần thì đẩy nhau, ở xa thì hút nhau, và có một khoảng cách “thoải mái” không có lực.</span><span class="en">Two grasshoppers too close repel, far apart attract, and in between lies a force-free “comfort” distance.</span></li>
+          <li class="reveal d5"><span class="vi">GOA dùng lực xã hội này cộng với lực kéo về mục tiêu tốt nhất để tìm nghiệm.</span><span class="en">GOA combines this social force with a pull toward the best target found.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 420 260" role="img" aria-label="Đồ thị lực xã hội s(r) với vùng đẩy, vùng thoải mái và vùng hút" id="goa-s"></svg>
+        <figcaption><span class="vi">Lực xã hội với f = 0.5, l = 1.5: đổi dấu tại r ≈ 2.079</span><span class="en">Social force with f = 0.5, l = 1.5: changes sign at r ≈ 2.079</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lực xã hội" data-label-en="Social force">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba lực tác động lên một con châu chấu</span><span class="en">Three forces on one grasshopper</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">X<sub>i</sub> = S<sub>i</sub> + G<sub>i</sub> + A<sub>i</sub></span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">S<sub>i</sub> = Σ<sub>j≠i</sub> s(d<sub>ij</sub>) · d̂<sub>ij</sub>, &nbsp; d̂<sub>ij</sub> = (x<sub>j</sub> − x<sub>i</sub>) / d<sub>ij</sub></span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">s(r) = f · e<sup>−r/l</sup> − e<sup>−r</sup></span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">S<sub>i</sub></span>: tương tác xã hội; <span class="m">G<sub>i</sub></span>: trọng lực; <span class="m">A<sub>i</sub></span>: gió đẩy.</span><span class="en"><span class="m">S<sub>i</sub></span>: social interaction; <span class="m">G<sub>i</sub></span>: gravity; <span class="m">A<sub>i</sub></span>: wind advection.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">f</span>: cường độ hút, <span class="m">l</span>: độ dài hút. Với <span class="m">f = 0.5, l = 1.5</span>, lực đẩy khi <span class="m">r &lt; 2.079</span> và hút khi <span class="m">r &gt; 2.079</span>.</span><span class="en"><span class="m">f</span>: attraction strength, <span class="m">l</span>: attractive length scale. With <span class="m">f = 0.5, l = 1.5</span>, repulsion for <span class="m">r &lt; 2.079</span> and attraction beyond.</span></li>
+          <li class="reveal d5"><span class="vi">Lực gần như bằng 0 khi <span class="m">r &gt; 4</span>, nên khoảng cách cần được chuẩn hóa về đoạn nhỏ trước khi dùng.</span><span class="en">The force fades for <span class="m">r &gt; 4</span>, so distances must be mapped into a small interval before use.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Cập nhật vị trí" data-label-en="Position update">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bỏ trọng lực và gió, thêm lực kéo về mục tiêu</span><span class="en">Drop gravity and wind, add a pull toward the target</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">X<span class="ss"><i>d</i><i>i</i></span> = c ( Σ<sub>j≠i</sub> c · (ub<sub>d</sub> − lb<sub>d</sub>)/2 · s(|x<span class="ss"><i>d</i><i>j</i></span> − x<span class="ss"><i>d</i><i>i</i></span>|) · (x<sub>j</sub> − x<sub>i</sub>)/d<sub>ij</sub> ) + T̂<sub>d</sub></span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">c = c<sub>max</sub> − l · (c<sub>max</sub> − c<sub>min</sub>) / L</span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">T̂<sub>d</sub></span>: vị trí tốt nhất tìm được (mục tiêu) ở chiều <span class="m">d</span>.</span><span class="en"><span class="m">T̂<sub>d</sub></span>: the best position found (target) in dimension <span class="m">d</span>.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">c</span> bên trong thu nhỏ vùng hút/đẩy theo thời gian; <span class="m">c</span> bên ngoài thu nhỏ vùng tìm kiếm quanh mục tiêu. Thường <span class="m">c<sub>max</sub> = 1, c<sub>min</sub> = 0.00004</span>.</span><span class="en">The inner <span class="m">c</span> shrinks the repulsion/attraction zones; the outer <span class="m">c</span> shrinks the search area around the target. Typically <span class="m">c<sub>max</sub> = 1, c<sub>min</sub> = 0.00004</span>.</span></li>
+          <li class="reveal d5"><span class="vi">Mỗi con châu chấu cộng lực từ <strong>mọi</strong> con khác, nên một vòng tốn <span class="m">O(n² · d)</span> phép tính.</span><span class="en">Each grasshopper sums forces from <strong>all</strong> others, so one iteration costs <span class="m">O(n² · d)</span>.</span></li>
+      </ul>
+    </div>
+    <p class="note reveal d6"><span class="vi">Trong mã nguồn gốc, khoảng cách được ánh xạ về đoạn [2, 4) bằng <span class="m">2 + rem(d<sub>ij</sub>, 2)</span> trước khi đưa vào <span class="m">s</span>; mô phỏng dưới đây làm đúng như vậy.</span><span class="en">In the original code, distances are mapped into [2, 4) by <span class="m">2 + rem(d<sub>ij</sub>, 2)</span> before entering <span class="m">s</span>; the simulation below does the same.</span></p>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của GOA</span><span class="en">GOA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Saremi, Mirjalili &amp; Lewis (2017), theo mã gốc.</span><span class="en">Saremi, Mirjalili &amp; Lewis (2017), following the original code.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> châu chấu; mục tiêu <span class="m">T̂</span> = lời giải tốt nhất.</span><span class="en">Initialize <span class="m">n</span> grasshoppers; target <span class="m">T̂</span> = best solution.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính <span class="m">c = c<sub>max</sub> − t(c<sub>max</sub> − c<sub>min</sub>)/T</span>.</span><span class="en">Compute <span class="m">c = c<sub>max</sub> − t(c<sub>max</sub> − c<sub>min</sub>)/T</span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Với mỗi châu chấu: cộng lực xã hội <span class="m">s(r)</span> từ mọi con khác, khoảng cách ánh xạ vào <span class="m">[1, 4)</span>.</span><span class="en">For each grasshopper: sum social forces <span class="m">s(r)</span> from all others, distances mapped into <span class="m">[1, 4)</span>.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Vị trí mới = <span class="m">c</span> × tổng lực + mục tiêu <span class="m">T̂</span>; kẹp biên.</span><span class="en">New position = <span class="m">c</span> × total force + target <span class="m">T̂</span>; clip to bounds.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật mục tiêu; lặp đến hết ngân sách.</span><span class="en">Update the target; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n châu chấu</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n grasshoppers</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Mục tiêu T̂ ←</text><text x="875" y="89">tốt nhất</text></g><g class="en"><text x="875" y="67">Target T̂ ←</text><text x="875" y="89">best</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Giảm c;</text><text x="875" y="259">tổng lực s(r)</text></g><g class="en"><text x="875" y="237">Decrease c;</text><text x="875" y="259">sum forces s(r)</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">x = c·lực + T̂;</text><text x="625" y="259">cập nhật T̂</text></g><g class="en"><text x="625" y="237">x = c·force + T̂;</text><text x="625" y="259">update T̂</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về T̂</text></g><g class="en"><text x="125" y="248">Return T̂</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của GOA</span><span class="en">GOA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">f, l</span></td><td><span class="vi">Cường độ hút và độ dài hút</span><span class="en">Attraction intensity and length scale</span></td><td>0.5, 1.5</td></tr>
+        <tr><td><span class="m">c<sub>max</sub>, c<sub>min</sub></span></td><td><span class="vi">Hệ số thu hẹp vùng thoải mái</span><span class="en">Comfort-zone shrinking coefficient</span></td><td>1, 4·10<sup>−5</sup></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Chi phí mỗi vòng là <span class="m">O(n² D)</span> vì phải tính lực giữa mọi cặp.</span><span class="en">Each iteration costs <span class="m">O(n² D)</span> because forces between all pairs are computed.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán GOA</span><span class="en">The GOA algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Tham số: <span class="m">n, L, c<sub>max</sub>, c<sub>min</sub>, f, l</span>; thường giữ <span class="m">f = 0.5, l = 1.5</span>.</span><span class="en">Parameters: <span class="m">n, L, c<sub>max</sub>, c<sub>min</sub>, f, l</span>; usually <span class="m">f = 0.5, l = 1.5</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">n</span> châu chấu; <span class="m">T̂</span> ← con tốt nhất</span><span class="en">Initialize <span class="m">n</span> grasshoppers; <span class="m">T̂</span> ← the best</span></li>
+        <li><span><span class="kw">for</span> <span class="m">l = 1 … L</span></span></li>
+        <li style="--ind:1"><span class="vi">Cập nhật <span class="m">c</span></span><span class="en">Update <span class="m">c</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi châu chấu</span><span class="en">each grasshopper</span> <span class="m">i</span></span></li>
+        <li style="--ind:2"><span class="vi">Chuẩn hóa khoảng cách; cộng lực xã hội từ mọi <span class="m">j ≠ i</span></span><span class="en">Normalize distances; sum social forces from every <span class="m">j ≠ i</span></span></li>
+        <li style="--ind:2"><span class="vi">Cập nhật <span class="m">X<sub>i</sub></span> theo công thức; kẹp trong miền</span><span class="en">Update <span class="m">X<sub>i</sub></span>; clamp to the bounds</span></li>
+        <li style="--ind:1"><span class="vi">Đánh giá; cập nhật <span class="m">T̂</span> nếu có con tốt hơn</span><span class="en">Evaluate; update <span class="m">T̂</span> if improved</span></li>
+        <li><span><span class="kw">return</span> <span class="m">T̂</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">20 con châu chấu trên cùng địa hình</span><span class="en">20 grasshoppers on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Lúc đầu <span class="m">c ≈ 1</span> nên bầy nhảy xa quanh mục tiêu; khi <span class="m">c</span> nhỏ dần, cả bầy co lại quanh mục tiêu (ô vuông cam).</span><span class="en">Early on <span class="m">c ≈ 1</span> and the swarm jumps widely around the target; as <span class="m">c</span> shrinks, the swarm contracts onto it (orange square).</span></p>
+        <p class="note"><span class="vi">Tham số: <span class="m">n = 20, L = 60, f = 0.5, l = 1.5</span>. Với cấu hình này, bầy co về một hố <strong>cục bộ</strong> phía dưới bên trái: đúng hạn chế nêu ở slide Đánh giá.</span><span class="en">Settings: <span class="m">n = 20, L = 60, f = 0.5, l = 1.5</span>. With this setup the swarm contracts onto a <strong>local</strong> basin at the lower left: exactly the limitation in the Assessment slide.</span></p>
+        <div class="key">
+          <span><i style="background:#4b8f45"></i><span class="vi">châu chấu</span><span class="en">grasshoppers</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">mục tiêu T̂</span><span class="en">target T̂</span></span>
+        </div>
+      </div>
+      <div class="field" id="goa-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đối chiếu tài liệu tham khảo" data-label-en="Checking the reference book">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ trong sách tham khảo</span><span class="en">Example from the reference book</span></p>
+      <h2 class="reveal d1"><span class="vi">Okwu &amp; Tartibu (2021), chương 10: hàm Bukin N.6</span><span class="en">Okwu &amp; Tartibu (2021), chapter 10: the Bukin N.6 function</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Nội dung</span><span class="en">Item</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Hàm mục tiêu</span><span class="en">Objective</span></td><td><span class="vi">100(y − 0.01x²) + 0.01|x + 10|</span><span class="en">100(y − 0.01x²) + 0.01|x + 10|</span></td><td><span class="vi">100√|y − 0.01x²| + 0.01|x + 10|: thiếu căn và trị tuyệt đối</span><span class="en">100√|y − 0.01x²| + 0.01|x + 10|: missing root and absolute value</span></td></tr>
+        <tr><td><span class="vi">Nghiệm tốt nhất</span><span class="en">Best solution</span></td><td><span class="vi">[10, 1], f = 0.2361</span><span class="en">[10, 1], f = 0.2361</span></td><td><span class="vi">Cực tiểu toàn cục ở (−10, 1) với f = 0; f(10, 1) = 0.2</span><span class="en">Global minimum at (−10, 1) with f = 0; f(10, 1) = 0.2</span></td></tr>
+        <tr><td><span class="vi">Người đề xuất</span><span class="en">Proposed by</span></td><td><span class="vi">“Mirjalili (2015)”</span><span class="en">“Mirjalili (2015)”</span></td><td><span class="vi">Saremi, Mirjalili &amp; Lewis (2017)</span><span class="en">Saremi, Mirjalili &amp; Lewis (2017)</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Hàm Bukin N.6 có một thung lũng hẹp dọc parabol <span class="m">y = 0.01x²</span>, rất khó cho mọi thuật toán; kết quả 0.2361 là chưa đạt tối ưu.</span><span class="en">Bukin N.6 has a narrow valley along <span class="m">y = 0.01x²</span> that is hard for every algorithm; 0.2361 is not optimal.</span></p>
+  </div>
+</section>
+
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Lực xã hội <span class="m">s(r)</span> đẩy hay hút?</span><span class="en">Is the social force <span class="m">s(r)</span> repulsive or attractive?</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">s(r) = f e<sup>−r/l</sup> − e<sup>−r</sup>, &nbsp; f = 0.5, l = 1.5</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">s(1) = 0.5 e<sup>−0.667</sup> − e<sup>−1</sup> = −0.111</span>: đẩy ra (quá gần).</span><span class="en"><span class="m">s(1) = 0.5 e<sup>−0.667</sup> − e<sup>−1</sup> = −0.111</span>: repulsion (too close).</span></li>
+          <li><span class="vi"><span class="m">s(3) = 0.5 e<sup>−2</sup> − e<sup>−3</sup> = 0.018</span>: hút vào (khá xa).</span><span class="en"><span class="m">s(3) = 0.5 e<sup>−2</sup> − e<sup>−3</sup> = 0.018</span>: attraction (fairly far).</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Vùng thoải mái</span><span class="en">Comfort zone</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">s(r) = 0</span> tại <span class="m">r ≈ 2.079</span>: không hút cũng không đẩy.</span><span class="en"><span class="m">s(r) = 0</span> at <span class="m">r ≈ 2.079</span>: neither attraction nor repulsion.</span></li>
+          <li><span class="vi">Vì khoảng cách được ánh xạ vào <span class="m">[1, 4)</span>, cả hai vùng đều luôn xuất hiện.</span><span class="en">Since distances are mapped into <span class="m">[1, 4)</span>, both regimes always appear.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của GOA</span><span class="en">GOA variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">MOGOA</span><span class="en">MOGOA</span></h3><p><span class="vi">Bản đa mục tiêu (Mirjalili và cs., 2018).</span><span class="en">Multi-objective version (Mirjalili et al., 2018).</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">GOA nhị phân</span><span class="en">Binary GOA</span></h3><p><span class="vi">Cho chọn đặc trưng.</span><span class="en">For feature selection.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">GOA + Lévy / hỗn loạn</span><span class="en">GOA + Lévy / chaos</span></h3><p><span class="vi">Tăng khám phá cho bài toán nhiều chiều.</span><span class="en">More exploration for high-dimensional problems.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">GOA lai</span><span class="en">Hybrid GOA</span></h3><p><span class="vi">Kết hợp với DE, PSO.</span><span class="en">Combined with DE, PSO.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của GOA</span><span class="en">GOA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán thường gặp với GOA.</span><span class="en">Problems commonly tackled with GOA.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Kết cấu</span><span class="en">Structures</span></h3><p><span class="vi">Thiết kế giàn và dầm.</span><span class="en">Truss and beam design.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Điều độ, ước lượng tham số pin mặt trời.</span><span class="en">Dispatch, solar-cell parameter estimation.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chỉnh SVM, chọn đặc trưng.</span><span class="en">SVM tuning, feature selection.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Bản rời rạc cho lập lịch tác vụ.</span><span class="en">Discrete versions for task scheduling.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GOA</span><span class="en">Experiment · GOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">1.01e−7</td><td class="num">6.46e−8</td><td class="num">8.73e−8</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.00e+2</td><td class="num">4.63e+2</td><td class="num">7.12e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">4.58e+1</td><td class="num">1.82e+1</td><td class="num">4.53e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">2.37e+0</td><td class="num">5.65e+0</td><td class="num">1.29e−4</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">2.83e−1</td><td class="num">1.32e−1</td><td class="num">2.71e−1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">8.82e−8</td><td class="num">6.17e−8</td><td class="num">7.29e−8</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">5.46e+1</td><td class="num">2.10e+1</td><td class="num">4.97e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>13.71</b>, đứng thứ <b>15/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>13.71</b>, position <b>15/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">GOA đứng gần cuối (13.71): lực xã hội <span class="m">O(n²)</span> tốn nhiều tính toán nhưng không cải thiện tìm kiếm trong ngân sách này.</span><span class="en">GOA ranks near the bottom (13.71): the <span class="m">O(n²)</span> social force is costly but does not improve search within this budget.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GOA</span><span class="en">Experiment · GOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/GOA.svg" alt="convergence GOA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/goa.py" class="c-sea">code/si/algorithms/goa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        c = cmax - t * (cmax - cmin) / T
+        diff = X[None, :, :] - X[:, None, :]                 <span class="c"># x_j - x_i</span>
+        dist = np.linalg.norm(diff, axis=2) + 1e-14
+        mapped = 2 + np.mod(dist, 2)
+        coef = s(mapped) / dist
+        np.fill_diagonal(coef, 0)
+        S = np.einsum(&<span class="c">#x27;ij,ijd-&gt;id&#x27;, coef, diff) * (c * half)</span>
+        X = prob.clip(c * S + target)
+        fx = prob(X)
+        <span class="k">if</span> prob.best_x is <span class="k">not</span> None:
+            target = prob.best_x.copy()
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Lực xã hội cho chuyển động tự nhiên, nhưng tốn kém</span><span class="en">Natural motion from social forces, but costly</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Vùng thoải mái giữ khoảng cách giữa các cá thể, giảm hiện tượng chồng lên nhau.</span><span class="en">The comfort zone keeps individuals apart and reduces crowding.</span></li>
+          <li><span class="vi">Hệ số <span class="m">c</span> giảm dần cho chuyển pha mượt từ khám phá sang khai thác.</span><span class="en">The decreasing <span class="m">c</span> gives a smooth switch from exploration to exploitation.</span></li>
+          <li><span class="vi">Ứng dụng: điều độ tải, thiết kế kết cấu, bố trí nút chuyển tiếp trong mạng cảm biến.</span><span class="en">Applications: load dispatch, structural design, relay-node placement in sensor networks.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Tổng lực <span class="m">O(n²)</span> mỗi vòng; chậm khi bầy lớn.</span><span class="en">The <span class="m">O(n²)</span> force sum per iteration is slow for large swarms.</span></li>
+          <li><span class="vi">Vị trí mới không phụ thuộc vị trí cũ trực tiếp mà luôn quy về <span class="m">T̂</span>; dễ kẹt nếu mục tiêu là cực trị cục bộ.</span><span class="en">New positions are always anchored on <span class="m">T̂</span> rather than the previous position; a local-optimum target traps the swarm.</span></li>
+          <li><span class="vi">Biến thể: GOA đa mục tiêu MOGOA (Mirjalili và cs., 2018), GOA nhị phân, GOA hỗn loạn.</span><span class="en">Variants: multi-objective MOGOA (Mirjalili et al., 2018), binary GOA, chaotic GOA.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">s(1), s(2.079), s(3)</span> với <span class="m">f = 0.5, l = 1.5</span>. Mỗi giá trị là đẩy hay hút?</span><span class="en">Compute <span class="m">s(1), s(2.079), s(3)</span> with <span class="m">f = 0.5, l = 1.5</span>. Repulsion or attraction?</span></li>
+          <li><span class="vi">Với <span class="m">c<sub>max</sub> = 1, c<sub>min</sub> = 0.00004, L = 100</span>, tính <span class="m">c</span> tại <span class="m">l = 50</span>.</span><span class="en">With <span class="m">c<sub>max</sub> = 1, c<sub>min</sub> = 0.00004, L = 100</span>, compute <span class="m">c</span> at <span class="m">l = 50</span>.</span></li>
+          <li><span class="vi">Vì sao cần chuẩn hóa khoảng cách trước khi tính <span class="m">s</span>?</span><span class="en">Why must distances be normalized before computing <span class="m">s</span>?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài GOA và vẽ quỹ đạo của con châu chấu đầu tiên như hình 10.8 trong sách.</span><span class="en">Implement GOA and plot the first grasshopper's trajectory as in the book's figure 10.8.</span></li>
+          <li><span class="vi">Chạy lại ví dụ Bukin N.6 với hàm đúng; báo cáo nghiệm và số lần đánh giá.</span><span class="en">Rerun the Bukin N.6 example with the correct function; report the solution and evaluation count.</span></li>
+          <li><span class="vi">Đo thời gian chạy khi <span class="m">n = 20, 50, 100</span> để thấy chi phí <span class="m">O(n²)</span>.</span><span class="en">Time runs with <span class="m">n = 20, 50, 100</span> to observe the <span class="m">O(n²)</span> cost.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Saremi, S. Mirjalili, and A. Lewis, “Grasshopper Optimisation Algorithm: Theory and application,” <em>Advances in Engineering Software</em>, vol. 105, pp. 30–47, 2017, doi: <a href="https://doi.org/10.1016/j.advengsoft.2017.01.004">10.1016/j.advengsoft.2017.01.004</a>.</li>
+        <li>S. Z. Mirjalili, S. Mirjalili, S. Saremi, H. Faris, and I. Aljarah, “Grasshopper optimization algorithm for multi-objective optimization problems,” <em>Appl Intell</em>, vol. 48, no. 4, pp. 805–820, 2018, doi: <a href="https://doi.org/10.1007/s10489-017-1019-8">10.1007/s10489-017-1019-8</a>.</li>
+        <li>S. Arora and S. Singh, “Butterfly optimization algorithm: a novel approach for global optimization,” <em>Soft Comput</em>, vol. 23, no. 3, pp. 715–734, 2019, doi: <a href="https://doi.org/10.1007/s00500-018-3102-4">10.1007/s00500-018-3102-4</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Đẩy ở gần, hút ở xa, thoải mái ở giữa</span><span class="en">Repel close, attract far, comfort between</span></span>
+      <span><span class="vi"><span class="m">c</span> giảm: bầy co về mục tiêu</span><span class="en">Shrinking <span class="m">c</span>: the swarm contracts on the target</span></span>
+      <span><span class="vi">Chi phí <span class="m">O(n²)</span> mỗi vòng</span><span class="en"><span class="m">O(n²)</span> cost per iteration</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Saremi, Mirjalili &amp; Lewis, <em>Advances in Engineering Software</em> 105, 2017</span><span class="en">Original paper: Saremi, Mirjalili &amp; Lewis, <em>Advances in Engineering Software</em> 105, 2017</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* Đồ thị s(r) (slide 3) */
+(function () {
+  const svg = document.getElementById('goa-s'), f = 0.5, l = 1.5, s = (r) => f * Math.exp(-r / l) - Math.exp(-r);
+  const X = (r) => 40 + r * 70, Y = (v) => 130 - v * 900;
+  let d = ''; for (let i = 0; i <= 300; i++) { const r = i / 60; d += `${i ? 'L' : 'M'}${X(r).toFixed(1)},${Math.max(10, Math.min(250, Y(s(r)))).toFixed(1)}`; }
+  svg.innerHTML = `<rect x="${X(0)}" y="10" width="${X(2.079) - X(0)}" height="240" fill="#f6d8cb" opacity="0.6"/><rect x="${X(2.079)}" y="10" width="${X(5) - X(2.079)}" height="240" fill="#d5e7e6" opacity="0.6"/>
+    <line x1="40" y1="130" x2="400" y2="130" stroke="#1c2a2e"/><line x1="40" y1="10" x2="40" y2="250" stroke="#1c2a2e"/>
+    <path class="draw" style="--len:900" d="${d}" fill="none" stroke="#1c2a2e" stroke-width="2.5"/>
+    <line x1="${X(2.079)}" y1="20" x2="${X(2.079)}" y2="240" stroke="#56676a" stroke-dasharray="4 4"/>
+    <g font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600"><text x="60" y="235" fill="#d9562f"><tspan class="vi">đẩy</tspan><tspan class="en">repulsion</tspan></text><text x="300" y="235" fill="#1f6f78"><tspan class="vi">hút</tspan><tspan class="en">attraction</tspan></text><text x="${X(2.079) + 6}" y="30" fill="#56676a">2.079</text></g>
+    <g font-family="STIX Two Text, serif" font-style="italic" font-size="16" fill="#1c2a2e"><text x="390" y="150">r</text><text x="48" y="24">s(r)</text></g>`;
+})();
+/* GOA trên địa hình chung (cực tiểu), theo mã nguồn gốc của Saremi và cs. (2017) */
+new SI.Field2D(document.getElementById('goa-field'), {
+  n: 20, T: 60, seed: 12, cMax: 1, cMin: 0.00004,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) }); S.c = this.cMax; },
+  step(S) {
+    const sf = (r) => 0.5 * Math.exp(-r / 1.5) - Math.exp(-r);
+    S.c = this.cMax - S.t * ((this.cMax - this.cMin) / S.T);
+    const old = S.pop.map((g) => g.x.slice()), half = (SI.HI - SI.LO) / 2, T = S.best.slice();
+    S.pop.forEach((g, i) => {
+      const tot = [0, 0];
+      old.forEach((xj, j) => {
+        if (j === i) return;
+        const dist = Math.hypot(xj[0] - old[i][0], xj[1] - old[i][1]) || 1e-12;
+        const rv = [(xj[0] - old[i][0]) / dist, (xj[1] - old[i][1]) / dist], xjxi = 2 + (dist % 2);
+        for (let d = 0; d < 2; d++) tot[d] += half * S.c * sf(xjxi) * rv[d];
+      });
+      g.x = [0, 1].map((d) => SI.clamp(S.c * tot[d] + T[d]));
+    });
+  },
+  draw(g, S, P) {
+    for (const h of S.pop) SI.trail(g, P, h, 'rgba(75,143,69,0.35)');
+    for (const h of S.pop) { const [x, y] = P.at(h); SI.dot(g, x, y, 4.2, '#4b8f45'); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return `<span><b>c</b> = ${S.c.toFixed(3)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

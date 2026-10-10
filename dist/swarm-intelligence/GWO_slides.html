@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bầy sói xám (GWO)" data-title-en="Grey Wolf Optimizer (GWO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy sói xám (GWO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<!-- 1. TITLE -->
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 9 · Trí tuệ bầy đàn</span><span class="en">Chapter 9 · Swarm Intelligence</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy sói xám</span><span class="en">Grey Wolf Optimizer</span><span class="sub"><span class="vi">Grey Wolf Optimizer — GWO</span><span class="en">GWO — hunting as a pack led by three wolves</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<!-- MỤC TIÊU BÀI HỌC -->
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+          <li class="reveal d2"><span class="vi">Mô tả thứ bậc <span class="m">α, β, δ, ω</span> và ba giai đoạn săn mồi.</span><span class="en">Describe the <span class="m">α, β, δ, ω</span> hierarchy and the three hunting phases.</span></li>
+          <li class="reveal d3"><span class="vi">Viết công thức vây bắt với <span class="m">A</span> và <span class="m">C</span>.</span><span class="en">Write the encircling equations with <span class="m">A</span> and <span class="m">C</span>.</span></li>
+          <li class="reveal d4"><span class="vi">Giải thích cập nhật vị trí theo trung bình ba con dẫn đầu.</span><span class="en">Explain the position update as the mean of three leaders.</span></li>
+          <li class="reveal d5"><span class="vi">Nhận diện điểm yếu: hội tụ sớm và thiên lệch gốc tọa độ.</span><span class="en">Recognize the weak spots: premature convergence and origin bias.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 2. INSPIRATION -->
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+          <h2 class="reveal d1"><span class="vi">Một đàn sói có thứ bậc rõ ràng</span><span class="en">A wolf pack with a strict pecking order</span></h2>
+        </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Mirjalili, Mirjalili và Lewis</strong> đề xuất năm 2014.</span><span class="en">Proposed by <strong>Mirjalili, Mirjalili and Lewis</strong> in 2014.</span></li>
+          <li class="reveal d3"><span class="vi">Sói xám sống thành đàn khoảng 5 – 12 con, phân cấp nghiêm ngặt từ con đầu đàn xuống con thấp nhất.</span><span class="en">Grey wolves live in packs of about 5 – 12, with a strict hierarchy from the leader down.</span></li>
+          <li class="reveal d4"><span class="vi">Cuộc săn có ba giai đoạn: <strong>lần theo</strong> con mồi, <strong>vây quanh</strong> để quấy rối, rồi <strong>tấn công</strong>.</span><span class="en">A hunt has three phases: <strong>track</strong> the prey, <strong>encircle</strong> and harass it, then <strong>attack</strong>.</span></li>
+          <li class="reveal d5"><span class="vi">GWO mô phỏng cả thứ bậc lẫn cách săn để tìm lời giải tối ưu.</span><span class="en">GWO models both the hierarchy and the hunt to search for an optimum.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 420 330" role="img" aria-label="Kim tự tháp thứ bậc alpha, beta, delta, omega">
+          <g font-family="STIX Two Text, serif" font-style="italic" text-anchor="middle">
+            <path d="M210,20 L270,95 L150,95 Z" fill="#d9562f"/><text x="210" y="82" font-size="30" fill="#fff">α</text>
+            <path d="M148,100 L272,100 L320,165 L100,165 Z" fill="#e6904f"/><text x="210" y="145" font-size="30" fill="#fff">β</text>
+            <path d="M97,170 L323,170 L370,235 L50,235 Z" fill="#4b8f45"/><text x="210" y="215" font-size="30" fill="#fff">δ</text>
+            <path d="M47,240 L373,240 L418,305 L2,305 Z" fill="#8a9a9c"/><text x="210" y="285" font-size="30" fill="#fff">ω</text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Bốn tầng thứ bậc trong đàn sói xám</span><span class="en">The four ranks of a grey wolf pack</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 3. CORE IDEA -->
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Không ai biết chính xác con mồi ở đâu. Nhưng <span class="hl c-soc">ba con sói giỏi nhất</span> đoán tốt hơn cả, nên mỗi con còn lại di chuyển về <span class="hl c-sea">trung bình ba lời đoán</span> đó.</span><span class="en">Nobody knows exactly where the prey is. But the <span class="hl c-soc">three best wolves</span> guess better than the rest, so every other wolf moves toward the <span class="hl c-sea">average of those three guesses</span>.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #d9562f"><b style="color:#d9562f">α · alpha</b><span><span class="vi">lời giải tốt nhất hiện có</span><span class="en">the best solution so far</span></span></div>
+      <div class="force reveal d4" style="border-color: #e6904f"><b style="color:#c56a2a">β · beta</b><span><span class="vi">lời giải tốt thứ hai</span><span class="en">the second-best solution</span></span></div>
+      <div class="force reveal d5" style="border-color: #4b8f45"><b class="c-cog">δ · delta</b><span><span class="vi">lời giải tốt thứ ba</span><span class="en">the third-best solution</span></span></div>
+    </div>
+    <p class="note reveal d6"><span class="vi">Những con còn lại là <em>ω (omega)</em>: chúng không dẫn dắt, chỉ đi theo α, β, δ.</span><span class="en">All other wolves are <em>ω (omega)</em>: they do not lead, they follow α, β and δ.</span></p>
+  </div>
+</section>
+
+<!-- 4. ENCIRCLING -->
+<section class="slide" aria-label="Vây bắt con mồi" data-label-en="Encircling the prey">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Vây bắt: tiến lại gần con mồi một khoảng ngẫu nhiên</span><span class="en">Encircling: close in on the prey by a random amount</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">D = | C · X<sub>p</sub>(t) − X(t) |</span></div>
+          <div class="eq" style="margin-top:0.35em"><span class="m">X(t+1) = X<sub>p</sub>(t) − A · D</span></div>
+        </div>
+        <div class="eq-box sand reveal d3">
+          <div class="eq"><span class="m">A = 2a · r<sub>1</sub> − a, &nbsp;&nbsp; C = 2 · r<sub>2</sub></span></div>
+        </div>
+      </div>
+      <ul class="bullets">
+        <li class="reveal d3"><span class="m">X<sub>p</sub></span><span class="vi">: vị trí con mồi; </span><span class="en">: prey position; </span><span class="m">X</span><span class="vi">: vị trí con sói.</span><span class="en">: wolf position.</span></li>
+        <li class="reveal d4"><span class="m">r<sub>1</sub>, r<sub>2</sub> ~ U(0, 1)</span><span class="vi">, rút lại cho từng chiều.</span><span class="en">, redrawn for every dimension.</span></li>
+        <li class="reveal d4"><span class="m">a</span><span class="vi"> giảm tuyến tính từ 2 về 0 theo số vòng lặp, nên </span><span class="en"> decreases linearly from 2 to 0 over the iterations, so </span><span class="m">A ∈ [−a, a]</span><span class="vi"> co dần.</span><span class="en"> shrinks.</span></li>
+        <li class="reveal d5"><span class="m">C ∈ [0, 2]</span><span class="vi"> phóng to hoặc thu nhỏ ảnh hưởng của con mồi, mô phỏng chướng ngại vật trên đường săn.</span><span class="en"> randomly amplifies or damps the prey's influence, mimicking obstacles on the way.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5. HUNTING -->
+<section class="slide" aria-label="Săn mồi theo ba con dẫn đầu" data-label-en="Hunting guided by three leaders">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Săn mồi: lấy trung bình ba lời đoán</span><span class="en">Hunting: average three guesses</span></h2>
+    </header>
+    <div class="cols">
+      <div class="stack">
+        <p class="reveal d2"><span class="vi">Vị trí con mồi không biết trước, nên GWO dùng α, β, δ làm ba ước lượng của nó:</span><span class="en">The prey's position is unknown, so GWO uses α, β and δ as three estimates of it:</span></p>
+        <div class="eq-box reveal d2">
+          <div class="eq"><span class="m">D<sub>α</sub> = |C<sub>1</sub>X<sub>α</sub> − X|, &nbsp; D<sub>β</sub> = |C<sub>2</sub>X<sub>β</sub> − X|, &nbsp; D<sub>δ</sub> = |C<sub>3</sub>X<sub>δ</sub> − X|</span></div>
+          <div class="eq" style="margin-top:0.35em"><span class="m">X<sub>1</sub> = X<sub>α</sub> − A<sub>1</sub>D<sub>α</sub>, &nbsp; X<sub>2</sub> = X<sub>β</sub> − A<sub>2</sub>D<sub>β</sub>, &nbsp; X<sub>3</sub> = X<sub>δ</sub> − A<sub>3</sub>D<sub>δ</sub></span></div>
+        </div>
+        <div class="eq-box sand reveal d3"><div class="eq"><span class="m">X(t+1) = (X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>) / 3</span></div></div>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 400 300" role="img" aria-label="Ba con dẫn đầu cho ba vị trí ước lượng, vị trí mới là trọng tâm">
+          <g stroke-dasharray="4 5" stroke-width="1.3" opacity="0.7">
+            <line x1="70" y1="250" x2="230" y2="80" stroke="#d9562f"/>
+            <line x1="70" y1="250" x2="320" y2="160" stroke="#c56a2a"/>
+            <line x1="70" y1="250" x2="200" y2="200" stroke="#4b8f45"/>
+          </g>
+          <circle cx="250" cy="70" r="14" fill="#d9562f"/><circle cx="335" cy="170" r="14" fill="#e6904f"/><circle cx="205" cy="225" r="14" fill="#4b8f45"/>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="18" fill="#fff" text-anchor="middle"><text x="250" y="76">α</text><text x="335" y="176">β</text><text x="205" y="231">δ</text></g>
+          <g fill="none" stroke-width="2"><circle cx="228" cy="96" r="7" stroke="#d9562f"/><circle cx="305" cy="160" r="7" stroke="#c56a2a"/><circle cx="196" cy="196" r="7" stroke="#4b8f45"/></g>
+          <path class="draw d3" style="--len:220" d="M243,150 L228,96 M243,150 L305,160 M243,150 L196,196" stroke="#56676a" stroke-width="1.2" fill="none"/>
+          <circle cx="243" cy="150" r="9" fill="#1c2a2e"/>
+          <circle cx="70" cy="250" r="9" fill="#8a9a9c" stroke="#1c2a2e"/>
+          <path class="draw d2" style="--len:200" d="M78,244 L234,155" stroke="#1c2a2e" stroke-width="2.5" fill="none"/>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="16" fill="#1c2a2e"><text x="215" y="110">X<tspan font-size="11" dy="4">1</tspan></text><text x="312" y="150">X<tspan font-size="11" dy="4">2</tspan></text><text x="170" y="196">X<tspan font-size="11" dy="4">3</tspan></text><text x="38" y="275">X(t)</text><text x="252" y="140">X(t+1)</text></g>
+        </svg>
+        <figcaption><span class="vi">Con sói ω đến trọng tâm của ba vị trí ước lượng</span><span class="en">The ω wolf moves to the centroid of the three estimates</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- 6. EXPLORATION VS EXPLOITATION -->
+<section class="slide" aria-label="Khám phá và khai thác" data-label-en="Exploration and exploitation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Khám phá và khai thác</span><span class="en">Exploration vs exploitation</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số <span class="m">a</span> quyết định đàn đang tản ra hay khép lại</span><span class="en">The parameter <span class="m">a</span> decides whether the pack spreads out or closes in</span></h2>
+    </header>
+    <div class="cols">
+      <figure class="fig reveal d2">
+        <svg viewBox="0 0 440 250" role="img" aria-label="a giảm từ 2 về 0; vùng A từ âm a đến a co lại theo thời gian">
+          <path d="M50,40 L410,130 L50,220 Z" fill="#d5e7e6"/>
+          <line x1="50" y1="130" x2="420" y2="130" stroke="#1c2a2e" stroke-width="1.3"/>
+          <line x1="50" y1="20" x2="50" y2="235" stroke="#1c2a2e" stroke-width="1.3"/>
+          <line x1="50" y1="85" x2="420" y2="85" stroke="#d9562f" stroke-dasharray="4 4"/><line x1="50" y1="175" x2="420" y2="175" stroke="#d9562f" stroke-dasharray="4 4"/>
+          <path class="draw" style="--len:380" d="M50,40 L410,130" stroke="#1f6f78" stroke-width="3" fill="none"/>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="16" fill="#1c2a2e">
+            <text x="20" y="45">2</text><text x="20" y="90">1</text><text x="20" y="135">0</text><text x="12" y="180">−1</text><text x="12" y="225">−2</text>
+            <text x="405" y="150">t</text><text x="120" y="52" fill="#1f6f78">a</text>
+          </g>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600">
+            <text x="60" y="122" fill="#d9562f"><tspan class="vi">|A| &gt; 1: tản ra</tspan><tspan class="en">|A| &gt; 1: diverge</tspan></text>
+            <text x="250" y="122" fill="#1f6f78"><tspan class="vi">|A| &lt; 1: tấn công</tspan><tspan class="en">|A| &lt; 1: attack</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Vùng xanh: miền giá trị có thể của A</span><span class="en">Shaded: the possible range of A</span></figcaption>
+      </figure>
+      <ul class="bullets">
+        <li class="reveal d3"><span class="vi"><strong>|A| &gt; 1</strong>: sói bị đẩy ra xa con mồi, đi tìm vùng mới. Đây là pha <strong>khám phá</strong>.</span><span class="en"><strong>|A| &gt; 1</strong>: wolves are pushed away from the prey to look elsewhere. This is <strong>exploration</strong>.</span></li>
+        <li class="reveal d4"><span class="vi"><strong>|A| &lt; 1</strong>: sói lao vào con mồi. Đây là pha <strong>khai thác</strong>.</span><span class="en"><strong>|A| &lt; 1</strong>: wolves charge the prey. This is <strong>exploitation</strong>.</span></li>
+        <li class="reveal d5"><span class="vi">Nửa đầu quá trình còn có cơ hội tản ra; nửa sau gần như chỉ khép vòng vây. Riêng <span class="m">C</span> vẫn ngẫu nhiên đến cuối, giữ lại chút đa dạng.</span><span class="en">In the first half wolves can still spread out; in the second half they mostly tighten the circle. Only <span class="m">C</span> stays random to the end, keeping some diversity.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 7. PSEUDOCODE -->
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của GWO</span><span class="en">GWO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Mirjalili, Mirjalili &amp; Lewis (2014); <span class="m">a</span> giảm tuyến tính 2 → 0.</span><span class="en">Mirjalili, Mirjalili &amp; Lewis (2014); <span class="m">a</span> decreases linearly 2 → 0.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> sói; chọn <span class="m">α, β, δ</span> là ba sói tốt nhất.</span><span class="en">Initialize <span class="m">n</span> wolves; pick <span class="m">α, β, δ</span> as the three best.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính <span class="m">a = 2 − 2t/T</span>; với mỗi sói tạo <span class="m">A = 2ar<sub>1</sub> − a, C = 2r<sub>2</sub></span>.</span><span class="en">Compute <span class="m">a = 2 − 2t/T</span>; for each wolf draw <span class="m">A = 2ar<sub>1</sub> − a, C = 2r<sub>2</sub></span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Tính <span class="m">X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub></span> theo <span class="m">α, β, δ</span>.</span><span class="en">Compute <span class="m">X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub></span> from <span class="m">α, β, δ</span>.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Vị trí mới <span class="m">X = (X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>)/3</span>; đánh giá.</span><span class="en">New position <span class="m">X = (X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>)/3</span>; evaluate.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật <span class="m">α, β, δ</span>; lặp đến hết ngân sách.</span><span class="en">Update <span class="m">α, β, δ</span>; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n sói</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n wolves</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Chọn</text><text x="875" y="89">α, β, δ</text></g><g class="en"><text x="875" y="67">Pick</text><text x="875" y="89">α, β, δ</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Giảm a; X = TB</text><text x="875" y="259">của X1, X2, X3</text></g><g class="en"><text x="875" y="237">Decrease a; X = mean</text><text x="875" y="259">of X1, X2, X3</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Đánh giá;</text><text x="625" y="259">cập nhật α, β, δ</text></g><g class="en"><text x="625" y="237">Evaluate;</text><text x="625" y="259">update α, β, δ</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về α</text></g><g class="en"><text x="125" y="248">Return α</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của GWO</span><span class="en">GWO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">a</span></td><td><span class="vi">Điều khiển khám phá/khai thác</span><span class="en">Controls exploration/exploitation</span></td><td>2 → 0 tuyến tính</td></tr>
+        <tr><td><span class="m">A</span></td><td><span class="vi"><span class="m">|A| &gt; 1</span> khám phá, <span class="m">|A| &lt; 1</span> khai thác</span><span class="en"><span class="m">|A| &gt; 1</span> explore, <span class="m">|A| &lt; 1</span> exploit</span></td><td><span class="m">2ar<sub>1</sub> − a</span></td></tr>
+        <tr><td><span class="m">C</span></td><td><span class="vi">Trọng số ngẫu nhiên cho con mồi</span><span class="en">Random weight on the prey</span></td><td><span class="m">2r<sub>2</sub> ∈ [0, 2]</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">GWO không có tham số cần chỉnh ngoài <span class="m">n</span> và <span class="m">T</span>.</span><span class="en">GWO has no parameters to tune besides <span class="m">n</span> and <span class="m">T</span>.</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán GWO</span><span class="en">The GWO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Chỉ có hai tham số người dùng phải chọn: số con sói <span class="m">n</span> và số vòng lặp <span class="m">T</span>.</span><span class="en">Only two settings are left to the user: the number of wolves <span class="m">n</span> and the number of iterations <span class="m">T</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo ngẫu nhiên <span class="m">n</span> con sói <span class="m">X<sub>i</sub></span></span><span class="en">Randomly initialize <span class="m">n</span> wolves <span class="m">X<sub>i</sub></span></span></li>
+        <li><span class="vi">Đánh giá; chọn <span class="m">X<sub>α</sub>, X<sub>β</sub>, X<sub>δ</sub></span> là ba con tốt nhất</span><span class="en">Evaluate; pick the three best as <span class="m">X<sub>α</sub>, X<sub>β</sub>, X<sub>δ</sub></span></span></li>
+        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span></li>
+        <li style="--ind:1"><span class="m">a = 2 − 2t / T</span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi con sói</span><span class="en">each wolf</span> <span class="m">i</span></span></li>
+        <li style="--ind:2"><span class="vi">Tính <span class="m">X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub></span> theo α, β, δ</span><span class="en">Compute <span class="m">X<sub>1</sub>, X<sub>2</sub>, X<sub>3</sub></span> from α, β, δ</span></li>
+        <li style="--ind:2"><span class="m">X<sub>i</sub> ← (X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>) / 3</span><span class="vi">, kẹp trong miền tìm kiếm</span><span class="en">, clamped to the bounds</span></li>
+        <li style="--ind:1"><span class="vi">Đánh giá lại, cập nhật α, β, δ</span><span class="en">Re-evaluate, update α, β, δ</span></li>
+        <li><span><span class="kw">return</span> <span class="m">X<sub>α</sub></span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 8. DEMO -->
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 con sói trên một địa hình nhiều hố</span><span class="en">12 wolves on a landscape with several basins</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Bài toán <strong>cực tiểu</strong>: vùng càng đậm càng tốt. Dấu <strong>+</strong> trắng là cực tiểu toàn cục; bốn hố nhạt hơn là cực tiểu cục bộ.</span><span class="en">A <strong>minimization</strong> problem: darker is better. The white <strong>+</strong> marks the global minimum; the four lighter basins are local minima.</span></p>
+        <div class="key">
+          <span><i style="background:#d9562f"></i>α</span><span><i style="background:#e6904f"></i>β</span><span><i style="background:#4b8f45"></i>δ</span><span><i style="background:#f5f0e6"></i>ω</span>
+        </div>
+        <p class="note"><span class="vi">Để ý: lúc đầu đàn còn tản rộng, về sau <span class="m">a</span> nhỏ dần và cả đàn khép quanh α.</span><span class="en">Watch how the pack starts wide, then tightens around α as <span class="m">a</span> shrinks.</span></p>
+      </div>
+      <div class="field" id="gwo-field">
+        <canvas aria-label="GWO simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 9. VARIANTS & APPLICATIONS -->
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GWO</span><span class="en">Experiment · GWO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">6.59e+0</td><td class="num">6.65e−1</td><td class="num">6.29e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">3.25e−2</td><td class="num">3.03e−2</td><td class="num">2.28e−2</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">4.34e+1</td><td class="num">1.15e+2</td><td class="num">6.55e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">1.31e+1</td><td class="num">5.18e+0</td><td class="num">1.20e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>7.00</b>, đứng thứ <b>6/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>7.00</b>, position <b>6/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Thiên lệch gốc tọa độ: trung vị F1 = 0 nhưng F6 (cùng hàm, dịch tâm) = 6.55e+0. Kết quả tốt trên F1 phần lớn do tối ưu nằm tại 0.</span><span class="en">Origin bias: median F1 = 0 but F6 (same function, shifted) = 6.55e+0. The good F1 result is largely due to the optimum lying at 0.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GWO</span><span class="en">Experiment · GWO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/GWO.svg" alt="convergence GWO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/gwo.py" class="c-sea">code/si/algorithms/gwo.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        a = 2 - 2 * t / T
+        acc = np.zeros_like(X)
+        <span class="k">for</span> k <span class="k">in</span> range(3):
+            A = 2 * a * rng.random(X.shape) - a
+            C = 2 * rng.random(X.shape)
+            acc += lead[k] - A * np.abs(C * lead[k] - X)
+        X = prob.clip(acc / 3)
+        rank(X, prob(X))
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Biến thể và ứng dụng" data-label-en="Variants and applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Biến thể và ứng dụng</span><span class="en">Variants and applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Một thuật toán gọn, nên được mở rộng rất nhiều</span><span class="en">A compact algorithm, extended in many directions</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><h3>Binary GWO</h3><p><span class="vi">Chuyển vị trí liên tục thành bit qua hàm sigmoid, dùng cho bài toán chọn đặc trưng.</span><span class="en">Maps continuous positions to bits through a sigmoid, used for feature selection.</span></p></div>
+      <div class="card reveal d3"><h3>MOGWO</h3><p><span class="vi">Phiên bản đa mục tiêu, giữ một kho lưu trữ các lời giải Pareto.</span><span class="en">Multi-objective version that keeps an archive of Pareto solutions.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Lịch giảm <span class="m">a</span> khác</span><span class="en">Other schedules for <span class="m">a</span></span></h3><p><span class="vi">Thay đường giảm tuyến tính bằng đường phi tuyến để cân bằng lại khám phá và khai thác.</span><span class="en">Replace the linear decay with a nonlinear curve to rebalance exploration and exploitation.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Ứng dụng</span><span class="en">Applications</span></h3><p><span class="vi">Thiết kế kỹ thuật, điều độ hệ thống điện, huấn luyện mạng nơ-ron, chọn đặc trưng.</span><span class="en">Engineering design, power dispatch, neural network training, feature selection.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10. STRENGTHS & LIMITATIONS -->
+<section class="slide" aria-label="Ưu và nhược điểm" data-label-en="Strengths and limitations">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Dễ dùng, nhưng cần biết điểm yếu</span><span class="en">Easy to use, but know its weak spots</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Rất ít tham số, cài đặt chỉ vài chục dòng.</span><span class="en">Very few parameters; a few dozen lines to implement.</span></li>
+          <li><span class="vi">Ba con dẫn đầu chia sẻ thông tin, ít phụ thuộc vào một điểm duy nhất.</span><span class="en">Three leaders share information, so the search depends less on a single point.</span></li>
+          <li><span class="vi">Hội tụ nhanh trên nhiều hàm thử nghiệm đơn mốt.</span><span class="en">Converges quickly on many unimodal benchmarks.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế</span><span class="en">Limitations</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Dễ hội tụ sớm trên hàm nhiều cực trị, vì cả đàn cùng bám α, β, δ.</span><span class="en">Prone to premature convergence on multimodal functions, since the whole pack follows α, β, δ.</span></li>
+          <li><span class="vi">Có xu hướng kéo về gốc tọa độ; kết quả trên hàm có tối ưu tại 0 có thể bị đánh giá quá cao (Niu và cs., 2019).</span><span class="en">Biased toward the origin, which can inflate results on functions whose optimum is at 0 (Niu et al., 2019).</span></li>
+          <li><span class="vi">Lịch giảm <span class="m">a</span> cố định không thích nghi theo bài toán.</span><span class="en">The fixed schedule for <span class="m">a</span> does not adapt to the problem.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- VÍ DỤ TÍNH TAY (dựa trên Okwu & Tartibu, 2021) -->
+<section class="slide" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · hàm <span class="m">f = (x<sub>1</sub> − 5)² + (x<sub>2</sub> − 2)²</span></span><span class="en">Worked example · <span class="m">f = (x<sub>1</sub> − 5)² + (x<sub>2</sub> − 2)²</span></span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước GWO cho con sói 1 tại (6.16, 4.41), <span class="m">a = 1.333</span></span><span class="en">One GWO step for wolf 1 at (6.16, 4.41), <span class="m">a = 1.333</span></span></h2>
+    </header>
+    <div class="reveal d2" style="font-size:0.9em">
+      <table class="mini-table gwo-ex"><thead><tr><th></th><th><span class="vi">Vị trí</span><span class="en">Position</span></th><th><span class="m">A = 2a·r<sub>1</sub> − a</span></th><th><span class="m">C = 2r<sub>2</sub></span></th><th><span class="m">D = |C·X<sub>lead</sub> − X|</span></th><th><span class="m">X<sub>k</sub> = X<sub>lead</sub> − A·D</span></th></tr></thead><tbody>
+<tr><td>α</td><td>(4.73, 3.30)</td><td><span class="m">(−0.800, 0.267)</span></td><td><span class="m">(1.0, 1.0)</span></td><td><span class="m">(1.430, 1.110)</span></td><td><span class="m">(5.874, 3.004)</span></td></tr>
+<tr><td>β</td><td>(4.81, 3.49)</td><td><span class="m">(−0.267, 0.800)</span></td><td><span class="m">(0.6, 1.8)</span></td><td><span class="m">(3.274, 1.872)</span></td><td><span class="m">(5.683, 1.992)</span></td></tr>
+<tr><td>δ</td><td>(5.94, 3.44)</td><td><span class="m">(0.533, −0.533)</span></td><td><span class="m">(1.2, 0.4)</span></td><td><span class="m">(0.968, 3.034)</span></td><td><span class="m">(5.424, 5.058)</span></td></tr>
+</tbody></table>
+    </div>
+    <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+      <li><span class="vi">12 con sói ban đầu như trong sách; ba con tốt nhất là sói 10, 11, 12 với <span class="m">f = 1.763, 2.256, 2.957</span>.</span><span class="en">12 initial wolves as in the book; the three best are wolves 10, 11, 12 with <span class="m">f = 1.763, 2.256, 2.957</span>.</span></li>
+      <li><span class="vi">Chọn <span class="m">r<sub>1</sub> = (0.2, 0.6), (0.4, 0.8), (0.7, 0.3)</span> và <span class="m">r<sub>2</sub> = (0.5, 0.5), (0.3, 0.9), (0.6, 0.2)</span> cho α, β, δ để ai cũng tính lại được.</span><span class="en">Fix <span class="m">r<sub>1</sub> = (0.2, 0.6), (0.4, 0.8), (0.7, 0.3)</span> and <span class="m">r<sub>2</sub> = (0.5, 0.5), (0.3, 0.9), (0.6, 0.2)</span> for α, β, δ so anyone can recompute.</span></li>
+      <li><span class="vi">Vị trí mới <span class="m">(X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>)/3 = (5.660, 3.352)</span>: <span class="m">f</span> giảm từ <span class="m">7.154</span> xuống <span class="m">2.263</span>. Cực tiểu ở (5, 2).</span><span class="en">New position <span class="m">(X<sub>1</sub> + X<sub>2</sub> + X<sub>3</sub>)/3 = (5.660, 3.352)</span>: <span class="m">f</span> drops from <span class="m">7.154</span> to <span class="m">2.263</span>. The minimum is at (5, 2).</span></li>
+    </ul>
+    <p class="note reveal d4"><span class="vi">Đối chiếu sách: sách không cho giá trị <span class="m">r<sub>1</sub>, r<sub>2</sub></span> nên không thể kiểm lại vị trí (4.04, 2.60); dấu |·| bị đặt bao cả biểu thức <span class="m">X<sub>k</sub></span>, và vị trí con đầu đàn chép không khớp (4.73 so với 4.7372).</span><span class="en">Checked against the book: it gives no <span class="m">r<sub>1</sub>, r<sub>2</sub></span>, so its position (4.04, 2.60) cannot be verified; the |·| wraps the whole <span class="m">X<sub>k</sub></span> expression, and the leader positions are copied inconsistently (4.73 vs 4.7372).</span></p>
+  </div>
+</section>
+
+<!-- BÀI TẬP VÀ THỰC HÀNH -->
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Một chiều: <span class="m">X<sub>α</sub> = 2, X = 0, a = 1, r<sub>1</sub> = 0.75, r<sub>2</sub> = 0.5</span>. Tính <span class="m">A, C, D<sub>α</sub>, X<sub>1</sub></span>.</span><span class="en">One dimension: <span class="m">X<sub>α</sub> = 2, X = 0, a = 1, r<sub>1</sub> = 0.75, r<sub>2</sub> = 0.5</span>. Compute <span class="m">A, C, D<sub>α</sub>, X<sub>1</sub></span>.</span></li>
+          <li><span class="vi">Nếu giữ <span class="m">a = 2</span> suốt quá trình thì sao? Nếu <span class="m">a = 0</span>?</span><span class="en">What if <span class="m">a = 2</span> throughout? And <span class="m">a = 0</span>?</span></li>
+          <li><span class="vi">Đề xuất một thí nghiệm để phát hiện thiên lệch gốc tọa độ.</span><span class="en">Design an experiment that reveals origin bias.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài GWO; chạy trên Sphere chuẩn và Sphere dịch tâm, so sánh kết quả.</span><span class="en">Implement GWO; run it on the standard and on a shifted Sphere, compare.</span></li>
+          <li><span class="vi">Thử lịch giảm <span class="m">a</span> phi tuyến và đo ảnh hưởng.</span><span class="en">Try a nonlinear schedule for <span class="m">a</span> and measure the effect.</span></li>
+          <li><span class="vi">Cài Binary GWO cho chọn đặc trưng trên một bộ dữ liệu UCI.</span><span class="en">Implement Binary GWO for feature selection on a UCI dataset.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11. CLOSING -->
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Mirjalili, S. M. Mirjalili, and A. Lewis, “Grey Wolf Optimizer,” <em>Advances in Engineering Software</em>, vol. 69, pp. 46–61, 2014, doi: <a href="https://doi.org/10.1016/j.advengsoft.2013.12.007">10.1016/j.advengsoft.2013.12.007</a>.</li>
+        <li>S. Mirjalili, S. Saremi, S. M. Mirjalili, and L. d. S. Coelho, “Multi-objective grey wolf optimizer: A novel algorithm for multi-criterion optimization,” <em>Expert Systems with Applications</em>, vol. 47, pp. 106–119, 2016, doi: <a href="https://doi.org/10.1016/j.eswa.2015.10.039">10.1016/j.eswa.2015.10.039</a>.</li>
+        <li>E. Emary, H. M. Zawbaa, and A. E. Hassanien, “Binary grey wolf optimization approaches for feature selection,” <em>Neurocomputing</em>, vol. 172, pp. 371–381, 2016, doi: <a href="https://doi.org/10.1016/j.neucom.2015.06.083">10.1016/j.neucom.2015.06.083</a>.</li>
+        <li>P. Niu, S. Niu, N. liu, and L. Chang, “The defect of the Grey Wolf optimization algorithm and its verification method,” <em>Knowledge-Based Systems</em>, vol. 171, pp. 37–43, 2019, doi: <a href="https://doi.org/10.1016/j.knosys.2019.01.018">10.1016/j.knosys.2019.01.018</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Thứ bậc α · β · δ · ω</span><span class="en">Hierarchy α · β · δ · ω</span></span>
+      <span><span class="vi">Vị trí mới = trung bình ba ước lượng</span><span class="en">New position = mean of three estimates</span></span>
+      <span><span class="vi"><span class="m">a</span>: 2 → 0, từ khám phá sang khai thác</span><span class="en"><span class="m">a</span>: 2 → 0, from exploration to exploitation</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili và cs., <em>Advances in Engineering Software</em> 69, 2014</span><span class="en">Original paper: Mirjalili et al., <em>Advances in Engineering Software</em> 69, 2014</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* ===========================================
+   GWO trên địa hình chung (cực tiểu).
+   Mỗi vòng: a = 2 − 2t/T; mỗi con sói đến trung bình ba ước lượng từ α, β, δ.
+   =========================================== */
+new SI.Field2D(document.getElementById('gwo-field'), {
+  n: 12, T: 60, seed: 5,
+  init(S) {
+    for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) });
+    S.a = 2; this.rank(S);
+  },
+  // Cập nhật α, β, δ như mã gốc của Mirjalili: giữ ba lời giải tốt nhất từ trước tới giờ
+  rank(S) {
+    if (!S.lead) { S.lead = [null, null, null]; S.lf = [Infinity, Infinity, Infinity]; }
+    for (const w of S.pop) {
+      const v = SI.f(w.x);
+      if (v < S.lf[0]) { S.lf[0] = v; S.lead[0] = w.x.slice(); }
+      if (v > S.lf[0] && v < S.lf[1]) { S.lf[1] = v; S.lead[1] = w.x.slice(); }
+      if (v > S.lf[0] && v > S.lf[1] && v < S.lf[2]) { S.lf[2] = v; S.lead[2] = w.x.slice(); }
+    }
+    for (let k = 1; k < 3; k++) if (!S.lead[k]) S.lead[k] = S.lead[0].slice();
+  },
+  step(S) {
+    S.a = 2 - 2 * S.t / S.T;
+    const L = S.lead.map((x) => x.slice());
+    for (const w of S.pop) {
+      for (let d = 0; d < 2; d++) {
+        let sum = 0;
+        for (let k = 0; k < 3; k++) {
+          const A = 2 * S.a * S.rnd() - S.a, C = 2 * S.rnd();
+          const D = Math.abs(C * L[k][d] - w.x[d]);
+          sum += L[k][d] - A * D;
+        }
+        w.x[d] = SI.clamp(sum / 3);
+      }
+    }
+    this.rank(S);
+  },
+  draw(g, S, P) {
+    const col = ['#d9562f', '#e6904f', '#4b8f45'];
+    for (const w of S.pop) SI.trail(g, P, w);
+    for (const w of S.pop) { const [x, y] = P.at(w); SI.dot(g, x, y, 5.5, '#f5f0e6'); }
+    g.font = 'italic 16px "STIX Two Text", serif';
+    [2, 1, 0].forEach((k) => {
+      const [x, y] = P.pt(S.lead[k]);
+      SI.dot(g, x, y, 8, col[k]);
+      g.fillStyle = '#1c2a2e'; g.fillText('αβδ'[k], x + 10, y - 8 + k * 2);
+    });
+  },
+  status(S, en) {
+    const phase = S.a > 1 ? (en ? 'may diverge' : 'còn tản ra') : (en ? 'attacking' : 'tấn công');
+    return `<span><b>a</b> = ${S.a.toFixed(2)} · ${phase}</span>`;
+  },
+});
+SI.boot();
+</script>
+</body>
+</html>

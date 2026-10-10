@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Thuật toán dơi (BA)" data-title-en="Bat Algorithm (BA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thuật toán dơi (BA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 10 · Mục 10.2</span><span class="en">Chapter 10 · Section 10.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Thuật toán dơi</span><span class="en">Bat Algorithm</span><span class="sub"><span class="vi">Bat Algorithm — BA</span><span class="en">BA — hunting by echolocation</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích cách dơi nhỏ định vị bằng tiếng vọng: tần số, độ to và tốc độ phát xung.</span><span class="en">Explain microbat echolocation: frequency, loudness and pulse rate.</span></li>
+        <li class="reveal d3"><span class="vi">Viết ba phương trình cập nhật tần số, vận tốc và vị trí.</span><span class="en">Write the three updates for frequency, velocity and position.</span></li>
+        <li class="reveal d4"><span class="vi">Giải thích vì sao độ to <span class="m">A</span> giảm và tốc độ xung <span class="m">r</span> tăng khi dơi tới gần mồi.</span><span class="en">Explain why loudness <span class="m">A</span> falls and pulse rate <span class="m">r</span> rises as a bat closes in.</span></li>
+        <li class="reveal d5"><span class="vi">Liên hệ BA với PSO và nhận diện lỗi trong ví dụ tính tay của sách tham khảo.</span><span class="en">Relate BA to PSO and spot the errors in the reference book's hand calculation.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Dơi “nhìn” bằng âm thanh</span><span class="en">Bats “see” with sound</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Xin-She Yang</strong> đề xuất năm 2010, dựa trên khả năng định vị bằng tiếng vọng (echolocation) của dơi nhỏ.</span><span class="en">Proposed by <strong>Xin-She Yang</strong> in 2010, based on microbat echolocation.</span></li>
+          <li class="reveal d3"><span class="vi">Dơi phát ra xung siêu âm và nghe tiếng vọng để biết khoảng cách, hướng và loại vật cản hay con mồi.</span><span class="en">Bats emit ultrasonic pulses and listen to echoes to judge distance, direction and the kind of obstacle or prey.</span></li>
+          <li class="reveal d4"><span class="vi">Khi đi tìm, dơi phát xung to và thưa; khi đã tới gần mồi, xung nhỏ dần nhưng dày lên để định vị chính xác.</span><span class="en">While searching, pulses are loud and sparse; near the prey they become quieter but more frequent for precise targeting.</span></li>
+          <li class="reveal d5"><span class="vi">Dơi là thú có vú; cùng với cá voi ở mục 10.1, chúng dùng sóng để săn mồi.</span><span class="en">Bats are mammals; like the whales of section 10.1, they hunt using waves.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 260" role="img" aria-label="Dơi phát sóng siêu âm và nhận tiếng vọng từ con mồi">
+          <g fill="none" stroke="#3a7fc1" stroke-width="2">
+            <path class="draw" style="--len:120" d="M110,130 a40,40 0 0 1 0,-0.1" />
+            <path class="draw d2" style="--len:140" d="M120,95 q30,35 0,70"/>
+            <path class="draw d3" style="--len:200" d="M140,70 q50,60 0,120"/>
+            <path class="draw d4" style="--len:260" d="M160,45 q70,85 0,170"/>
+          </g>
+          <g fill="none" stroke="#d9562f" stroke-width="1.6" stroke-dasharray="4 4">
+            <path d="M300,110 q-30,20 0,40"/><path d="M285,95 q-40,35 0,70"/>
+          </g>
+          <path d="M60,130 l30,-22 l10,14 l10,-14 l30,22 l-25,-4 l-15,12 l-15,-12 z" fill="#1c2a2e"/>
+          <circle cx="315" cy="130" r="7" fill="#d9562f"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a">
+            <text x="30" y="200"><tspan class="vi">sóng phát ra: tần số f, độ to A</tspan><tspan class="en">emitted pulses: frequency f, loudness A</tspan></text>
+            <text x="250" y="200"><tspan class="vi">tiếng vọng từ con mồi</tspan><tspan class="en">echo from the prey</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Sóng phát ra và tiếng vọng trở về</span><span class="en">Emitted pulses and returning echoes</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi con dơi bay với vận tốc được “chỉnh tần số” về phía con dơi giỏi nhất. Khi có vẻ đã thấy mồi, nó <span class="hl c-in">hạ giọng</span> và <span class="hl c-cog">phát xung dày hơn</span>: ít khám phá ngẫu nhiên, nhiều tìm kiếm quanh lời giải tốt.</span><span class="en">Each bat flies with a “frequency-tuned” velocity toward the best bat. Once it seems to have found prey, it <span class="hl c-in">lowers its voice</span> and <span class="hl c-cog">pulses faster</span>: less random exploration, more local search around good solutions.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Tần số f</span><span class="en">Frequency f</span></b><span><span class="vi">bước nhảy về phía con tốt nhất</span><span class="en">step size toward the best bat</span></span></div>
+      <div class="force reveal d4" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Độ to A</span><span class="en">Loudness A</span></b><span><span class="vi">xác suất chấp nhận lời giải mới; giảm dần</span><span class="en">chance of accepting a new solution; decreases</span></span></div>
+      <div class="force reveal d5" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Tốc độ xung r</span><span class="en">Pulse rate r</span></b><span><span class="vi">càng lớn càng ít bước đi cục bộ; tăng dần</span><span class="en">the larger, the fewer local walks; increases</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tần số, vận tốc, vị trí" data-label-en="Frequency, velocity, position">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba phương trình chuyển động</span><span class="en">Three motion equations</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">f<sub>i</sub> = f<sub>min</sub> + (f<sub>max</sub> − f<sub>min</sub>) β, &nbsp; β ~ U(0, 1)</span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">v<span class="ss"><i>t</i><i>i</i></span> = v<span class="ss"><i>t−1</i><i>i</i></span> + (x<span class="ss"><i>t−1</i><i>i</i></span> − x*) f<sub>i</sub></span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">x<span class="ss"><i>t</i><i>i</i></span> = x<span class="ss"><i>t−1</i><i>i</i></span> + v<span class="ss"><i>t</i><i>i</i></span></span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">x*</span>: vị trí tốt nhất hiện tại, chọn theo <strong>giá trị hàm mục tiêu</strong>, không theo tần số hay độ to.</span><span class="en"><span class="m">x*</span>: the current best position, chosen by <strong>objective value</strong>, not by frequency or loudness.</span></li>
+          <li class="reveal d4"><span class="vi">Giống PSO không có pbest: vận tốc tích lũy và bị kéo về con tốt nhất với hệ số ngẫu nhiên <span class="m">f<sub>i</sub></span>.</span><span class="en">Like PSO without pbest: velocity accumulates and is pulled to the best bat with a random factor <span class="m">f<sub>i</sub></span>.</span></li>
+          <li class="reveal d5"><span class="vi">Ví dụ: <span class="m">[f<sub>min</sub>, f<sub>max</sub>] = [0, 2]</span> trong mã minh họa của Yang.</span><span class="en">For example <span class="m">[f<sub>min</sub>, f<sub>max</sub>] = [0, 2]</span> in Yang's demo code.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đi cục bộ, độ to và xung" data-label-en="Local walk, loudness and pulses">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Đi bộ cục bộ và điều chỉnh tiếng kêu</span><span class="en">Local walk and call adjustment</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &gt; r<sub>i</sub>: &nbsp; x<sub>new</sub> = x<sub>old</sub> + ε · Ā<sup>t</sup>, &nbsp; ε ~ U(−1, 1)</div></div>
+          <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> rand &lt; A<sub>i</sub> <span class="up"><span class="vi">và</span><span class="en">and</span></span> f(x<sub>new</sub>) &lt; f(x<sub>i</sub>): <span class="vi">nhận</span><span class="en">accept</span>, A<sub>i</sub> ← αA<sub>i</sub>, r<sub>i</sub> ← r<span class="ss"><i>0</i><i>i</i></span>(1 − e<sup>−γt</sup>)</div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">x<sub>old</sub></span>: một lời giải trong nhóm tốt nhất; <span class="m">Ā<sup>t</sup></span>: độ to trung bình của cả bầy.</span><span class="en"><span class="m">x<sub>old</sub></span>: a solution among the current best; <span class="m">Ā<sup>t</sup></span>: average loudness of the swarm.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">0 &lt; α &lt; 1, γ &gt; 0</span>; thường <span class="m">α = γ = 0.9</span>. Khi <span class="m">t → ∞</span>: <span class="m">A<sub>i</sub> → 0</span> và <span class="m">r<sub>i</sub> → r<span class="ss"><i>0</i><i>i</i></span></span>.</span><span class="en"><span class="m">0 &lt; α &lt; 1, γ &gt; 0</span>; typically <span class="m">α = γ = 0.9</span>. As <span class="m">t → ∞</span>: <span class="m">A<sub>i</sub> → 0</span> and <span class="m">r<sub>i</sub> → r<span class="ss"><i>0</i><i>i</i></span></span>.</span></li>
+          <li class="reveal d5"><span class="vi">Lưu ý dấu âm trong <span class="m">e<sup>−γt</sup></span>: nếu viết <span class="m">e<sup>+γt</sup></span> như trong sách tham khảo thì <span class="m">r</span> sẽ âm.</span><span class="en">Note the minus sign in <span class="m">e<sup>−γt</sup></span>: with <span class="m">e<sup>+γt</sup></span>, as printed in the reference book, <span class="m">r</span> would become negative.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của BA</span><span class="en">BA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Yang (2010); <span class="m">f ∈ [0, 2], A<sub>0</sub> = 1, r<sub>0</sub> = 0.5, α = γ = 0.9</span>.</span><span class="en">Yang (2010); <span class="m">f ∈ [0, 2], A<sub>0</sub> = 1, r<sub>0</sub> = 0.5, α = γ = 0.9</span>.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> dơi với vận tốc 0, độ to <span class="m">A<sub>0</sub></span>, tần suất xung <span class="m">r<sub>0</sub></span>.</span><span class="en">Initialize <span class="m">n</span> bats with zero velocity, loudness <span class="m">A<sub>0</sub></span>, pulse rate <span class="m">r<sub>0</sub></span>.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Rút tần số <span class="m">f</span>; cập nhật vận tốc và vị trí.</span><span class="en">Draw frequency <span class="m">f</span>; update velocity and position.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Nếu <span class="m">rand &gt; r<sub>i</sub></span>: đi cục bộ quanh con tốt nhất <span class="m">x* + ε Ā</span>.</span><span class="en">If <span class="m">rand &gt; r<sub>i</sub></span>: local walk around the best <span class="m">x* + ε Ā</span>.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Nhận lời giải mới nếu tốt hơn và <span class="m">rand &lt; A<sub>i</sub></span>; khi nhận, giảm <span class="m">A<sub>i</sub></span>, tăng <span class="m">r<sub>i</sub></span>.</span><span class="en">Accept if better and <span class="m">rand &lt; A<sub>i</sub></span>; on acceptance, decrease <span class="m">A<sub>i</sub></span>, increase <span class="m">r<sub>i</sub></span>.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Cập nhật con tốt nhất; lặp đến hết ngân sách.</span><span class="en">Update the best; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n dơi</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n bats</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">x* ←</text><text x="875" y="89">tốt nhất</text></g><g class="en"><text x="875" y="67">x* ←</text><text x="875" y="89">best</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Tần số f; v, x;</text><text x="875" y="259">đi cục bộ</text></g><g class="en"><text x="875" y="237">Frequency f; v, x;</text><text x="875" y="259">local walk</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Nhận theo A;</text><text x="625" y="259">A ↓, r ↑</text></g><g class="en"><text x="625" y="237">Accept by A;</text><text x="625" y="259">A ↓, r ↑</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về x*</text></g><g class="en"><text x="125" y="248">Return x*</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của BA</span><span class="en">BA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">f<sub>min</sub>, f<sub>max</sub></span></td><td><span class="vi">Dải tần số</span><span class="en">Frequency range</span></td><td>0, 2</td></tr>
+        <tr><td><span class="m">A<sub>0</sub>, α</span></td><td><span class="vi">Độ to ban đầu và hệ số giảm</span><span class="en">Initial loudness and decay</span></td><td>1, 0.9</td></tr>
+        <tr><td><span class="m">r<sub>0</sub>, γ</span></td><td><span class="vi">Tần suất xung và tốc độ tăng</span><span class="en">Pulse rate and growth</span></td><td>0.5, 0.9</td></tr>
+        <tr><td><span class="m">v<sub>max</sub></span></td><td><span class="vi">Kẹp vận tốc (lựa chọn cài đặt)</span><span class="en">Velocity clamp (implementation choice)</span></td><td>0.2 (ub − lb)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán BA</span><span class="en">The BA algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Tham số: <span class="m">n, f<sub>min</sub>, f<sub>max</sub>, A<sub>0</sub>, r<sub>0</sub>, α, γ</span>.</span><span class="en">Parameters: <span class="m">n, f<sub>min</sub>, f<sub>max</sub>, A<sub>0</sub>, r<sub>0</sub>, α, γ</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo vị trí <span class="m">x<sub>i</sub></span>, vận tốc <span class="m">v<sub>i</sub></span>, độ to <span class="m">A<sub>i</sub></span>, xung <span class="m">r<sub>i</sub></span>; <span class="m">x*</span> ← con tốt nhất</span><span class="en">Initialize positions <span class="m">x<sub>i</sub></span>, velocities <span class="m">v<sub>i</sub></span>, loudness <span class="m">A<sub>i</sub></span>, pulse rates <span class="m">r<sub>i</sub></span>; <span class="m">x*</span> ← best</span></li>
+        <li><span><span class="kw">while</span> <span class="m">t &lt; T</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi con dơi</span><span class="en">each bat</span></span>: <span class="vi">cập nhật <span class="m">f<sub>i</sub>, v<sub>i</sub></span>, tạo <span class="m">x<sub>new</sub></span></span><span class="en">update <span class="m">f<sub>i</sub>, v<sub>i</sub></span>, build <span class="m">x<sub>new</sub></span></span></li>
+        <li style="--ind:2"><span><span class="kw">if</span> <span class="m">rand &gt; r<sub>i</sub></span>:</span> <span class="vi">thay <span class="m">x<sub>new</sub></span> bằng bước đi cục bộ quanh lời giải tốt</span><span class="en">replace <span class="m">x<sub>new</sub></span> by a local walk around a good solution</span></li>
+        <li style="--ind:2"><span><span class="kw">if</span> <span class="m">rand &lt; A<sub>i</sub></span> <span class="vi">và</span><span class="en">and</span> <span class="m">x<sub>new</sub></span> <span class="vi">tốt hơn</span><span class="en">is better</span>:</span> <span class="vi">nhận; giảm <span class="m">A<sub>i</sub></span>, tăng <span class="m">r<sub>i</sub></span></span><span class="en">accept; lower <span class="m">A<sub>i</sub></span>, raise <span class="m">r<sub>i</sub></span></span></li>
+        <li style="--ind:1"><span class="vi">Xếp hạng theo hàm mục tiêu, cập nhật <span class="m">x*</span></span><span class="en">Rank by objective, update <span class="m">x*</span></span></li>
+        <li><span><span class="kw">return</span> <span class="m">x*</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 con dơi trên cùng địa hình</span><span class="en">12 bats on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Vòng tròn quanh mỗi con dơi tỉ lệ với độ to <span class="m">A<sub>i</sub></span>: càng về sau vòng càng nhỏ, cho thấy dơi đã “hạ giọng” để tìm kỹ quanh mồi.</span><span class="en">The ring around each bat scales with its loudness <span class="m">A<sub>i</sub></span>: rings shrink as bats “lower their voice” to search closely around prey.</span></p>
+        <p class="note"><span class="vi">Tham số: <span class="m">f ∈ [0, 2], A<sub>0</sub> = 1, r<sub>0</sub> = 0.5, α = γ = 0.9</span>. Vì <span class="m">r</span> bắt đầu từ 0, lúc đầu hầu như con dơi nào cũng đi bộ cục bộ quanh <span class="m">x*</span>; với cấu hình này bầy dừng ở hố <strong>cục bộ</strong> phía trên bên trái.</span><span class="en">Settings: <span class="m">f ∈ [0, 2], A<sub>0</sub> = 1, r<sub>0</sub> = 0.5, α = γ = 0.9</span>. Because <span class="m">r</span> starts at 0, early on almost every bat takes a local walk around <span class="m">x*</span>; with this setup the colony settles in the <strong>local</strong> basin at the upper left.</span></p>
+        <div class="key">
+          <span><i style="background:#1c2a2e"></i><span class="vi">dơi</span><span class="en">bats</span></span>
+          <span><i style="background:#3a7fc1"></i><span class="vi">độ to A</span><span class="en">loudness A</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">x* tốt nhất</span><span class="en">best x*</span></span>
+        </div>
+      </div>
+      <div class="field" id="ba-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đối chiếu tài liệu tham khảo" data-label-en="Checking the reference book">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ trong sách tham khảo</span><span class="en">Example from the reference book</span></p>
+      <h2 class="reveal d1"><span class="vi">Okwu &amp; Tartibu (2021), chương 8: ví dụ ba con dơi</span><span class="en">Okwu &amp; Tartibu (2021), chapter 8: the three-bat example</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Nội dung</span><span class="en">Item</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Cập nhật tần số</span><span class="en">Frequency update</span></td><td><span class="vi">f<sub>1</sub> = 2 + 1(8 − 2) = 8 với [f<sub>min</sub>, f<sub>max</sub>] = [0, 10]</span><span class="en">f<sub>1</sub> = 2 + 1(8 − 2) = 8 with [f<sub>min</sub>, f<sub>max</sub>] = [0, 10]</span></td><td><span class="vi">f = 0 + β · 10; không dùng giá trị f cũ</span><span class="en">f = 0 + β · 10; the old f is not used</span></td></tr>
+        <tr><td><span class="vi">Vị trí con dơi 1</span><span class="en">Bat 1 position</span></td><td><span class="vi">x<sub>1</sub> = 39, rồi bước sau dùng 35</span><span class="en">x<sub>1</sub> = 39, then 35 in the next step</span></td><td><span class="vi">không nhất quán giữa hai bảng</span><span class="en">inconsistent between the two tables</span></td></tr>
+        <tr><td><span class="vi">Chọn con tốt nhất</span><span class="en">Choosing the best bat</span></td><td><span class="vi">theo tần số và độ to lớn nhất</span><span class="en">by highest frequency and loudness</span></td><td><span class="vi">theo giá trị hàm mục tiêu nhỏ nhất</span><span class="en">by the lowest objective value</span></td></tr>
+        <tr><td><span class="vi">Công thức 8.5 và ε</span><span class="en">Equation 8.5 and ε</span></td><td><span class="vi">r = r<sub>0</sub>(1 − e<sup>γt</sup>); ε = 1.1</span><span class="en">r = r<sub>0</sub>(1 − e<sup>γt</sup>); ε = 1.1</span></td><td><span class="vi">r = r<sub>0</sub>(1 − e<sup>−γt</sup>); ε phải thuộc [−1, 1]</span><span class="en">r = r<sub>0</sub>(1 − e<sup>−γt</sup>); ε must lie in [−1, 1]</span></td></tr>
+        <tr><td><span class="vi">Hàm Wayburn</span><span class="en">Wayburn function</span></td><td><span class="vi">nghiệm in ra có 10 thành phần, f = 0.236</span><span class="en">a 10-component solution, f = 0.236</span></td><td><span class="vi">hàm chỉ có 2 biến; cực tiểu f = 0 tại (1, 2)</span><span class="en">the function has 2 variables; minimum f = 0 at (1, 2)</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Vì các lỗi trên, chương này trình bày BA theo bài gốc của Yang (2010) thay vì ví dụ trong sách. Ứng dụng tắc nghẽn giao thông (Delta State) trong sách chỉ dừng ở bước dựng mô hình hai mức, chưa có kết quả tối ưu.</span><span class="en">Because of these errors, this chapter follows Yang's original paper (2010) rather than the book's example. The book's traffic-congestion application (Delta State) stops at building the bi-level model, without optimization results.</span></p>
+  </div>
+</section>
+
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước của dơi</span><span class="en">One bat step</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">f = f<sub>min</sub> + (f<sub>max</sub> − f<sub>min</sub>) β</span></div>
+          <div class="eq"><span class="m">v ← v + (x − x*) f, &nbsp; x ← x + v</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">β = 0.5</span>: <span class="m">f = 1</span>. <span class="m">v = 0, x = 3, x* = 1</span>: <span class="m">v = 2, x = 5</span>.</span><span class="en"><span class="m">β = 0.5</span>: <span class="m">f = 1</span>. <span class="m">v = 0, x = 3, x* = 1</span>: <span class="m">v = 2, x = 5</span>.</span></li>
+          <li><span class="vi">Theo đúng công thức gốc, số hạng <span class="m">(x − x*)</span> đẩy dơi <em>ra xa</em> con tốt nhất; khai thác nhờ bước cục bộ.</span><span class="en">Following the original formula, the term <span class="m">(x − x*)</span> pushes the bat <em>away</em> from the best; exploitation comes from the local walk.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Độ to và xung</span><span class="en">Loudness and pulse</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Sau một lần nhận: <span class="m">A = 0.9 · 1 = 0.9</span>.</span><span class="en">After one acceptance: <span class="m">A = 0.9 · 1 = 0.9</span>.</span></li>
+          <li><span class="vi"><span class="m">r = 0.5(1 − e<sup>−0.9</sup>) = 0.297</span> tại <span class="m">t = 1</span>, tiến dần về 0.5.</span><span class="en"><span class="m">r = 0.5(1 − e<sup>−0.9</sup>) = 0.297</span> at <span class="m">t = 1</span>, approaching 0.5.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của BA</span><span class="en">BA variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">BA nhị phân</span><span class="en">Binary BA</span></h3><p><span class="vi">Hàm chuyển cho chọn đặc trưng.</span><span class="en">Transfer functions for feature selection.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">BA đa mục tiêu</span><span class="en">Multi-objective BA</span></h3><p><span class="vi">Yang (2011).</span><span class="en">Yang (2011).</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">BA + Lévy / hỗn loạn</span><span class="en">BA + Lévy / chaos</span></h3><p><span class="vi">Tăng khám phá.</span><span class="en">More exploration.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">BA lai</span><span class="en">Hybrid BA</span></h3><p><span class="vi">Kết hợp với DE, PSO.</span><span class="en">Combined with DE, PSO.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của BA</span><span class="en">BA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán thường gặp với BA.</span><span class="en">Problems commonly tackled with BA.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế</span><span class="en">Design</span></h3><p><span class="vi">Bài toán kỹ thuật có ràng buộc.</span><span class="en">Constrained engineering problems.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Flow-shop, phân bổ tài nguyên.</span><span class="en">Flow-shop, resource allocation.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Ảnh</span><span class="en">Imaging</span></h3><p><span class="vi">Phân ngưỡng, nén ảnh.</span><span class="en">Thresholding, compression.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chọn đặc trưng, huấn luyện mạng.</span><span class="en">Feature selection, network training.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BA</span><span class="en">Experiment · BA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">1.55e+2</td><td class="num">2.07e+2</td><td class="num">7.77e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">2.94e+1</td><td class="num">5.19e+1</td><td class="num">7.52e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">4.67e+1</td><td class="num">1.31e+1</td><td class="num">4.43e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">1.31e+1</td><td class="num">1.53e+0</td><td class="num">1.35e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">3.71e+1</td><td class="num">1.18e+1</td><td class="num">3.71e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">6.04e+2</td><td class="num">5.51e+2</td><td class="num">5.23e+2</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">4.58e+1</td><td class="num">1.40e+1</td><td class="num">4.36e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>15.86</b>, đứng thứ <b>17/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>15.86</b>, position <b>17/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">BA đứng gần cuối: phần lớn tiến bộ đến từ bước cục bộ, còn bước theo tần số đẩy dơi ra xa con tốt nhất.</span><span class="en">BA ranks near the bottom: most progress comes from the local walk, while the frequency step pushes bats away from the best.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BA</span><span class="en">Experiment · BA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/BA.svg" alt="convergence BA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/ba.py" class="c-sea">code/si/algorithms/ba.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        best = prob.best_x.copy()
+        Abar = A.mean()
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            <span class="k">if</span> prob.done:
+                break
+            fr = fmin + (fmax - fmin) * rng.random()
+            V[i] = np.clip(V[i] + (X[i] - best) * fr, -vmax, vmax)
+            xn = X[i] + V[i]
+            <span class="k">if</span> rng.random() &gt; r[i]:
+                xn = best + rng.uniform(-1, 1, prob.dim) * Abar
+            xn = prob.clip(xn)
+            fn = prob(xn)[0]
+            <span class="k">if</span> rng.random() &lt; A[i] <span class="k">and</span> fn &lt; fx[i]:
+                X[i], fx[i] = xn, fn</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Tự điều chỉnh tham số theo tiến trình săn</span><span class="en">Self-tuning parameters as the hunt progresses</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Độ to và tốc độ xung tự điều chỉnh, giúp chuyển dần từ khám phá sang khai thác.</span><span class="en">Loudness and pulse rate self-adjust, shifting smoothly from exploration to exploitation.</span></li>
+          <li><span class="vi">Điều chỉnh tần số cho bước nhảy đa dạng giữa các con dơi.</span><span class="en">Frequency tuning gives each bat a different step size.</span></li>
+          <li><span class="vi">Khi <span class="m">A<sub>i</sub> = 0, r<sub>i</sub> = 0</span> và tần số cố định, BA trở về một dạng PSO; khi bỏ vận tốc, gần với tìm kiếm ngẫu nhiên có chấp nhận.</span><span class="en">With <span class="m">A<sub>i</sub> = 0, r<sub>i</sub> = 0</span> and fixed frequency, BA reduces to a form of PSO; without velocity it is close to a random search with acceptance.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Vận tốc tích lũy không có quán tính nên dễ “bay quá” và dao động; thường phải kẹp vận tốc.</span><span class="en">Accumulated velocity without inertia tends to overshoot and oscillate; velocity clamping is often needed.</span></li>
+          <li><span class="vi">Khi <span class="m">A</span> về 0 quá sớm, bầy ngừng nhận lời giải mới và hội tụ sớm.</span><span class="en">If <span class="m">A</span> drops to 0 too early, the swarm stops accepting new solutions and converges prematurely.</span></li>
+          <li><span class="vi">Biến thể: BA nhị phân, BA hỗn loạn, BA đa mục tiêu (Yang, 2011).</span><span class="en">Variants: binary BA, chaotic BA, multi-objective BA (Yang, 2011).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">A<sub>0</sub> = 1, α = 0.9</span>, sau bao nhiêu lần chấp nhận thì <span class="m">A &lt; 0.1</span>?</span><span class="en">With <span class="m">A<sub>0</sub> = 1, α = 0.9</span>, after how many acceptances does <span class="m">A &lt; 0.1</span>?</span></li>
+          <li><span class="vi">Với <span class="m">r<sub>0</sub> = 0.5, γ = 0.9</span>, tính <span class="m">r</span> tại <span class="m">t = 1, 5, 10</span>.</span><span class="en">With <span class="m">r<sub>0</sub> = 0.5, γ = 0.9</span>, compute <span class="m">r</span> at <span class="m">t = 1, 5, 10</span>.</span></li>
+          <li><span class="vi">Làm lại ví dụ ba con dơi của sách với số liệu bảng 8.1 (<span class="m">x = 4, 8, 5; v = 3, 7, 4</span>), <span class="m">[f<sub>min</sub>, f<sub>max</sub>] = [0, 10], β = (0.2, 0.6, 0.3)</span>, hàm <span class="m">f(x) = x²</span>. Tính <span class="m">f<sub>i</sub>, v<sub>i</sub>, x<sub>i</sub></span> sau một vòng.</span><span class="en">Redo the book's three-bat example with table 8.1 (<span class="m">x = 4, 8, 5; v = 3, 7, 4</span>), <span class="m">[f<sub>min</sub>, f<sub>max</sub>] = [0, 10], β = (0.2, 0.6, 0.3)</span>, objective <span class="m">f(x) = x²</span>. Compute <span class="m">f<sub>i</sub>, v<sub>i</sub>, x<sub>i</sub></span> after one iteration.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài BA theo Yang (2010); chạy hàm Wayburn đúng 2 biến và báo cáo nghiệm.</span><span class="en">Implement BA after Yang (2010); run the 2-variable Wayburn function and report the solution.</span></li>
+          <li><span class="vi">So sánh BA với PSO cùng ngân sách đánh giá hàm trên 30 lần chạy.</span><span class="en">Compare BA with PSO under the same evaluation budget over 30 runs.</span></li>
+          <li><span class="vi">Thử bỏ kẹp vận tốc và quan sát hiện tượng “bay quá”.</span><span class="en">Remove velocity clamping and observe overshooting.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>X.-S. Yang, “A New Metaheuristic Bat-Inspired Algorithm,” in <em>Studies in Computational Intelligence</em>, Springer Berlin Heidelberg, 2010, pp. 65–74, doi: <a href="https://doi.org/10.1007/978-3-642-12538-6_6">10.1007/978-3-642-12538-6_6</a>.</li>
+        <li>J. A. Goldbogen, A. S. Friedlaender, J. Calambokidis, M. F. McKenna, M. Simon, and D. P. Nowacek, “Integrative Approaches to the Study of Baleen Whale Diving Behavior, Feeding Performance, and Foraging Ecology,” <em>BioScience</em>, vol. 63, no. 2, pp. 90–100, 2013, doi: <a href="https://doi.org/10.1525/bio.2013.63.2.5">10.1525/bio.2013.63.2.5</a>.</li>
+        <li>S. Mirjalili and A. Lewis, “The Whale Optimization Algorithm,” <em>Advances in Engineering Software</em>, vol. 95, pp. 51–67, 2016, doi: <a href="https://doi.org/10.1016/j.advengsoft.2016.01.008">10.1016/j.advengsoft.2016.01.008</a>.</li>
+        <li>M. M. Mafarja and S. Mirjalili, “Hybrid Whale Optimization Algorithm with simulated annealing for feature selection,” <em>Neurocomputing</em>, vol. 260, pp. 302–312, 2017, doi: <a href="https://doi.org/10.1016/j.neucom.2017.04.053">10.1016/j.neucom.2017.04.053</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+        <li>J. Kang and Z. Ma, “Red-Crowned Crane Optimization: A Novel Biomimetic Metaheuristic Algorithm for Engineering Applications,” <em>Biomimetics</em>, vol. 10, no. 9, pp. 565, 2025, doi: <a href="https://doi.org/10.3390/biomimetics10090565">10.3390/biomimetics10090565</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Tần số · độ to · tốc độ xung</span><span class="en">Frequency · loudness · pulse rate</span></span>
+      <span><span class="vi">A giảm, r tăng khi tới gần mồi</span><span class="en">A falls, r rises near the prey</span></span>
+      <span><span class="vi">Chọn con tốt nhất theo hàm mục tiêu</span><span class="en">Pick the best by objective value</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Yang, <em>Nature Inspired Cooperative Strategies for Optimization</em>, SCI 284, Springer, 2010</span><span class="en">Original paper: Yang, <em>Nature Inspired Cooperative Strategies for Optimization</em>, SCI 284, Springer, 2010</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* BA trên địa hình chung (cực tiểu), theo Yang (2010): độ to và tốc độ xung riêng cho từng con dơi */
+new SI.Field2D(document.getElementById('ba-field'), {
+  n: 12, T: 60, seed: 15, fmin: 0, fmax: 2, A0: 1, r0: 0.5, alpha: 0.9, gamma: 0.9, vmax: 2,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), v: [0, 0], A: this.A0, r: 0 }); },
+  step(S) {
+    const best = S.best.slice(), Abar = S.pop.reduce((s, b) => s + b.A, 0) / S.pop.length;
+    for (const b of S.pop) {
+      const f = this.fmin + (this.fmax - this.fmin) * S.rnd();
+      b.v = b.v.map((v, d) => Math.max(-this.vmax, Math.min(this.vmax, v + (b.x[d] - best[d]) * f)));
+      let xn = b.x.map((x, d) => SI.clamp(x + b.v[d]));
+      if (S.rnd() > b.r) xn = best.map((x) => SI.clamp(x + (2 * S.rnd() - 1) * Abar));
+      const fn = SI.f(xn);
+      if (S.rnd() < b.A && fn < SI.f(b.x)) { b.x = xn; b.A *= this.alpha; b.r = this.r0 * (1 - Math.exp(-this.gamma * S.t)); }
+      if (fn < S.bestF) { S.bestF = fn; S.best = xn.slice(); }
+    }
+    S.Abar = Abar;
+  },
+  draw(g, S, P) {
+    for (const b of S.pop) { const [x, y] = P.at(b); g.strokeStyle = 'rgba(58,127,193,0.55)'; g.lineWidth = 1.4; g.beginPath(); g.arc(x, y, 4 + 18 * b.A, 0, Math.PI * 2); g.stroke(); }
+    for (const b of S.pop) SI.trail(g, P, b, 'rgba(28,42,46,0.3)');
+    for (const b of S.pop) { const [x, y] = P.at(b); SI.dot(g, x, y, 4, '#1c2a2e', '#f5f0e6'); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { const A = S.pop.reduce((s, b) => s + b.A, 0) / S.pop.length, r = S.pop.reduce((s, b) => s + b.r, 0) / S.pop.length; return `<span><b>Ā</b> = ${A.toFixed(2)}</span><span><b>r̄</b> = ${r.toFixed(2)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bướm đêm và ngọn lửa (MFO)" data-title-en="Moth–Flame Optimization (MFO)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bướm đêm và ngọn lửa (MFO)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 6 · Mục 6.2</span><span class="en">Chapter 6 · Section 6.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bướm đêm và ngọn lửa</span><span class="en">Moth–Flame Optimization</span><span class="sub"><span class="vi">Moth–Flame Optimization — MFO</span><span class="en">MFO — spiralling around the light</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích định hướng ngang (transverse orientation) và vì sao bướm đêm bay xoắn quanh đèn.</span><span class="en">Explain transverse orientation and why moths spiral around lamps.</span></li>
+        <li class="reveal d3"><span class="vi">Viết phương trình xoắn ốc logarit với <span class="m">D, b, t</span>.</span><span class="en">Write the logarithmic spiral update with <span class="m">D, b, t</span>.</span></li>
+        <li class="reveal d4"><span class="vi">Mô tả ngọn lửa như bộ nhớ các lời giải tốt và cơ chế giảm số ngọn lửa.</span><span class="en">Describe flames as a memory of good solutions and the shrinking flame count.</span></li>
+        <li class="reveal d5"><span class="vi">So sánh đường xoắn của MFO với WOA (chương 10).</span><span class="en">Compare the MFO spiral with WOA (chapter 10).</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Bướm đêm bay theo một góc cố định với nguồn sáng</span><span class="en">Moths fly at a fixed angle to a light source</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Seyedali Mirjalili</strong> đề xuất năm 2015 (<em>Knowledge-Based Systems</em> 89).</span><span class="en">Proposed by <strong>Seyedali Mirjalili</strong> in 2015 (<em>Knowledge-Based Systems</em> 89).</span></li>
+          <li class="reveal d3"><span class="vi">Ban đêm, bướm đêm giữ một góc cố định với mặt trăng. Vì mặt trăng rất xa, giữ góc cố định nghĩa là bay gần như thẳng.</span><span class="en">At night, moths keep a fixed angle to the moon. Because the moon is so far away, a fixed angle means an almost straight path.</span></li>
+          <li class="reveal d4"><span class="vi">Với ngọn đèn ở gần, cùng quy tắc đó lại tạo ra một đường <strong>xoắn ốc</strong> thu dần về phía đèn.</span><span class="en">With a nearby lamp, the same rule produces a <strong>spiral</strong> that closes in on the light.</span></li>
+          <li class="reveal d5"><span class="vi">MFO: bướm đêm là tác tử tìm kiếm; ngọn lửa là những vị trí tốt nhất đã tìm được.</span><span class="en">In MFO, moths are search agents; flames are the best positions found so far.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 280" role="img" aria-label="Bướm đêm bay thẳng theo mặt trăng và bay xoắn quanh ngọn đèn">
+          <circle cx="60" cy="50" r="22" fill="#f6e6b8" stroke="#c9a227"/>
+          <path d="M70,240 L170,80" stroke="#56676a" stroke-dasharray="5 5" fill="none"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a"><text x="20" y="95"><tspan class="vi">mặt trăng ở rất xa:</tspan><tspan class="en">distant moon:</tspan></text><text x="20" y="110"><tspan class="vi">bay thẳng</tspan><tspan class="en">straight flight</tspan></text>
+          <text x="215" y="265"><tspan class="vi">ngọn đèn ở gần: bay xoắn</tspan><tspan class="en">nearby lamp: spiral</tspan></text></g>
+          <circle cx="285" cy="160" r="30" fill="url(#fl)"/>
+          <defs><radialGradient id="fl"><stop offset="0" stop-color="#ffd27a"/><stop offset="1" stop-color="#ffd27a" stop-opacity="0"/></radialGradient></defs>
+          <circle cx="285" cy="160" r="6" fill="#d9562f"/>
+          <path id="mfo-spiral" class="draw d2" style="--len:900" fill="none" stroke="#1c2a2e" stroke-width="1.8"/>
+        </svg>
+        <figcaption><span class="vi">Cùng một quy tắc góc cố định cho hai đường bay khác nhau</span><span class="en">One fixed-angle rule, two different flight paths</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi bướm đêm bay <span class="hl c-soc">xoắn ốc</span> quanh một ngọn lửa riêng; ngọn lửa là nơi tốt nhất từng tìm thấy. Theo thời gian, <span class="hl c-sea">số ngọn lửa giảm dần</span>, cả đàn dồn về vài ngọn sáng nhất.</span><span class="en">Each moth <span class="hl c-soc">spirals</span> around its own flame, the best place found so far. Over time <span class="hl c-sea">the number of flames shrinks</span> and the swarm gathers around the brightest few.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #1c2a2e"><b style="color:#1c2a2e"><span class="vi">Bướm đêm</span><span class="en">Moths</span></b><span><span class="vi">tác tử di chuyển, mỗi vòng ở vị trí mới</span><span class="en">moving agents, new positions every iteration</span></span></div>
+      <div class="force reveal d4" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Ngọn lửa</span><span class="en">Flames</span></b><span><span class="vi">bộ nhớ: các vị trí tốt nhất, đã sắp xếp</span><span class="en">memory: the best positions, sorted</span></span></div>
+      <div class="force reveal d5" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Số ngọn lửa</span><span class="en">Flame count</span></b><span><span class="vi"><span class="m">FN</span> giảm từ <span class="m">N</span> về 1</span><span class="en"><span class="m">FN</span> drops from <span class="m">N</span> to 1</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường xoắn ốc logarit" data-label-en="Logarithmic spiral">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Bướm đêm bay xoắn quanh ngọn lửa của nó</span><span class="en">A moth spirals around its flame</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">M<sub>i</sub> = D<sub>i</sub> · e<sup>bt</sup> · cos(2πt) + F<sub>j</sub></span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">D<sub>i</sub> = | F<sub>j</sub> − M<sub>i</sub> |</span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">b</span>: hằng số hình dạng xoắn, thường bằng 1. <span class="m">t ∈ [r, 1]</span>: <span class="m">t = −1</span> là gần ngọn lửa nhất, <span class="m">t = 1</span> là xa nhất.</span><span class="en"><span class="m">b</span>: spiral shape constant, usually 1. <span class="m">t ∈ [r, 1]</span>: <span class="m">t = −1</span> is closest to the flame, <span class="m">t = 1</span> the farthest.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">r</span> giảm tuyến tính từ −1 về −2, nên càng về sau bướm đêm càng hay rơi vào vùng sát ngọn lửa: chuyển sang khai thác.</span><span class="en"><span class="m">r</span> decreases linearly from −1 to −2, so later moths more often land right next to their flame: exploitation.</span></li>
+          <li class="reveal d5"><span class="vi">Đường xoắn này giống bước xoắn ốc của WOA, nhưng mỗi bướm đêm xoắn quanh <strong>ngọn lửa riêng</strong>, không phải quanh một lời giải tốt nhất duy nhất.</span><span class="en">The spiral matches WOA's, but each moth circles <strong>its own flame</strong>, not a single global best.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Số ngọn lửa" data-label-en="Flame number">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Giảm dần số ngọn lửa để cân bằng khám phá và khai thác</span><span class="en">Shrinking the flame count to balance exploration and exploitation</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">FN = round( N − l · (N − 1) / T )</span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">l</span>: vòng lặp hiện tại, <span class="m">N</span>: số bướm đêm tối đa, <span class="m">T</span>: số vòng lặp tối đa.</span><span class="en"><span class="m">l</span>: current iteration, <span class="m">N</span>: maximum number of moths, <span class="m">T</span>: maximum iterations.</span></li>
+          <li class="reveal d4"><span class="vi">Ngọn lửa là <span class="m">N</span> vị trí tốt nhất trong (ngọn lửa cũ ∪ bướm đêm hiện tại), sắp xếp từ tốt đến kém.</span><span class="en">Flames are the <span class="m">N</span> best positions in (previous flames ∪ current moths), sorted best first.</span></li>
+          <li class="reveal d5"><span class="vi">Bướm đêm thứ <span class="m">i</span> bay quanh ngọn lửa thứ <span class="m">i</span> nếu <span class="m">i ≤ FN</span>; các con còn lại cùng bay quanh ngọn lửa thứ <span class="m">FN</span>.</span><span class="en">Moth <span class="m">i</span> circles flame <span class="m">i</span> if <span class="m">i ≤ FN</span>; the rest share flame <span class="m">FN</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của MFO</span><span class="en">MFO step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Mirjalili (2015); <span class="m">b = 1</span>.</span><span class="en">Mirjalili (2015); <span class="m">b = 1</span>.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">N</span> bướm đêm; đánh giá.</span><span class="en">Initialize <span class="m">N</span> moths; evaluate them.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Ngọn lửa = <span class="m">N</span> vị trí tốt nhất của (ngọn lửa cũ ∪ bướm đêm), đã sắp xếp.</span><span class="en">Flames = the <span class="m">N</span> best positions of (old flames ∪ moths), sorted.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Tính số ngọn lửa <span class="m">FN = round(N − l(N − 1)/T)</span>.</span><span class="en">Compute the flame count <span class="m">FN = round(N − l(N − 1)/T)</span>.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Bướm đêm <span class="m">i</span> bay xoắn ốc quanh ngọn lửa <span class="m">min(i, FN)</span> với <span class="m">t ~ U(r, 1)</span>.</span><span class="en">Moth <span class="m">i</span> spirals around flame <span class="m">min(i, FN)</span> with <span class="m">t ~ U(r, 1)</span>.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Giảm <span class="m">r</span> từ −1 về −2; lặp đến hết ngân sách.</span><span class="en">Decrease <span class="m">r</span> from −1 to −2; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">N bướm đêm</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">N moths</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="78">Đánh giá</text></g><g class="en"><text x="875" y="78">Evaluate</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Cập nhật lửa;</text><text x="875" y="259">tính FN</text></g><g class="en"><text x="875" y="237">Update flames;</text><text x="875" y="259">compute FN</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Bay xoắn ốc</text><text x="625" y="259">quanh lửa</text></g><g class="en"><text x="625" y="237">Spiral</text><text x="625" y="259">around flames</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về ngọn lửa 1</text></g><g class="en"><text x="125" y="248">Return flame 1</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của MFO</span><span class="en">MFO parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">b</span></td><td><span class="vi">Hệ số hình dạng xoắn ốc logarit</span><span class="en">Logarithmic spiral shape constant</span></td><td>1</td></tr>
+        <tr><td><span class="m">r</span></td><td><span class="vi">Cận dưới của <span class="m">t</span>, giảm tuyến tính</span><span class="en">Lower bound of <span class="m">t</span>, linearly decreasing</span></td><td>−1 → −2</td></tr>
+        <tr><td><span class="m">FN</span></td><td><span class="vi">Số ngọn lửa, giảm từ N về 1</span><span class="en">Number of flames, from N down to 1</span></td><td><span class="m">round(N − l(N − 1)/T)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán MFO</span><span class="en">The MFO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ngọn lửa đóng vai trò như pbest được sắp xếp; số ngọn lửa giảm dần là “công tắc” khám phá – khai thác.</span><span class="en">Flames act like sorted pbest memories; the shrinking flame count is the exploration–exploitation switch.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">N</span> bướm đêm; ngọn lửa ← bướm đêm đã sắp xếp</span><span class="en">Initialize <span class="m">N</span> moths; flames ← sorted moths</span></li>
+        <li><span><span class="kw">for</span> <span class="m">l = 1 … T</span></span></li>
+        <li style="--ind:1"><span class="vi">Tính <span class="m">FN</span> và <span class="m">r = −1 − l/T</span></span><span class="en">Compute <span class="m">FN</span> and <span class="m">r = −1 − l/T</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi bướm đêm</span><span class="en">each moth</span> <span class="m">i</span></span></li>
+        <li style="--ind:2"><span class="vi"><span class="m">j = min(i, FN)</span>; mỗi chiều: <span class="m">t ~ U(r, 1)</span></span><span class="en"><span class="m">j = min(i, FN)</span>; per dimension: <span class="m">t ~ U(r, 1)</span></span></li>
+        <li style="--ind:2"><span class="m">M<sub>i</sub> ← |F<sub>j</sub> − M<sub>i</sub>| · e<sup>bt</sup> cos(2πt) + F<sub>j</sub></span></li>
+        <li style="--ind:1"><span class="vi">Đánh giá; ngọn lửa ← <span class="m">N</span> vị trí tốt nhất của (ngọn lửa ∪ bướm đêm)</span><span class="en">Evaluate; flames ← best <span class="m">N</span> of (flames ∪ moths)</span></li>
+        <li><span><span class="kw">return</span> <span class="vi">ngọn lửa tốt nhất</span><span class="en">the best flame</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 bướm đêm và các ngọn lửa trên cùng địa hình</span><span class="en">12 moths and their flames on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Quầng cam là các ngọn lửa còn hoạt động; số quầng giảm dần theo <span class="m">FN</span>. Đường mảnh nối mỗi bướm đêm với ngọn lửa của nó.</span><span class="en">Orange glows are the active flames; their number drops with <span class="m">FN</span>. Thin lines link each moth to its flame.</span></p>
+        <p class="note"><span class="vi">Tham số: <span class="m">N = 12, T = 60, b = 1</span>, đúng theo bài báo gốc.</span><span class="en">Settings: <span class="m">N = 12, T = 60, b = 1</span>, as in the original paper.</span></p>
+        <div class="key">
+          <span><i style="background:#1c2a2e"></i><span class="vi">bướm đêm</span><span class="en">moths</span></span>
+          <span><i style="background:#f0a04b"></i><span class="vi">ngọn lửa đang dùng</span><span class="en">active flames</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">ngọn lửa tốt nhất</span><span class="en">best flame</span></span>
+        </div>
+      </div>
+      <div class="field" id="mfo-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đối chiếu tài liệu tham khảo" data-label-en="Checking the reference book">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ trong sách tham khảo</span><span class="en">Example from the reference book</span></p>
+      <h2 class="reveal d1"><span class="vi">Okwu &amp; Tartibu (2021), chương 12: hàm Goldstein–Price</span><span class="en">Okwu &amp; Tartibu (2021), chapter 12: the Goldstein–Price function</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Nội dung</span><span class="en">Item</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Kết quả MFO</span><span class="en">MFO result</span></td><td><span class="vi">f = 84 tại (1.7999, 0.19996)</span><span class="en">f = 84 at (1.7999, 0.19996)</span></td><td><span class="vi">Đó là một cực tiểu <strong>cục bộ</strong>; cực tiểu toàn cục là f = 3 tại (0, −1)</span><span class="en">That is a <strong>local</strong> minimum; the global minimum is f = 3 at (0, −1)</span></td></tr>
+        <tr><td><span class="vi">Công thức 12.14</span><span class="en">Equation 12.14</span></td><td><span class="vi">FN = round[(N − I)·(N − 1/T)]</span><span class="en">FN = round[(N − I)·(N − 1/T)]</span></td><td><span class="vi">FN = round(N − l·(N − 1)/T)</span><span class="en">FN = round(N − l·(N − 1)/T)</span></td></tr>
+        <tr><td><span class="vi">Công thức 12.13</span><span class="en">Equation 12.13</span></td><td><span class="vi">D = F − M</span><span class="en">D = F − M</span></td><td><span class="vi">D = |F − M| (trị tuyệt đối)</span><span class="en">D = |F − M| (absolute value)</span></td></tr>
+        <tr><td><span class="vi">Công thức 12.10</span><span class="en">Equation 12.10</span></td><td><span class="vi">lb = [lb<sub>1</sub>, …, ub<sub>n</sub>]</span><span class="en">lb = [lb<sub>1</sub>, …, ub<sub>n</sub>]</span></td><td><span class="vi">phần tử cuối phải là lb<sub>n</sub></span><span class="en">the last entry should be lb<sub>n</sub></span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Bài học: một lần chạy dừng ở cực tiểu cục bộ vẫn trông như “hội tụ”. Luôn so với giá trị tối ưu đã biết và chạy nhiều lần.</span><span class="en">Lesson: a run stuck in a local minimum still looks “converged”. Always compare with the known optimum and use many runs.</span></p>
+  </div>
+</section>
+
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Số ngọn lửa và một bước xoắn ốc</span><span class="en">Flame count and one spiral step</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">FN = round(N − l(N − 1)/T)</span></div>
+          <div class="eq"><span class="m">S = D e<sup>bt</sup> cos(2πt) + F, &nbsp; D = |F − M|</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">N = 30, T = 500, l = 250</span>: <span class="m">FN = round(30 − 14.5) = 16</span>.</span><span class="en"><span class="m">N = 30, T = 500, l = 250</span>: <span class="m">FN = round(30 − 14.5) = 16</span>.</span></li>
+          <li><span class="vi">Giữa quá trình, chỉ còn khoảng một nửa số ngọn lửa dẫn đường.</span><span class="en">Halfway through, only about half the flames still guide moths.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Xoắn ốc</span><span class="en">Spiral</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">F = 3, M = 1, b = 1, t = −0.5</span>: <span class="m">D = 2</span>.</span><span class="en"><span class="m">F = 3, M = 1, b = 1, t = −0.5</span>: <span class="m">D = 2</span>.</span></li>
+          <li><span class="vi"><span class="m">S = 2 e<sup>−0.5</sup> cos(−π) + 3 = 1.787</span>: bướm đêm vòng sang phía bên kia, gần ngọn lửa hơn.</span><span class="en"><span class="m">S = 2 e<sup>−0.5</sup> cos(−π) + 3 = 1.787</span>: the moth swings to the other side, closer to the flame.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của MFO</span><span class="en">MFO variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">MOMFO</span><span class="en">MOMFO</span></h3><p><span class="vi">Bản đa mục tiêu dùng kho Pareto.</span><span class="en">Multi-objective version with a Pareto archive.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">MFO + Lévy</span><span class="en">MFO + Lévy</span></h3><p><span class="vi">Thêm bước Lévy để thoát cực trị cục bộ.</span><span class="en">Add Lévy steps to escape local optima.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">MFO nhị phân</span><span class="en">Binary MFO</span></h3><p><span class="vi">Hàm chuyển S/V cho chọn đặc trưng (chương 15).</span><span class="en">S/V transfer functions for feature selection (chapter 15).</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">MFO lai</span><span class="en">Hybrid MFO</span></h3><p><span class="vi">Kết hợp với DE hoặc PSO.</span><span class="en">Combined with DE or PSO.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của MFO</span><span class="en">MFO applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán thường gặp với MFO.</span><span class="en">Problems commonly tackled with MFO.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Dòng công suất tối ưu, điều độ.</span><span class="en">Optimal power flow, dispatch.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Thiết kế</span><span class="en">Design</span></h3><p><span class="vi">Bài toán kỹ thuật có ràng buộc.</span><span class="en">Constrained engineering problems.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chỉnh SVM, chọn đặc trưng.</span><span class="en">SVM tuning, feature selection.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Ảnh</span><span class="en">Imaging</span></h3><p><span class="vi">Phân ngưỡng đa mức.</span><span class="en">Multi-level thresholding.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · MFO</span><span class="en">Experiment · MFO</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">3.48e+3</td><td class="num">1.64e+4</td><td class="num">2.22e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">2.29e+1</td><td class="num">1.15e+1</td><td class="num">2.04e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">1.32e+0</td><td class="num">4.80e+0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F5 · Griewank</td><td class="num">1.68e−1</td><td class="num">1.23e−1</td><td class="num">1.38e−1</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">1.58e+2</td><td class="num">6.00e+2</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">2.91e+1</td><td class="num">1.41e+1</td><td class="num">2.63e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>9.50</b>, đứng thứ <b>11/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>9.50</b>, position <b>11/18</b> among the textbook’s 18 algorithms.</span></li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · MFO</span><span class="en">Experiment · MFO</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/MFO.svg" alt="convergence MFO" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/mfo.py" class="c-sea">code/si/algorithms/mfo.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        l += 1
+        FN = int(round(n - l * (n - 1) / T)); FN = max(FN, 1)
+        r = -1 + l * (-1 / T)
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            j = min(i, FN - 1)
+            t = (r - 1) * rng.random(prob.dim) + 1
+            Dd = np.abs(F[j] - M[i])
+            M[i] = Dd * np.exp(b * t) * np.cos(2 * np.pi * t) + F[j]
+        M = prob.clip(M)
+        mf = prob(M)
+        allx = np.vstack([F, M]); allf = np.concatenate([ff, mf])
+        o = np.argsort(allf)[:n]
+        F, ff = allx[o], allf[o]
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Đơn giản, có bộ nhớ, nhưng dễ mắc kẹt</span><span class="en">Simple and memory-based, but easily trapped</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Cài đặt rất ngắn; chỉ thêm hằng số <span class="m">b</span>.</span><span class="en">Very short to implement; only the constant <span class="m">b</span> is added.</span></li>
+          <li><span class="vi">Ngọn lửa là bộ nhớ đã sắp xếp nên không bao giờ mất lời giải tốt.</span><span class="en">Flames are a sorted memory, so good solutions are never lost.</span></li>
+          <li><span class="vi">Nhiều ngọn lửa ở đầu quá trình giúp tìm song song quanh nhiều vùng.</span><span class="en">Many early flames let the swarm search several regions in parallel.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi"><span class="m">FN</span> giảm tuyến tính nên đa dạng mất đi nhanh ở nửa sau; dễ kẹt cục bộ như ví dụ Goldstein–Price.</span><span class="en"><span class="m">FN</span> drops linearly, so diversity vanishes in the second half; local traps like the Goldstein–Price example are common.</span></li>
+          <li><span class="vi">Không có bước khám phá ngẫu nhiên độc lập với ngọn lửa.</span><span class="en">There is no exploration step independent of the flames.</span></li>
+          <li><span class="vi">Biến thể: MFO với bước Lévy, MFO hỗn loạn, MFO nhị phân; tổng quan của Shehab và cs. (2020).</span><span class="en">Variants: Lévy-flight MFO, chaotic MFO, binary MFO; see the survey by Shehab et al. (2020).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">N = 30, T = 100</span>, tính <span class="m">FN</span> tại <span class="m">l = 0, 50, 100</span>.</span><span class="en">With <span class="m">N = 30, T = 100</span>, compute <span class="m">FN</span> at <span class="m">l = 0, 50, 100</span>.</span></li>
+          <li><span class="vi">Một chiều: <span class="m">F = 0, M = 2, b = 1, t = −0.5</span>. Tính vị trí mới.</span><span class="en">One dimension: <span class="m">F = 0, M = 2, b = 1, t = −0.5</span>. Compute the new position.</span></li>
+          <li><span class="vi">So sánh vai trò của ngọn lửa trong MFO với pbest trong PSO.</span><span class="en">Compare MFO flames with pbest in PSO.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài MFO; chạy 30 lần trên Goldstein–Price và đếm số lần đạt cực tiểu toàn cục 3 so với cục bộ 84.</span><span class="en">Implement MFO; run it 30 times on Goldstein–Price and count global (3) versus local (84) outcomes.</span></li>
+          <li><span class="vi">So sánh MFO với WOA cùng ngân sách đánh giá hàm.</span><span class="en">Compare MFO with WOA under the same evaluation budget.</span></li>
+          <li><span class="vi">Thử giảm <span class="m">FN</span> theo hàm mũ thay vì tuyến tính và nhận xét.</span><span class="en">Try an exponential rather than linear decrease of <span class="m">FN</span> and comment.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Mirjalili, “The Ant Lion Optimizer,” <em>Advances in Engineering Software</em>, vol. 83, pp. 80–98, 2015, doi: <a href="https://doi.org/10.1016/j.advengsoft.2015.01.010">10.1016/j.advengsoft.2015.01.010</a>.</li>
+        <li>S. Mirjalili, “Moth-flame optimization algorithm: A novel nature-inspired heuristic paradigm,” <em>Knowledge-Based Systems</em>, vol. 89, pp. 228–249, 2015, doi: <a href="https://doi.org/10.1016/j.knosys.2015.07.006">10.1016/j.knosys.2015.07.006</a>.</li>
+        <li>E. Emary, H. M. Zawbaa, and A. E. Hassanien, “Binary ant lion approaches for feature selection,” <em>Neurocomputing</em>, vol. 213, pp. 54–65, 2016, doi: <a href="https://doi.org/10.1016/j.neucom.2016.03.101">10.1016/j.neucom.2016.03.101</a>.</li>
+        <li>M. Shehab, L. Abualigah, H. Al Hamad, H. Alabool, M. Alshinwan, and A. M. Khasawneh, “Moth–flame optimization algorithm: variants and applications,” <em>Neural Comput & Applic</em>, vol. 32, no. 14, pp. 9859–9884, 2020, doi: <a href="https://doi.org/10.1007/s00521-019-04570-6">10.1007/s00521-019-04570-6</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Bướm đêm xoắn quanh ngọn lửa</span><span class="en">Moths spiral around flames</span></span>
+      <span><span class="vi">Ngọn lửa = bộ nhớ đã sắp xếp</span><span class="en">Flames = sorted memory</span></span>
+      <span><span class="vi"><span class="m">FN</span> giảm dần: khám phá → khai thác</span><span class="en">Shrinking <span class="m">FN</span>: explore → exploit</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili, <em>Knowledge-Based Systems</em> 89, 2015</span><span class="en">Original paper: Mirjalili, <em>Knowledge-Based Systems</em> 89, 2015</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* Hình minh họa: đường xoắn quanh ngọn đèn (slide 3) */
+(function () {
+  const p = document.getElementById('mfo-spiral'); let d = '';
+  for (let k = 0; k <= 160; k++) { const th = k * 0.12, r = 110 * Math.exp(-0.035 * k); d += `${k ? 'L' : 'M'}${(285 + r * Math.cos(th + 2.6)).toFixed(1)},${(160 + r * Math.sin(th + 2.6) * 0.8).toFixed(1)}`; }
+  p.setAttribute('d', d);
+})();
+/* MFO trên địa hình chung (cực tiểu), theo bài báo và mã gốc của Mirjalili (2015) */
+new SI.Field2D(document.getElementById('mfo-field'), {
+  n: 12, T: 60, seed: 6, b: 1,
+  init(S) {
+    for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) });
+    S.flames = S.pop.map((m) => ({ x: m.x.slice(), f: SI.f(m.x) })).sort((p, q) => p.f - q.f);
+    S.FN = this.n;
+  },
+  step(S) {
+    const N = this.n, l = S.t, T = S.T;
+    S.FN = Math.round(N - l * (N - 1) / T);
+    const r = -1 + l * (-1 / T);
+    S.pop.forEach((m, i) => {
+      const j = Math.min(i, S.FN - 1), F = S.flames[j].x; m.flame = j;
+      m.x = [0, 1].map((d) => { const t = (r - 1) * S.rnd() + 1, Dd = Math.abs(F[d] - m.x[d]); return SI.clamp(Dd * Math.exp(this.b * t) * Math.cos(2 * Math.PI * t) + F[d]); });
+    });
+    S.flames = S.flames.concat(S.pop.map((m) => ({ x: m.x.slice(), f: SI.f(m.x) }))).sort((p, q) => p.f - q.f).slice(0, N);
+  },
+  draw(g, S, P) {
+    for (let j = S.FN - 1; j >= 0; j--) {
+      const [x, y] = P.pt(S.flames[j].x), R = j === 0 ? 20 : 14, gr = g.createRadialGradient(x, y, 0, x, y, R);
+      gr.addColorStop(0, j === 0 ? 'rgba(217,86,47,0.95)' : 'rgba(240,160,75,0.85)'); gr.addColorStop(1, 'rgba(240,160,75,0)');
+      g.fillStyle = gr; g.beginPath(); g.arc(x, y, R, 0, Math.PI * 2); g.fill();
+    }
+    for (const m of S.pop) {
+      const [x, y] = P.at(m);
+      if (m.flame !== undefined) { const [fx, fy] = P.pt(S.flames[Math.min(m.flame, S.FN - 1)].x); g.strokeStyle = 'rgba(28,42,46,0.18)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, y); g.lineTo(fx, fy); g.stroke(); }
+      SI.dot(g, x, y, 4.2, '#1c2a2e', '#f5f0e6');
+    }
+  },
+  status(S) { return `<span><b>FN</b> = ${S.FN}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

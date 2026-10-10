@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 17: Bầy đàn trong AI" data-title-en="Chapter 17: Swarm intelligence in AI">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 17: Bầy đàn trong AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 17 · Phần V</span><span class="en">Chapter 17 · Part V</span></p>
+    <h1 class="reveal d1"><span class="vi">Trí tuệ bầy đàn trong trí tuệ nhân tạo</span><span class="en">Swarm intelligence in artificial intelligence</span><span class="sub"><span class="vi">Huấn luyện mạng, siêu tham số, xử lý ảnh</span><span class="en">Training networks, hyper-parameters, image processing</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Biến việc huấn luyện mạng nơ-ron thành bài toán tối ưu liên tục.</span><span class="en">Turn neural-network training into a continuous optimization problem.</span></li>
+        <li class="reveal d3"><span class="vi">Dùng PSO để chọn siêu tham số và so sánh công bằng với tìm kiếm ngẫu nhiên.</span><span class="en">Use PSO for hyper-parameter tuning and compare it fairly with random search.</span></li>
+        <li class="reveal d4"><span class="vi">Áp dụng PSO cho phân ngưỡng ảnh đa mức Otsu.</span><span class="en">Apply PSO to multi-level Otsu image thresholding.</span></li>
+        <li class="reveal d5"><span class="vi">Nhận ra khi nào bầy đàn <em>không</em> phải công cụ tốt nhất.</span><span class="en">Recognize when a swarm is <em>not</em> the best tool.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Ba cách đưa AI về bài toán tối ưu</span><span class="en">Three ways to cast AI as optimization</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Trọng số mạng</span><span class="en">Network weights</span></span><span class="en"><span class="vi">Trọng số mạng</span><span class="en">Network weights</span></span></dt><dd><span class="vi">Vector <span class="m">w ∈ ℝ<sup>d</sup></span>, mục tiêu là hàm mất mát trên tập huấn luyện</span><span class="en">A vector <span class="m">w ∈ ℝ<sup>d</sup></span>; the objective is the training loss</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Siêu tham số</span><span class="en">Hyper-parameters</span></span><span class="en"><span class="vi">Siêu tham số</span><span class="en">Hyper-parameters</span></span></dt><dd><span class="vi">Ít chiều nhưng mỗi lần đánh giá rất đắt (huấn luyện + kiểm định chéo)</span><span class="en">Few dimensions but each evaluation is costly (training + cross-validation)</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Ngưỡng ảnh</span><span class="en">Image thresholds</span></span><span class="en"><span class="vi">Ngưỡng ảnh</span><span class="en">Image thresholds</span></span></dt><dd><span class="vi"><span class="m">k</span> ngưỡng nguyên; mục tiêu là phương sai giữa các lớp</span><span class="en"><span class="m">k</span> integer thresholds; the objective is between-class variance</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></span><span class="en"><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></span></dt><dd><span class="vi">Vector bit, xem chương 15</span><span class="en">A bit vector, see chapter 15</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Mạng một lớp ẩn</span><span class="en">One-hidden-layer net</span></h3><span class="m">ŷ = softmax(W<sub>2</sub> tanh(W<sub>1</sub>x + b<sub>1</sub>) + b<sub>2</sub>)</span></div>
+        <div class="card sea mathcard reveal d4"><h3><span class="vi">Otsu</span><span class="en">Otsu</span></h3><span class="m">σ<sub>B</sub>² = Σ<sub>k</sub> ω<sub>k</sub>(μ<sub>k</sub> − μ)²</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Mô hình" data-label-en="Models">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Hàm mục tiêu cho từng ứng dụng</span><span class="en">Objectives for each application</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">min<sub>w</sub> L(w) = −(1/N) Σ log p<sub>w</sub>(y<sub>i</sub> | x<sub>i</sub>)</span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">min<sub>θ</sub> 1 − acc<sub>CV</sub>(θ), &nbsp; θ = (cây, độ sâu, lá, tỉ lệ đặc trưng)</span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">max<sub>t<sub>1</sub>&lt;t<sub>2</sub></sub> σ<sub>B</sub>²(t<sub>1</sub>, t<sub>2</sub>)</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Mạng: mất mát entropy chéo; <span class="m">d</span> tham số = 10 nơ-ron ẩn × (số đặc trưng + số lớp) + độ lệch.</span><span class="en">Network: cross-entropy loss; <span class="m">d</span> parameters = 10 hidden units × (features + classes) + biases.</span></li>
+          <li class="reveal d4"><span class="vi">Siêu tham số Random Forest (Breiman, 2001) trên <span class="m">[10, 200] × [2, 20] × [1, 10] × [0.05, 1]</span>.</span><span class="en">Random Forest (Breiman, 2001) hyper-parameters over <span class="m">[10, 200] × [2, 20] × [1, 10] × [0.05, 1]</span>.</span></li>
+          <li class="reveal d5"><span class="vi">Otsu (1979): chọn ngưỡng làm các lớp mức xám tách nhau nhất.</span><span class="en">Otsu (1979): pick thresholds that separate gray-level classes the most.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">PSO tìm hai ngưỡng Otsu</span><span class="en">PSO searches two Otsu thresholds</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Histogram mức xám thật của ảnh mẫu “china.jpg” (scikit-learn). 20 hạt, mỗi hạt là một cặp ngưỡng; vạch cam là cặp tốt nhất hiện tại.</span><span class="en">Real gray-level histogram of the sample image “china.jpg” (scikit-learn). 20 particles, each a pair of thresholds; orange lines are the current best.</span></p>
+        <p class="note"><span class="vi">Vét cạn 32 385 cặp cho (77  170)  σ<sub>B</sub>² = 6699.108.</span><span class="en">Exhaustive search over 32,385 pairs gives (77, 170), σ<sub>B</sub>² = 6699.108.</span></p>
+      </div>
+      <div class="field" id="c17-field"><canvas aria-label="Otsu PSO"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một nơ-ron và một ngưỡng Otsu</span><span class="en">One neuron and one Otsu threshold</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">x = (1, 2), &nbsp; w = (0.5, −0.3), &nbsp; b = 0.1</span></div>
+          <div class="eq"><span class="m">h = [4, 4, 0, 0, 2, 0, 0, 0, 4, 6]</span><span class="vi"> (mức 0–9)</span><span class="en"> (levels 0–9)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">v = 0.5 − 0.6 + 0.1 = 0</span>, <span class="m">σ(0) = 0.5</span>: nơ-ron đang ở giữa vùng không chắc chắn.</span><span class="en"><span class="m">v = 0.5 − 0.6 + 0.1 = 0</span>, <span class="m">σ(0) = 0.5</span>: the neuron sits at maximum uncertainty.</span></li>
+          <li><span class="vi">PSO thay đổi <span class="m">w, b</span> trực tiếp, không cần đạo hàm của <span class="m">σ</span>.</span><span class="en">PSO changes <span class="m">w, b</span> directly, without the derivative of <span class="m">σ</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Otsu một ngưỡng</span><span class="en">Single-threshold Otsu</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Lớp dưới: mức 0, 1, 4: <span class="m">ω = 0.5, μ = 1.2</span>. Lớp trên: mức 8, 9: <span class="m">ω = 0.5, μ = 8.6</span>. <span class="m">μ = 4.9</span>.</span><span class="en">Lower class: levels 0, 1, 4: <span class="m">ω = 0.5, μ = 1.2</span>. Upper class: levels 8, 9: <span class="m">ω = 0.5, μ = 8.6</span>. <span class="m">μ = 4.9</span>.</span></li>
+          <li><span class="vi"><span class="m">σ<sub>B</sub>² = 0.5 · 3.7² + 0.5 · 3.7² = 13.69</span>, đạt với mọi ngưỡng <span class="m">t = 4…7</span>.</span><span class="en"><span class="m">σ<sub>B</sub>² = 0.5 · 3.7² + 0.5 · 3.7² = 13.69</span>, reached for any <span class="m">t = 4…7</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Huấn luyện mạng" data-label-en="Training networks">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · huấn luyện MLP</span><span class="en">Experiment · MLP training</span></p>
+      <h2 class="reveal d1"><span class="vi">PSO (6 000 lần đánh giá) và Adam (tối đa 500 epoch), 10 lần chạy</span><span class="en">PSO (6,000 evaluations) vs Adam (up to 500 epochs), 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Dữ liệu</span><span class="en">Dataset</span></th><th><span class="vi">Độ chính xác · PSO</span><span class="en">Accuracy · PSO</span></th><th><span class="vi">Độ chính xác · Adam</span><span class="en">Accuracy · Adam</span></th><th><span class="vi">p</span><span class="en">p</span></th></tr></thead>
+      <tbody>
+        <tr><td>BreastCancer</td><td>0.9445 ± 0.0111</td><td>0.9597 ± 0.0080</td><td>2.2e-03</td></tr>
+        <tr><td>Wine</td><td>0.9611 ± 0.0308</td><td>0.9944 ± 0.0089</td><td>1.3e-03</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">MLP 10 nơ-ron ẩn, tập kiểm tra 30% giữ riêng. Adam (Kingma &amp; Ba, 2015) tốt hơn PSO trên cả hai bộ dữ liệu: khi có gradient, tối ưu dựa gradient thường thắng. Bầy đàn hữu ích hơn khi mạng nhỏ, mục tiêu không khả vi, hoặc tối ưu cả kiến trúc.</span><span class="en">MLP with 10 hidden units, a held-out 30% test set. Adam (Kingma &amp; Ba, 2015) beats PSO on both datasets: with gradients available, gradient-based training usually wins. Swarms help more for small nets, non-differentiable objectives, or architecture search.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Siêu tham số và Otsu" data-label-en="Hyper-parameters and Otsu">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · HPO và phân ngưỡng</span><span class="en">Experiment · HPO and thresholding</span></p>
+      <h2 class="reveal d1"><span class="vi">Cùng ngân sách, kết quả đo trên dữ liệu chưa thấy</span><span class="en">Equal budgets, results on unseen data</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Bài toán</span><span class="en">Task</span></th><th><span class="vi">Phương pháp</span><span class="en">Method</span></th><th><span class="vi">Ngân sách</span><span class="en">Budget</span></th><th><span class="vi">Kết quả (10 lần chạy)</span><span class="en">Result (10 runs)</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Random Forest trên Digits</span><span class="en">Random Forest on Digits</span></td><td>PSO</td><td><span class="vi">50 cấu hình</span><span class="en">50 configs</span></td><td>0.9730 ± 0.0027</td></tr>
+        <tr><td><span class="vi">Random Forest trên Digits</span><span class="en">Random Forest on Digits</span></td><td><span class="vi">Tìm kiếm ngẫu nhiên</span><span class="en">Random search</span></td><td><span class="vi">50 cấu hình</span><span class="en">50 configs</span></td><td>0.9711 ± 0.0044</td></tr>
+        <tr><td><span class="vi">Otsu 2 ngưỡng, china.jpg</span><span class="en">Otsu, 2 thresholds, china.jpg</span></td><td><span class="vi">Vét cạn</span><span class="en">Exhaustive</span></td><td>32 385</td><td>(77, 170), σ² = 6699.108</td></tr>
+        <tr><td><span class="vi">Otsu 2 ngưỡng, china.jpg</span><span class="en">Otsu, 2 thresholds, china.jpg</span></td><td>PSO</td><td>1 000</td><td><span class="vi">đạt đúng tối ưu 10/10 lần</span><span class="en">exact optimum 10/10 runs</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">HPO: độ chính xác kiểm tra của PSO và tìm kiếm ngẫu nhiên không khác nhau có ý nghĩa (p = 0.19), phù hợp với Bergstra &amp; Bengio (2012): với ít chiều, tìm kiếm ngẫu nhiên là mốc rất mạnh. Otsu: PSO tìm đúng tối ưu với ít hơn 1/32 số lần đánh giá.</span><span class="en">HPO: PSO and random search do not differ significantly on test accuracy (p = 0.19), in line with Bergstra &amp; Bengio (2012): in low dimensions random search is a strong baseline. Otsu: PSO finds the exact optimum with under 1/32 of the evaluations.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng trong AI</span><span class="en">Applications in AI</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Bầy đàn hay được dùng ở những chỗ gradient không có hoặc quá đắt.</span><span class="en">Swarms are used where gradients are missing or too costly.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Huấn luyện mạng nhỏ</span><span class="en">Training small nets</span></h3><p><span class="vi">GWO huấn luyện MLP (Mirjalili, 2015).</span><span class="en">GWO trains MLPs (Mirjalili, 2015).</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Siêu tham số</span><span class="en">Hyper-parameters</span></h3><p><span class="vi">PSO cho mạng sâu (Lorenzo và cs., 2017).</span><span class="en">PSO for deep networks (Lorenzo et al., 2017).</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Xử lý ảnh</span><span class="en">Image processing</span></h3><p><span class="vi">Phân ngưỡng đa mức, đăng ký ảnh.</span><span class="en">Multi-level thresholding, image registration.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">BPSO, BGWO (chương 15).</span><span class="en">BPSO, BGWO (chapter 15).</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Hàm mục tiêu Otsu</span><span class="en">The Otsu objective</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Phương sai giữa các lớp cho bất kỳ số ngưỡng nào; PSO cực tiểu giá trị âm của nó.</span><span class="en">Between-class variance for any number of thresholds; PSO minimizes its negative.</span> <a href="code/si/applications.py" class="c-sea">code/si/applications.py</a></p>
+    <pre class="codeblock reveal d2"><span class="k">def</span> otsu_between(hist, t):
+    &quot;&quot;&quot;Phương sai giữa các lớp cho các ngưỡng t (đã sắp xếp), histogram 256 mức.&quot;&quot;&quot;
+    p = hist / hist.sum(); levels = np.arange(256); mu = (p * levels).sum()
+    edges = [0] + [int(x) + 1 <span class="k">for</span> x <span class="k">in</span> t] + [256]
+    s = 0.0
+    <span class="k">for</span> a, b <span class="k">in</span> zip(edges[:-1], edges[1:]):
+        w = p[a:b].sum()
+        <span class="k">if</span> w &gt; 0:
+            m = (p[a:b] * levels[a:b]).sum() / w
+            s += w * (m - mu) ** 2
+    <span class="k">return</span> s</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Bầy đàn trong AI: dùng đúng chỗ</span><span class="en">Swarms in AI: use them where they fit</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Không cần đạo hàm; dùng được với mục tiêu rời rạc, không khả vi.</span><span class="en">No derivatives needed; works with discrete, non-differentiable objectives.</span></li>
+          <li><span class="vi">Otsu đa mức: đạt tối ưu với rất ít lần đánh giá.</span><span class="en">Multi-level Otsu: optimal with very few evaluations.</span></li>
+          <li><span class="vi">Dễ song song hóa các lần huấn luyện khi tối ưu siêu tham số.</span><span class="en">Easy to parallelize training runs when tuning hyper-parameters.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Thua Adam khi huấn luyện trọng số mạng (bảng trên).</span><span class="en">Loses to Adam when training network weights (table above).</span></li>
+          <li><span class="vi">Không vượt tìm kiếm ngẫu nhiên có ý nghĩa trong HPO 4 chiều.</span><span class="en">Not significantly better than random search in 4-D HPO.</span></li>
+          <li><span class="vi">Số chiều lớn (hàng triệu trọng số) vượt khả năng của bầy đàn cổ điển.</span><span class="en">Huge dimensions (millions of weights) are beyond classic swarms.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Đếm số tham số của MLP 30–10–2 dùng trong thực nghiệm Breast Cancer.</span><span class="en">Count the parameters of the 30–10–2 MLP used for Breast Cancer.</span></li>
+          <li><span class="vi">Tính <span class="m">σ<sub>B</sub>²</span> của ví dụ Otsu với <span class="m">t = 2</span>. So với 13.69.</span><span class="en">Compute <span class="m">σ<sub>B</sub>²</span> for the Otsu example with <span class="m">t = 2</span>. Compare with 13.69.</span></li>
+          <li><span class="vi">Vì sao so sánh HPO phải dùng cùng số cấu hình?</span><span class="en">Why must HPO comparisons use the same number of configurations?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Mở rộng Otsu lên 3 và 4 ngưỡng; so PSO với vét cạn về thời gian.</span><span class="en">Extend Otsu to 3 and 4 thresholds; compare PSO and exhaustive search in time.</span></li>
+          <li><span class="vi">Dùng PSO tối ưu cả số nơ-ron ẩn và tốc độ học của Adam.</span><span class="en">Use PSO to tune both the hidden size and Adam's learning rate.</span></li>
+          <li><span class="vi">Thay PSO bằng GWO trong bài huấn luyện MLP.</span><span class="en">Replace PSO with GWO in MLP training.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>N. Otsu, “A Threshold Selection Method from Gray-Level Histograms,” <em>IEEE Trans. Syst., Man, Cybern.</em>, vol. 9, no. 1, pp. 62–66, 1979, doi: <a href="https://doi.org/10.1109/TSMC.1979.4310076">10.1109/TSMC.1979.4310076</a>.</li>
+        <li>L. Breiman, “Random Forests,” <em>Machine Learning</em>, vol. 45, no. 1, pp. 5–32, 2001, doi: <a href="https://doi.org/10.1023/A:1010933404324">10.1023/A:1010933404324</a>.</li>
+        <li>F. Pedregosa et al., “Scikit-learn: Machine learning in Python,” <em>J. Mach. Learn. Res.</em>, vol. 12, pp. 2825–2830, 2011.</li>
+        <li>J. Bergstra and Y. Bengio, “Random search for hyper-parameter optimization,” <em>J. Mach. Learn. Res.</em>, vol. 13, pp. 281–305, 2012.</li>
+        <li>S. Mirjalili, “How effective is the Grey Wolf optimizer in training multi-layer perceptrons,” <em>Appl Intell</em>, vol. 43, no. 1, pp. 150–161, 2015, doi: <a href="https://doi.org/10.1007/s10489-014-0645-7">10.1007/s10489-014-0645-7</a>.</li>
+        <li>D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” in <em>Proc. Int. Conf. Learn. Represent. (ICLR)</em>, 2015, arXiv:1412.6980.</li>
+        <li>P. R. Lorenzo, J. Nalepa, M. Kawulok, L. S. Ramos, and J. R. Pastor, “Particle swarm optimization for hyper-parameter selection in deep neural networks,” in <em>Proceedings of the Genetic and Evolutionary Computation Conference</em>, 2017, pp. 481–488, doi: <a href="https://doi.org/10.1145/3071178.3071208">10.1145/3071178.3071208</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">AI → bài toán tối ưu</span><span class="en">AI → optimization problems</span></span>
+      <span><span class="vi">Gradient có sẵn thì dùng gradient</span><span class="en">Use gradients when you have them</span></span>
+      <span><span class="vi">Bầy đàn mạnh ở bài toán rời rạc, không khả vi</span><span class="en">Swarms shine on discrete, non-differentiable tasks</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Bergstra &amp; Bengio, <em>JMLR</em> 13, 2012</span><span class="en">Original paper: Bergstra &amp; Bengio, <em>JMLR</em> 13, 2012</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () {
+  const H = [605, 806, 779, 978, 1014, 1093, 1168, 1206, 1187, 1179, 1206, 1182, 1215, 1159, 1100, 1094, 1142, 1128, 1174, 1143, 1160, 1157, 1175, 1224, 1169, 1205, 1174, 1243, 1243, 1213, 1234, 1201, 1220, 1215, 1207, 1260, 1146, 1099, 1104, 1081, 1074, 1099, 1064, 1052, 1100, 1083, 1066, 1111, 1095, 1056, 1069, 1044, 1090, 1020, 1017, 1105, 1020, 1037, 1043, 1004, 1058, 1085, 1048, 1019, 1015, 987, 965, 1037, 1036, 993, 970, 981, 1008, 926, 977, 1022, 1011, 1005, 991, 959, 973, 966, 922, 935, 923, 971, 893, 938, 928, 886, 907, 910, 859, 872, 863, 807, 792, 836, 838, 796, 758, 733, 766, 767, 735, 700, 742, 734, 734, 652, 636, 672, 666, 665, 698, 627, 552, 613, 638, 641, 630, 586, 640, 553, 591, 571, 597, 511, 599, 553, 533, 542, 548, 562, 513, 496, 462, 509, 465, 437, 480, 434, 456, 419, 433, 440, 422, 413, 389, 430, 407, 472, 465, 521, 559, 642, 644, 576, 570, 540, 533, 484, 397, 398, 401, 363, 407, 400, 439, 375, 425, 379, 425, 393, 416, 388, 388, 403, 359, 403, 429, 486, 500, 576, 653, 744, 822, 862, 815, 794, 625, 565, 584, 575, 639, 654, 655, 576, 609, 659, 646, 717, 809, 826, 894, 1000, 1167, 1480, 1999, 2479, 2838, 2992, 3298, 3314, 3379, 2647, 2152, 1737, 1952, 1685, 1150, 879, 1027, 1104, 1158, 1162, 1273, 1385, 1994, 2225, 2265, 2202, 2194, 2422, 2281, 2500, 2581, 2455, 2448, 2539, 2839, 2861, 2624, 2500, 2761, 3576, 4151, 3334, 3211, 2577, 2079, 2492, 2352, 656, 220, 10], N = H.reduce((a, b) => a + b, 0), p = H.map((v) => v / N), mu = p.reduce((s, v, i) => s + v * i, 0);
+  const sb = (t1, t2) => { const e = [0, t1 + 1, t2 + 1, 256]; let s = 0; for (let k = 0; k < 3; k++) { let w = 0, m = 0; for (let i = e[k]; i < e[k + 1]; i++) { w += p[i]; m += p[i] * i; } if (w > 0) s += w * (m / w - mu) ** 2; } return s; };
+  const fit = (x) => { const a = Math.round(Math.min(x[0], x[1])), b = Math.round(Math.max(x[0], x[1])); return [a, b, sb(a, b)]; };
+  const root = document.getElementById('c17-field'), cv = root.querySelector('canvas'), stat = root.querySelector('.field-stat'), playBtn = root.querySelector('[data-act="play"]'), slide = root.closest('.slide');
+  let S, timer = null, userPaused = false;
+  function reset() { const rnd = SI.rng(3); S = { rnd, t: 0, T: 50, X: [], V: [], P: [], pf: [], g: null, gf: -1, fes: 0 };
+    for (let i = 0; i < 20; i++) { const x = [rnd() * 254, rnd() * 254]; S.X.push(x); S.V.push([0, 0]); S.P.push(x.slice()); const f = fit(x)[2]; S.pf.push(f); S.fes++; if (f > S.gf) { S.gf = f; S.g = x.slice(); } } render(); upd(); }
+  function step() { if (S.t >= S.T) { pause(); return; } S.t++; const rnd = S.rnd, w = 0.9 - 0.5 * S.t / S.T;
+    S.X.forEach((x, i) => { for (let d = 0; d < 2; d++) { S.V[i][d] = Math.max(-50, Math.min(50, w * S.V[i][d] + 2 * rnd() * (S.P[i][d] - x[d]) + 2 * rnd() * (S.g[d] - x[d]))); x[d] = Math.max(0, Math.min(254, x[d] + S.V[i][d])); }
+      const f = fit(x)[2]; S.fes++; if (f > S.pf[i]) { S.pf[i] = f; S.P[i] = x.slice(); } if (f > S.gf) { S.gf = f; S.g = x.slice(); } });
+    render(); upd(); }
+  function render() { const r = cv.getBoundingClientRect(), s = Math.max(120, Math.floor(r.width)), dpr = Math.min(2, devicePixelRatio || 1); cv.width = s * dpr; cv.height = s * dpr; const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    g.fillStyle = '#fbf8f2'; g.fillRect(0, 0, s, s); const mx = Math.max(...H), X = (i) => 14 + i / 255 * (s - 28), base = s - 26;
+    g.fillStyle = '#9fb7b9'; for (let i = 0; i < 256; i++) { const h = H[i] / mx * (s - 70); g.fillRect(X(i), base - h, Math.max(1, (s - 28) / 256), h); }
+    g.strokeStyle = '#1c2a2e'; g.beginPath(); g.moveTo(14, base); g.lineTo(s - 14, base); g.stroke();
+    S.X.forEach((x) => { [0, 1].forEach((d) => SI.dot(g, X(x[d]), base + 10, 3, '#3a7fc1')); });
+    const [a, b] = fit(S.g); g.strokeStyle = '#d9562f'; g.lineWidth = 2.5; [a, b].forEach((t) => { g.beginPath(); g.moveTo(X(t), 18); g.lineTo(X(t), base); g.stroke(); });
+    g.fillStyle = '#56676a'; g.font = '11px "Be Vietnam Pro"'; g.fillText('0', 12, s - 4); g.fillText('255', s - 34, s - 4); }
+  function upd() { const en = SI.lang() === 'en', [a, b, v] = fit(S.g);
+    stat.innerHTML = `<span><b>t</b> = ${S.t} / ${S.T}</span><span><b>${en ? 'thresholds' : 'ngưỡng'}</b> = (${a}, ${b})</span><span><b>σ²<sub>B</sub></b> = ${v.toFixed(3)}</span><span><b>${en ? 'evals' : 'đánh giá'}</b> = ${S.fes}</span>`;
+    playBtn.textContent = timer ? (en ? '❚❚ Pause' : '❚❚ Dừng') : (en ? '▶ Run' : '▶ Chạy'); }
+  function play() { if (S.t >= S.T) reset(); clearInterval(timer); timer = setInterval(step, 220); upd(); }
+  function pause() { clearInterval(timer); timer = null; upd(); }
+  root.querySelector('[data-act="step"]').onclick = () => { userPaused = true; pause(); step(); };
+  root.querySelector('[data-act="reset"]').onclick = () => { reset(); if (!userPaused && !reduceMotion) play(); };
+  playBtn.onclick = () => { if (timer) { userPaused = true; pause(); } else { userPaused = false; play(); } };
+  slide.addEventListener('slideenter', () => { if (!reduceMotion && !userPaused && S.t < S.T) play(); });
+  slide.addEventListener('slideleave', pause); SI.onLang(upd); window.addEventListener('resize', render);
+  reset();
+})();
+
+SI.boot();
+</script>
+</body>
+</html>

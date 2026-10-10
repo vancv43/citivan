@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 18: Ứng dụng kỹ thuật và tương lai" data-title-en="Chapter 18: Engineering and future directions">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 18: Ứng dụng kỹ thuật và tương lai</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 18 · Phần V</span><span class="en">Chapter 18 · Part V</span></p>
+    <h1 class="reveal d1"><span class="vi">Ứng dụng kỹ thuật và hướng phát triển</span><span class="en">Engineering applications and future directions</span><span class="sub"><span class="vi">Định tuyến xe, môi trường động, robot bầy đàn</span><span class="en">Vehicle routing, dynamic environments, swarm robotics</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô hình hóa bài toán định tuyến xe có tải trọng (CVRP) và giải bằng ACO.</span><span class="en">Model the capacitated vehicle routing problem (CVRP) and solve it with ACO.</span></li>
+        <li class="reveal d3"><span class="vi">So sánh metaheuristic với heuristic chuyên biệt (Clarke–Wright).</span><span class="en">Compare a metaheuristic with a dedicated heuristic (Clarke–Wright).</span></li>
+        <li class="reveal d4"><span class="vi">Xử lý môi trường động: phát hiện thay đổi và khởi tạo lại.</span><span class="en">Handle dynamic environments: detect changes and re-initialize.</span></li>
+        <li class="reveal d5"><span class="vi">Nắm các hướng nghiên cứu: robot bầy đàn, tối ưu quy mô lớn, các họ thuật toán khác.</span><span class="en">Survey research directions: swarm robotics, large-scale optimization, other families.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Định tuyến xe" data-label-en="Vehicle routing">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">CVRP: một kho, nhiều xe cùng tải trọng</span><span class="en">CVRP: one depot, identical capacitated vehicles</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">min Σ<sub>r</sub> [ d<sub>0,r<sub>1</sub></sub> + Σ<sub>k</sub> d<sub>r<sub>k</sub>,r<sub>k+1</sub></sub> + d<sub>r<sub>last</sub>,0</sub> ]</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">Σ<sub>i∈r</sub> q<sub>i</sub> ≤ Q &nbsp; với mọi tuyến r</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">s<sub>ij</sub> = d<sub>0i</sub> + d<sub>0j</sub> − d<sub>ij</sub></span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Mỗi khách được phục vụ đúng một lần; mỗi tuyến bắt đầu và kết thúc tại kho 0.</span><span class="en">Each customer is served exactly once; each route starts and ends at depot 0.</span></li>
+          <li class="reveal d4"><span class="vi">Clarke &amp; Wright (1964): ghép tuyến theo thứ tự tiết kiệm <span class="m">s<sub>ij</sub></span> giảm dần.</span><span class="en">Clarke &amp; Wright (1964): merge routes in decreasing order of savings <span class="m">s<sub>ij</sub></span>.</span></li>
+          <li class="reveal d5"><span class="vi">ACO: kiến xây từng tuyến, quay về kho khi không khách nào còn vừa tải.</span><span class="en">ACO: ants build routes and return to the depot when no customer still fits.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước của thuật toán tiết kiệm</span><span class="en">One savings step</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">d<sub>0i</sub> = 10, &nbsp; d<sub>0j</sub> = 12, &nbsp; d<sub>ij</sub> = 5</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Hai tuyến riêng: <span class="m">2(10) + 2(12) = 44</span>.</span><span class="en">Two separate routes: <span class="m">2(10) + 2(12) = 44</span>.</span></li>
+          <li><span class="vi">Ghép thành <span class="m">0 → i → j → 0</span>: <span class="m">10 + 5 + 12 = 27</span>.</span><span class="en">Merged <span class="m">0 → i → j → 0</span>: <span class="m">10 + 5 + 12 = 27</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Tiết kiệm</span><span class="en">Savings</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">s<sub>ij</sub> = 10 + 12 − 5 = 17 = 44 − 27</span>.</span><span class="en"><span class="m">s<sub>ij</sub> = 10 + 12 − 5 = 17 = 44 − 27</span>.</span></li>
+          <li><span class="vi">Chỉ ghép khi <span class="m">q<sub>i</sub> + q<sub>j</sub> ≤ Q</span> và <span class="m">i, j</span> đang ở đầu hoặc cuối tuyến.</span><span class="en">Merge only if <span class="m">q<sub>i</sub> + q<sub>j</sub> ≤ Q</span> and <span class="m">i, j</span> are route endpoints.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm CVRP" data-label-en="CVRP experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · CVRP</span><span class="en">Experiment · CVRP</span></p>
+      <h2 class="reveal d1"><span class="vi">30 khách, tải trọng 100, ACO 5 000 lời giải, 10 lần chạy</span><span class="en">30 customers, capacity 100, ACO 5,000 solutions, 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Phương pháp</span><span class="en">Method</span></th><th><span class="vi">Chi phí TB</span><span class="en">Mean cost</span></th><th><span class="vi">Tốt nhất</span><span class="en">Best</span></th><th><span class="vi">Chênh lệch so với Clarke–Wright</span><span class="en">Gap to Clarke–Wright</span></th></tr></thead>
+      <tbody>
+        <tr><td>Clarke–Wright</td><td>714.80</td><td>714.80</td><td>—</td></tr>
+        <tr><td><span class="vi">ACO (Ant System, không tìm kiếm cục bộ)</span><span class="en">ACO (Ant System, no local search)</span></td><td>769.68 ± 8.09</td><td>757.47</td><td>+7.7% / +6.0%</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Kết quả âm thật: ACO đơn giản thua heuristic tiết kiệm 50 năm tuổi. Các ACO cạnh tranh cho CVRP (Bullnheimer và cs., 1999) dùng thêm xếp hạng, danh sách ứng viên và tìm kiếm cục bộ 2-opt; đó là bài tập thực hành.</span><span class="en">An honest negative result: plain ACO loses to the 50-year-old savings heuristic. Competitive ACOs for CVRP (Bullnheimer et al., 1999) add ranking, candidate lists and 2-opt local search; that is a lab exercise.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Môi trường động" data-label-en="Dynamic environments">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tối ưu động</span><span class="en">Dynamic optimization</span></p>
+      <h2 class="reveal d1"><span class="vi">Khi tối ưu di chuyển theo thời gian</span><span class="en">When the optimum moves over time</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Bài toán thực thay đổi: giá, nhu cầu, tắc đường, hỏng thiết bị (Branke, 1999).</span><span class="en">Real problems change: prices, demand, traffic, equipment failures (Branke, 1999).</span></li>
+          <li class="reveal d3"><span class="vi">PSO thường hội tụ rồi <strong>mất đa dạng</strong>; pbest cũ trở thành trí nhớ sai.</span><span class="en">Plain PSO converges and <strong>loses diversity</strong>; old pbests become wrong memories.</span></li>
+          <li class="reveal d4"><span class="vi">Hu &amp; Eberhart (2002): đánh giá lại gbest mỗi vòng; nếu giá trị đổi thì khởi tạo lại một phần bầy và đặt lại trí nhớ.</span><span class="en">Hu &amp; Eberhart (2002): re-evaluate gbest every iteration; if it changed, re-initialize part of the swarm and reset memories.</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thiết lập thực nghiệm</span><span class="en">Experimental setup</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Hàm cầu 5 chiều, tâm dịch 1 đơn vị sau mỗi 1 000 lần đánh giá; 20 000 lần đánh giá; 10 lần chạy.</span><span class="en">5-D sphere whose centre moves by 1 unit every 1,000 evaluations; 20,000 evaluations; 10 runs.</span></li>
+          <li><span class="vi">Đo sai số trung bình theo thời gian của cá thể gần tâm nhất.</span><span class="en">Measure the time-averaged error of the particle closest to the centre.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">PSO đuổi theo tối ưu di động</span><span class="en">PSO chasing a moving optimum</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Dấu + là tâm hàm cầu, nhảy sau mỗi 15 vòng. Chọn chế độ rồi quan sát bầy có theo kịp không.</span><span class="en">The + is the sphere centre; it jumps every 15 iterations. Pick a mode and see whether the swarm keeps up.</span></p>
+        <div class="field-ctrl" id="c18-modes"><button class="btn solid" data-mode="0" type="button"><span class="vi">PSO thường</span><span class="en">Plain PSO</span></button><button class="btn" data-mode="1" type="button"><span class="vi">Phát hiện + khởi tạo lại</span><span class="en">Detect + re-initialize</span></button></div>
+      </div>
+      <div class="field" id="c18-field"><canvas aria-label="dynamic PSO"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm động" data-label-en="Dynamic experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · môi trường động</span><span class="en">Experiment · dynamic environment</span></p>
+      <h2 class="reveal d1"><span class="vi">Sai số trung bình theo thời gian, 10 lần chạy</span><span class="en">Time-averaged error, 10 runs</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Phương pháp</span><span class="en">Method</span></th><th><span class="vi">TB ± độ lệch chuẩn</span><span class="en">Mean ± std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">p (Wilcoxon)</span><span class="en">p (Wilcoxon)</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">PSO thường (hằng số co)</span><span class="en">Plain PSO (constriction)</span></td><td>8.16 ± 5.30</td><td>6.87</td><td>—</td></tr>
+        <tr><td><span class="vi">PSO + phát hiện và khởi tạo lại nửa bầy</span><span class="en">PSO + detection and half-swarm re-initialization</span></td><td>0.36 ± 0.09</td><td>0.34</td><td>1.6e-04</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Cơ chế phản ứng giảm sai số hơn 20 lần. Chi phí: thêm 1 lần đánh giá mỗi vòng và <span class="m">n</span> lần đánh giá mỗi lần khởi tạo lại, đã tính vào ngân sách.</span><span class="en">The response mechanism cuts the error by over 20×. Cost: 1 extra evaluation per iteration and <span class="m">n</span> per re-initialization, all counted in the budget.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Robot bầy đàn" data-label-en="Swarm robotics">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Hướng phát triển</span><span class="en">Future directions</span></p>
+      <h2 class="reveal d1"><span class="vi">Từ thuật toán đến robot thật</span><span class="en">From algorithms to real robots</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Robot bầy đàn</strong>: nhiều robot đơn giản, cảm biến cục bộ, không điều khiển trung tâm (Şahin, 2005; Brambilla và cs., 2013).</span><span class="en"><strong>Swarm robotics</strong>: many simple robots, local sensing, no central control (Şahin, 2005; Brambilla et al., 2013).</span></li>
+          <li class="reveal d3"><span class="vi">Nhiệm vụ: tụ tập, tạo hình, tìm kiếm cứu nạn, vận chuyển tập thể; nền tảng là quy tắc của Reynolds (1987).</span><span class="en">Tasks: aggregation, formation, search and rescue, collective transport; built on Reynolds' rules (1987).</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Tối ưu quy mô lớn</strong>: hàng nghìn biến; đồng tiến hóa chia nhóm biến (Omidvar và cs., 2014).</span><span class="en"><strong>Large-scale optimization</strong>: thousands of variables; cooperative co-evolution with variable grouping (Omidvar et al., 2014).</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Các họ thuật toán khác</span><span class="en">Other families</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Lấy cảm hứng vật lý: mô phỏng luyện kim (Kirkpatrick và cs., 1983), GSA (Rashedi và cs., 2009).</span><span class="en">Physics-inspired: simulated annealing (Kirkpatrick et al., 1983), GSA (Rashedi et al., 2009).</span></li>
+          <li><span class="vi">Xu hướng đáng tin: so sánh trên bộ CEC, mã nguồn mở, ablation; ít “thuật toán mới” chỉ đổi ẩn dụ.</span><span class="en">Healthy trends: CEC benchmarks, open code, ablations; fewer “new” algorithms that only change the metaphor.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng kỹ thuật</span><span class="en">Engineering applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán kỹ thuật thường gặp trong tài liệu.</span><span class="en">Engineering problems common in the literature.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Logistics</span><span class="en">Logistics</span></h3><p><span class="vi">Định tuyến xe, lập lịch giao hàng, bố trí kho.</span><span class="en">Vehicle routing, delivery scheduling, warehouse layout.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Điều độ kinh tế, đặt thiết bị bù, tối ưu lưới điện.</span><span class="en">Economic dispatch, capacitor placement, grid optimization.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Thiết kế cơ khí</span><span class="en">Mechanical design</span></h3><p><span class="vi">Bình áp lực, lò xo, dầm hàn (bài toán có ràng buộc).</span><span class="en">Pressure vessel, spring, welded beam (constrained problems).</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Mạng truyền thông</span><span class="en">Communication networks</span></h3><p><span class="vi">Đặt trạm, định tuyến, phân bổ kênh.</span><span class="en">Station placement, routing, channel allocation.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">PSO trong môi trường động</span><span class="en">PSO in a dynamic environment</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Phát hiện thay đổi bằng cách đánh giá lại gbest; nếu đổi thì khởi tạo lại một nửa bầy.</span><span class="en">Detect change by re-evaluating gbest; if it changed, re-initialize half the swarm.</span> <a href="code/si/applications.py" class="c-sea">code/si/applications.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> fes &lt; budget:
+        <span class="k">if</span> react:
+            probe = f(P[g:g + 1])[0]; fes += 1
+            <span class="k">if</span> abs(probe - pf[g]) &gt; 1e-12:
+                half = rng.permutation(n)[: n // 2]
+                X[half] = rng.uniform(lb, ub, (len(half), dim)); V[half] = 0
+                P = X.copy(); pf = f(P); fes += n
+        V = w * V + c1 * rng.random(X.shape) * (P - X) + c2 * rng.random(X.shape) * (P[g] - X)
+        X = np.clip(X + V, lb, ub)
+        fx = f(X); fes += n
+        b = fx &lt; pf; P[b], pf[b] = X[b], fx[b]; g = int(np.argmin(pf))
+        errs.append(float(np.min(np.sum((X - state[&<span class="c">#x27;c&#x27;]) ** 2, axis=1))))</span></pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Từ phòng thí nghiệm ra thực tế</span><span class="en">From the lab to the real world</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Khung metaheuristic linh hoạt: thêm ràng buộc, mục tiêu, thay đổi động dễ dàng.</span><span class="en">Flexible metaheuristic frameworks: constraints, objectives and dynamics are easy to add.</span></li>
+          <li><span class="vi">Cơ chế phản ứng đơn giản cải thiện mạnh trong môi trường động.</span><span class="en">Simple response mechanisms help greatly in dynamic environments.</span></li>
+          <li><span class="vi">Robot bầy đàn bền vững khi từng robot hỏng.</span><span class="en">Swarm robotics is robust to individual robot failure.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Heuristic chuyên biệt (Clarke–Wright) có thể tốt hơn metaheuristic “thuần”.</span><span class="en">Dedicated heuristics (Clarke–Wright) can beat “pure” metaheuristics.</span></li>
+          <li><span class="vi">Kết quả trên bài nhỏ không bảo đảm mở rộng lên quy mô thật.</span><span class="en">Results on small instances do not guarantee real-scale performance.</span></li>
+          <li><span class="vi">Luôn so với mốc mạnh nhất đã biết, không chỉ với thuật toán bầy đàn khác.</span><span class="en">Always compare with the strongest known baseline, not only other swarms.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính tiết kiệm cho mọi cặp trong 4 khách cho trước và chạy Clarke–Wright bằng tay.</span><span class="en">Compute all savings for 4 given customers and run Clarke–Wright by hand.</span></li>
+          <li><span class="vi">Vì sao pbest cũ có hại sau khi môi trường thay đổi?</span><span class="en">Why are old pbests harmful after the environment changes?</span></li>
+          <li><span class="vi">Nêu ba quy tắc của Reynolds và vai trò của mỗi quy tắc.</span><span class="en">State Reynolds' three rules and the role of each.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Thêm 2-opt cho từng tuyến của ACO-CVRP và chạy lại.</span><span class="en">Add per-route 2-opt to ACO-CVRP and re-run.</span></li>
+          <li><span class="vi">Thay khởi tạo lại bằng hạt lượng tử (QPSO) trong môi trường động.</span><span class="en">Replace re-initialization with quantum particles (QPSO) in the dynamic setting.</span></li>
+          <li><span class="vi">Mô phỏng 50 boid trong trình duyệt với ba quy tắc Reynolds.</span><span class="en">Simulate 50 boids in the browser with Reynolds' three rules.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>G. Clarke and J. W. Wright, “Scheduling of Vehicles from a Central Depot to a Number of Delivery Points,” <em>Operations Research</em>, vol. 12, no. 4, pp. 568–581, 1964, doi: <a href="https://doi.org/10.1287/opre.12.4.568">10.1287/opre.12.4.568</a>.</li>
+        <li>S. Kirkpatrick, C. D. Gelatt, and M. P. Vecchi, “Optimization by Simulated Annealing,” <em>Science</em>, vol. 220, no. 4598, pp. 671–680, 1983, doi: <a href="https://doi.org/10.1126/science.220.4598.671">10.1126/science.220.4598.671</a>.</li>
+        <li>C. W. Reynolds, “Flocks, herds and schools: A distributed behavioral model,” <em>SIGGRAPH Comput. Graph.</em>, vol. 21, no. 4, pp. 25–34, 1987, doi: <a href="https://doi.org/10.1145/37402.37406">10.1145/37402.37406</a>.</li>
+        <li>J. Branke, “Memory enhanced evolutionary algorithms for changing optimization problems,” in <em>Proceedings of the 1999 Congress on Evolutionary Computation-CEC99 (Cat. No. 99TH8406)</em>, 1999, pp. 1875–1882, doi: <a href="https://doi.org/10.1109/CEC.1999.785502">10.1109/CEC.1999.785502</a>.</li>
+        <li>X. Hu and R. Eberhart, “Adaptive particle swarm optimization: detection and response to dynamic systems,” in <em>Proceedings of the 2002 Congress on Evolutionary Computation. CEC'02 (Cat. No.02TH8600)</em>, 2002, pp. 1666–1670, doi: <a href="https://doi.org/10.1109/CEC.2002.1004492">10.1109/CEC.2002.1004492</a>.</li>
+        <li>E. Şahin, “Swarm Robotics: From Sources of Inspiration to Domains of Application,” in <em>Lecture Notes in Computer Science</em>, Springer Berlin Heidelberg, 2005, pp. 10–20, doi: <a href="https://doi.org/10.1007/978-3-540-30552-1_2">10.1007/978-3-540-30552-1_2</a>.</li>
+        <li>E. Rashedi, H. Nezamabadi-pour, and S. Saryazdi, “GSA: A Gravitational Search Algorithm,” <em>Information Sciences</em>, vol. 179, no. 13, pp. 2232–2248, 2009, doi: <a href="https://doi.org/10.1016/j.ins.2009.03.004">10.1016/j.ins.2009.03.004</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
+        <li>M. Brambilla, E. Ferrante, M. Birattari, and M. Dorigo, “Swarm robotics: a review from the swarm engineering perspective,” <em>Swarm Intell</em>, vol. 7, no. 1, pp. 1–41, 2013, doi: <a href="https://doi.org/10.1007/s11721-012-0075-2">10.1007/s11721-012-0075-2</a>.</li>
+        <li>M. N. Omidvar, X. Li, Y. Mei, and X. Yao, “Cooperative Co-Evolution With Differential Grouping for Large Scale Optimization,” <em>IEEE Trans. Evol. Computat.</em>, vol. 18, no. 3, pp. 378–393, 2014, doi: <a href="https://doi.org/10.1109/TEVC.2013.2281543">10.1109/TEVC.2013.2281543</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">CVRP: metaheuristic vs heuristic chuyên biệt</span><span class="en">CVRP: metaheuristic vs dedicated heuristic</span></span>
+      <span><span class="vi">Môi trường động: phát hiện + phản ứng</span><span class="en">Dynamic: detect + respond</span></span>
+      <span><span class="vi">Robot bầy đàn và tối ưu quy mô lớn</span><span class="en">Swarm robotics and large-scale optimization</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Brambilla và cs., <em>Swarm Intelligence</em> 7(1), 2013</span><span class="en">Original paper: Brambilla et al., <em>Swarm Intelligence</em> 7(1), 2013</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () {
+  const root = document.getElementById('c18-field'), cv = root.querySelector('canvas'), stat = root.querySelector('.field-stat'), playBtn = root.querySelector('[data-act="play"]'), slide = root.closest('.slide');
+  let S, timer = null, userPaused = false, react = false;
+  const f = (x) => (x[0] - S.c[0]) ** 2 + (x[1] - S.c[1]) ** 2, R = 5, N = 16;
+  function reset() { const rnd = SI.rng(7); S = { rnd, t: 0, T: 150, c: [rnd() * 6 - 3, rnd() * 6 - 3], X: [], V: [], P: [], pf: [], errs: [] };
+    for (let i = 0; i < N; i++) { const x = [rnd() * 10 - 5, rnd() * 10 - 5]; S.X.push(x); S.V.push([0, 0]); S.P.push(x.slice()); S.pf.push(f(x)); } render(); upd(); }
+  const gi = () => S.pf.indexOf(Math.min(...S.pf));
+  function step() { if (S.t >= S.T) { pause(); return; } S.t++; const rnd = S.rnd;
+    if (S.t % 15 === 0) { const a = rnd() * 2 * Math.PI; S.c = [Math.max(-4, Math.min(4, S.c[0] + 1.5 * Math.cos(a))), Math.max(-4, Math.min(4, S.c[1] + 1.5 * Math.sin(a)))]; }
+    let g = gi();
+    if (react && Math.abs(f(S.P[g]) - S.pf[g]) > 1e-12) { for (let i = 0; i < N; i++) { if (i % 2) { S.X[i] = [rnd() * 10 - 5, rnd() * 10 - 5]; S.V[i] = [0, 0]; } S.P[i] = S.X[i].slice(); S.pf[i] = f(S.X[i]); } g = gi(); }
+    S.X.forEach((x, i) => { for (let d = 0; d < 2; d++) { S.V[i][d] = 0.729 * S.V[i][d] + 1.494 * rnd() * (S.P[i][d] - x[d]) + 1.494 * rnd() * (S.P[g][d] - x[d]); x[d] = Math.max(-R, Math.min(R, x[d] + S.V[i][d])); }
+      const v = f(x); if (v < S.pf[i]) { S.pf[i] = v; S.P[i] = x.slice(); } });
+    S.errs.push(Math.min(...S.X.map(f))); render(); upd(); }
+  function render() { const r = cv.getBoundingClientRect(), s = Math.max(120, Math.floor(r.width)), dpr = Math.min(2, devicePixelRatio || 1); cv.width = s * dpr; cv.height = s * dpr; const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const X = (v) => (v + R) / (2 * R) * s, Y = (v) => s - (v + R) / (2 * R) * s;
+    g.fillStyle = '#fbf8f2'; g.fillRect(0, 0, s, s);
+    for (let k = 6; k >= 1; k--) { g.beginPath(); g.arc(X(S.c[0]), Y(S.c[1]), k * s / 14, 0, 2 * Math.PI); g.fillStyle = `rgba(31,111,120,${0.05 + 0.03 * (6 - k)})`; g.fill(); }
+    S.X.forEach((x) => SI.dot(g, X(x[0]), Y(x[1]), 4.5, react ? '#1f6f78' : '#3a7fc1'));
+    g.strokeStyle = '#d9562f'; g.lineWidth = 3; const cx = X(S.c[0]), cy = Y(S.c[1]); g.beginPath(); g.moveTo(cx - 9, cy); g.lineTo(cx + 9, cy); g.moveTo(cx, cy - 9); g.lineTo(cx, cy + 9); g.stroke(); }
+  function upd() { const en = SI.lang() === 'en', e = S.errs.length ? S.errs[S.errs.length - 1] : 0, m = S.errs.length ? S.errs.reduce((a, b) => a + b, 0) / S.errs.length : 0;
+    stat.innerHTML = `<span><b>t</b> = ${S.t} / ${S.T}</span><span><b>${en ? 'error now' : 'sai số'}</b> = ${e.toFixed(3)}</span><span><b>${en ? 'avg error' : 'sai số TB'}</b> = ${m.toFixed(3)}</span>`;
+    playBtn.textContent = timer ? (en ? '❚❚ Pause' : '❚❚ Dừng') : (en ? '▶ Run' : '▶ Chạy'); }
+  function play() { if (S.t >= S.T) reset(); clearInterval(timer); timer = setInterval(step, 160); upd(); }
+  function pause() { clearInterval(timer); timer = null; upd(); }
+  root.querySelector('[data-act="step"]').onclick = () => { userPaused = true; pause(); step(); };
+  root.querySelector('[data-act="reset"]').onclick = () => { reset(); if (!userPaused && !reduceMotion) play(); };
+  playBtn.onclick = () => { if (timer) { userPaused = true; pause(); } else { userPaused = false; play(); } };
+  document.querySelectorAll('#c18-modes [data-mode]').forEach((b) => b.addEventListener('click', () => { react = b.dataset.mode === '1'; document.querySelectorAll('#c18-modes [data-mode]').forEach((q) => q.classList.toggle('solid', q === b)); userPaused = false; reset(); play(); }));
+  slide.addEventListener('slideenter', () => { if (!reduceMotion && !userPaused && S.t < S.T) play(); });
+  slide.addEventListener('slideleave', pause); SI.onLang(upd); window.addEventListener('resize', render);
+  reset();
+})();
+
+SI.boot();
+</script>
+</body>
+</html>

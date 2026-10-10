@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Chương 2: Cơ sở toán học và hàm kiểm thử" data-title-en="Chapter 2: Mathematical foundations and benchmarks">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chương 2: Cơ sở toán học và hàm kiểm thử</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 2 · Phần I</span><span class="en">Chapter 2 · Part I</span></p>
+    <h1 class="reveal d1"><span class="vi">Cơ sở toán học và bộ hàm kiểm thử</span><span class="en">Mathematical foundations and benchmarks</span><span class="sub"><span class="vi">Quần thể, bước ngẫu nhiên, hàm thử và thống kê</span><span class="en">Populations, random steps, test functions and statistics</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Biểu diễn quần thể bằng ma trận và tính ma trận khoảng cách.</span><span class="en">Represent a population as a matrix and compute its distance matrix.</span></li>
+        <li class="reveal d3"><span class="vi">Sinh bước Gauss và bước Lévy (thuật toán Mantegna) và so sánh tính chất đuôi dày.</span><span class="en">Generate Gaussian and Lévy steps (Mantegna) and compare their heavy tails.</span></li>
+        <li class="reveal d4"><span class="vi">Nhận biết các hàm thử đơn đỉnh, đa đỉnh, cố định chiều và vì sao cần bản dịch tâm.</span><span class="en">Recognize unimodal, multimodal and fixed-dimension test functions and why shifted versions are needed.</span></li>
+        <li class="reveal d5"><span class="vi">Dùng kiểm định Wilcoxon và Friedman để so sánh thuật toán.</span><span class="en">Use Wilcoxon and Friedman tests to compare algorithms.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Quần thể dưới dạng ma trận</span><span class="en">A population as a matrix</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Quần thể</span><span class="en">Population</span></span><span class="en"><span class="vi">Quần thể</span><span class="en">Population</span></span></dt><dd><span class="vi"><span class="m">X ∈ ℝ<sup>n×D</sup></span>: mỗi hàng là một cá thể</span><span class="en"><span class="m">X ∈ ℝ<sup>n×D</sup></span>: each row is an individual</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Độ thích nghi</span><span class="en">Fitness</span></span><span class="en"><span class="vi">Độ thích nghi</span><span class="en">Fitness</span></span></dt><dd><span class="vi"><span class="m">f(X) ∈ ℝ<sup>n</sup></span>, tính một lần cho cả ma trận</span><span class="en"><span class="m">f(X) ∈ ℝ<sup>n</sup></span>, computed once for the whole matrix</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Khoảng cách</span><span class="en">Distances</span></span><span class="en"><span class="vi">Khoảng cách</span><span class="en">Distances</span></span></dt><dd><span class="vi"><span class="m">d<sub>ij</sub> = ‖x<sub>i</sub> − x<sub>j</sub>‖</span>: cần cho FA, GOA, BFO, MOPSO</span><span class="en"><span class="m">d<sub>ij</sub> = ‖x<sub>i</sub> − x<sub>j</sub>‖</span>: used by FA, GOA, BFO, MOPSO</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="vi">Không gian trạng thái</span><span class="en">State space</span></span><span class="en"><span class="vi">Không gian trạng thái</span><span class="en">State space</span></span></dt><dd><span class="vi">Vị trí, vận tốc, bộ nhớ (pbest, ngọn lửa, kho...)</span><span class="en">Positions, velocities, memories (pbest, flames, archives...)</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Ma trận khoảng cách</span><span class="en">Distance matrix</span></h3><span class="m">D = √(‖x‖² + ‖x‖²<sup>T</sup> − 2XX<sup>T</sup>)</span></div>
+        <div class="card sea mathcard reveal d4"><h3><span class="vi">Chi phí</span><span class="en">Cost</span></h3><span class="m">O(n² D)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Bước ngẫu nhiên" data-label-en="Random walks">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Phân phối xác suất</span><span class="en">Probability distributions</span></p>
+      <h2 class="reveal d1"><span class="vi">Bước Gauss và bước Lévy</span><span class="en">Gaussian and Lévy steps</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">Gauss: &nbsp; s ~ N(0, σ²)</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">Lévy (Mantegna): &nbsp; s = u / |v|<sup>1/β</sup>, &nbsp; u ~ N(0, σ<sub>u</sub>²), v ~ N(0, 1)</span></div></div>
+          <div class="eq-box  reveal d4"><div class="eq"><span class="m">σ<sub>u</sub> = [ Γ(1+β) sin(πβ/2) / (Γ((1+β)/2) β 2<sup>(β−1)/2</sup>) ]<sup>1/β</sup></span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Phân phối Lévy có đuôi dày: <span class="m">P(|s| &gt; x) ~ x<sup>−β</sup></span>; phần lớn bước nhỏ, thỉnh thoảng rất lớn (Mantegna, 1994).</span><span class="en">Lévy distributions are heavy-tailed: <span class="m">P(|s| &gt; x) ~ x<sup>−β</sup></span>; most steps small, occasionally huge (Mantegna, 1994).</span></li>
+          <li class="reveal d4"><span class="vi">Tìm kiếm kiểu Lévy tối ưu khi mục tiêu thưa và phân bố ngẫu nhiên (Viswanathan và cs., 1999).</span><span class="en">Lévy search is optimal when targets are sparse and random (Viswanathan et al., 1999).</span></li>
+          <li class="reveal d5"><span class="vi">Dùng trong HHO, CS, MPA và nhiều biến thể khác.</span><span class="en">Used in HHO, CS, MPA and many variants.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">Xem hình dạng các hàm thử</span><span class="en">Explore the shapes of test functions</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Chọn hàm để xem bản đồ đường mức 2 chiều. Vùng đậm là giá trị nhỏ; dấu + là cực tiểu toàn cục.</span><span class="en">Pick a function to see its 2-D contour map. Dark means low; + marks global minima.</span></p>
+        <div class="field-ctrl" id="c2-funcs"></div>
+        <p class="note" id="c2-info"></p>
+      </div>
+      <div class="field"><canvas id="c2-canvas" aria-label="function map"></canvas></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bộ hàm kiểm thử" data-label-en="Benchmark functions">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bộ hàm kiểm thử</span><span class="en">Benchmark functions</span></p>
+      <h2 class="reveal d1"><span class="vi">Bộ 7 hàm dùng trong giáo trình</span><span class="en">The textbook's 7-function suite</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Công thức</span><span class="en">Formula</span></th><th><span class="vi">Miền</span><span class="en">Range</span></th><th><span class="vi">Loại</span><span class="en">Type</span></th></tr></thead>
+      <tbody>
+        <tr><td>F1 Sphere</td><td><span class="m">Σ x<sub>i</sub>²</span></td><td>[−100, 100]</td><td><span class="vi">đơn đỉnh</span><span class="en">unimodal</span></td></tr>
+        <tr><td>F2 Rosenbrock</td><td><span class="m">Σ 100(x<sub>i+1</sub> − x<sub>i</sub>²)² + (x<sub>i</sub> − 1)²</span></td><td>[−30, 30]</td><td><span class="vi">thung lũng hẹp</span><span class="en">narrow valley</span></td></tr>
+        <tr><td>F3 Rastrigin</td><td><span class="m">10D + Σ (x<sub>i</sub>² − 10 cos 2πx<sub>i</sub>)</span></td><td>[−5.12, 5.12]</td><td><span class="vi">đa đỉnh đều</span><span class="en">regular multimodal</span></td></tr>
+        <tr><td>F4 Ackley</td><td><span class="m">−20e<sup>−0.2√(Σx²/D)</sup> − e<sup>Σcos 2πx/D</sup> + 20 + e</span></td><td>[−32, 32]</td><td><span class="vi">đa đỉnh</span><span class="en">multimodal</span></td></tr>
+        <tr><td>F5 Griewank</td><td><span class="m">1 + Σ x<sub>i</sub>²/4000 − Π cos(x<sub>i</sub>/√i)</span></td><td>[−600, 600]</td><td><span class="vi">đa đỉnh</span><span class="en">multimodal</span></td></tr>
+        <tr><td>F6, F7</td><td><span class="m">F1(x − o), F3(x − o)</span></td><td><span class="vi">như F1, F3</span><span class="en">as F1, F3</span></td><td><span class="vi">dịch tâm: phát hiện thiên lệch gốc</span><span class="en">shifted: reveals origin bias</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Hàm 2 biến cố định chiều trong các ví dụ của sách tham khảo: Booth, Himmelblau (4 nghiệm), Goldstein–Price (toàn cục 3, cục bộ 84), Bukin N.6, Wayburn–Seader (Jamil &amp; Yang, 2013).</span><span class="en">Fixed-dimension 2-D functions in the reference book's examples: Booth, Himmelblau (4 optima), Goldstein–Price (global 3, local 84), Bukin N.6, Wayburn–Seader (Jamil &amp; Yang, 2013).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · bước Lévy</span><span class="en">Experiment · Lévy steps</span></p>
+      <h2 class="reveal d1"><span class="vi">100 000 bước Lévy (β = 1.5) và Gauss</span><span class="en">100,000 Lévy (β = 1.5) and Gaussian steps</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Phân phối</span><span class="en">Distribution</span></th><th><span class="vi">Trung vị |s|</span><span class="en">Median |s|</span></th><th><span class="vi">Phân vị 99%</span><span class="en">99th percentile</span></th><th><span class="vi">Lớn nhất</span><span class="en">Maximum</span></th><th><span class="vi">% bước &gt; 10× trung vị</span><span class="en">% steps &gt; 10× median</span></th></tr></thead>
+      <tbody>
+        <tr><td>Lévy (β = 1.5)</td><td>0.6285</td><td>11.576</td><td>1404.4</td><td>2.468</td></tr>
+        <tr><td>Gauss</td><td>0.6746</td><td>2.57</td><td>4.2</td><td>0.0</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Hai phân phối có trung vị gần như nhau, nhưng bước Lévy lớn nhất dài gấp hơn 300 lần bước Gauss lớn nhất: đó là “bước nhảy xa” giúp thoát cực trị.</span><span class="en">Both have nearly the same median, yet the largest Lévy step is over 300 times the largest Gaussian one: the “long jump” that escapes local optima.</span></p>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Kiểm định thống kê" data-label-en="Statistical tests">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Phân tích thống kê</span><span class="en">Statistical analysis</span></p>
+      <h2 class="reveal d1"><span class="vi">Wilcoxon rank-sum và Friedman</span><span class="en">Wilcoxon rank-sum and Friedman</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="vi">Wilcoxon: xếp hạng chung hai mẫu, so tổng hạng của một mẫu với giá trị kỳ vọng</span><span class="en">Wilcoxon: rank both samples together; compare one sample's rank sum with its expectation</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">χ²<sub>F</sub> = 12N / (k(k+1)) · [Σ<sub>j</sub> R<sub>j</sub>² − k(k+1)²/4]</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Wilcoxon rank-sum: so sánh hai thuật toán trên một hàm, không giả định phân phối chuẩn.</span><span class="en">Wilcoxon rank-sum: compare two algorithms on one function, without assuming normality.</span></li>
+          <li class="reveal d4"><span class="vi">Friedman: so sánh <span class="m">k</span> thuật toán trên <span class="m">N</span> bài toán qua thứ hạng trung bình <span class="m">R<sub>j</sub></span>.</span><span class="en">Friedman: compare <span class="m">k</span> algorithms over <span class="m">N</span> problems via average ranks <span class="m">R<sub>j</sub></span>.</span></li>
+          <li class="reveal d5"><span class="vi">Báo cáo luôn kèm trung bình, độ lệch chuẩn, trung vị và giá trị p (Derrac và cs., 2011).</span><span class="en">Always report mean, standard deviation, median and p-values (Derrac et al., 2011).</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Wilcoxon rank-sum trên hai mẫu nhỏ</span><span class="en">Wilcoxon rank-sum on two small samples</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">A = (0.12, 0.30, 0.05, 0.41, 0.22)</span></div>
+          <div class="eq"><span class="m">B = (0.50, 0.38, 0.61, 0.29, 0.45)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Xếp hạng chung 10 giá trị: hạng của A là <span class="m">2, 5, 1, 7, 3</span>; tổng hạng <span class="m">R<sub>A</sub> = 18</span>.</span><span class="en">Rank all 10 values: A gets <span class="m">2, 5, 1, 7, 3</span>; rank sum <span class="m">R<sub>A</sub> = 18</span>.</span></li>
+          <li><span class="vi">Kỳ vọng khi không khác biệt: <span class="m">n(n + m + 1)/2 = 27.5</span>.</span><span class="en">Expectation under no difference: <span class="m">n(n + m + 1)/2 = 27.5</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Thống kê chuẩn hóa cho <span class="m">p = 0.047 &lt; 0.05</span>: A tốt hơn B (sai số nhỏ hơn) có ý nghĩa thống kê.</span><span class="en">The normalized statistic gives <span class="m">p = 0.047 &lt; 0.05</span>: A is significantly better (lower error) than B.</span></li>
+          <li><span class="vi">Với bước Lévy: <span class="m">σ<sub>u</sub>(β = 1.5) = 0.6966</span>.</span><span class="en">For Lévy steps: <span class="m">σ<sub>u</sub>(β = 1.5) = 0.6966</span>.</span></li>
+          <li><span class="vi">Toàn bộ bảng kết quả của giáo trình dùng đúng hai kiểm định này với 30 lần chạy.</span><span class="en">All result tables in this book use exactly these two tests with 30 runs.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Xếp hạng Friedman" data-label-en="Friedman ranking">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · toàn giáo trình</span><span class="en">Experiment · whole textbook</span></p>
+      <h2 class="reveal d1"><span class="vi">Xếp hạng Friedman của 18 thuật toán bầy đàn</span><span class="en">Friedman ranking of the 18 swarm algorithms</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Hạng</span><span class="en">Rank</span></th><th><span class="vi">Thuật toán</span><span class="en">Algorithm</span></th><th><span class="vi">Hạng TB</span><span class="en">Avg. rank</span></th><th><span class="vi">Hạng</span><span class="en">Rank</span></th><th><span class="vi">Thuật toán</span><span class="en">Algorithm</span></th><th><span class="vi">Hạng TB</span><span class="en">Avg. rank</span></th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>ABC</td><td>4.36</td><td>10</td><td>ALO</td><td>8.79</td></tr>
+        <tr><td>2</td><td>AAA</td><td>5.21</td><td>11</td><td>MFO</td><td>9.50</td></tr>
+        <tr><td>3</td><td>MPA</td><td>5.21</td><td>12</td><td>SSA</td><td>10.21</td></tr>
+        <tr><td>4</td><td>PSO</td><td>5.93</td><td>13</td><td>BOA</td><td>11.79</td></tr>
+        <tr><td>5</td><td>HHO</td><td>6.79</td><td>14</td><td>CS</td><td>12.14</td></tr>
+        <tr><td>6</td><td>GWO</td><td>7.00</td><td>15</td><td>GOA</td><td>13.71</td></tr>
+        <tr><td>7</td><td>ACOR</td><td>7.21</td><td>16</td><td>RCO</td><td>14.86</td></tr>
+        <tr><td>8</td><td>WOA</td><td>7.64</td><td>17</td><td>BA</td><td>15.86</td></tr>
+        <tr><td>9</td><td>FA</td><td>8.64</td><td>18</td><td>BFO</td><td>16.14</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Kiểm định Friedman trên 7 hàm: p = 1.3e-07. Thứ hạng phụ thuộc bộ thử và ngân sách: đây không phải xếp hạng tuyệt đối (NFL).</span><span class="en">Friedman test over 7 functions: p = 1.3e-07. Rankings depend on the suite and budget: this is not an absolute ranking (NFL).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Bộ hàm kiểm thử</span><span class="en">The benchmark suite</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Hàm <span class="m">suite()</span> tạo F1–F7, kể cả hai bản dịch tâm với vector dịch cố định.</span><span class="en"><span class="m">suite()</span> builds F1–F7, including the two shifted versions with a fixed shift vector.</span> <a href="code/si/benchmarks.py" class="c-sea">code/si/benchmarks.py</a></p>
+    <pre class="codeblock reveal d2">        (&<span class="c">#x27;F2&#x27;, &#x27;Rosenbrock&#x27;, rosenbrock, -30, 30),</span>
+        (&<span class="c">#x27;F3&#x27;, &#x27;Rastrigin&#x27;, rastrigin, -5.12, 5.12),</span>
+        (&<span class="c">#x27;F4&#x27;, &#x27;Ackley&#x27;, ackley, -32, 32),</span>
+        (&<span class="c">#x27;F5&#x27;, &#x27;Griewank&#x27;, griewank, -600, 600),</span>
+        (&<span class="c">#x27;F6&#x27;, &#x27;Shifted Sphere&#x27;, shifted(sphere, o6), -100, 100),</span>
+        (&<span class="c">#x27;F7&#x27;, &#x27;Shifted Rastrigin&#x27;, shifted(rastrigin, o7), -5.12, 5.12),</span>
+    ]</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Thiết kế thực nghiệm đúng cách</span><span class="en">Designing experiments properly</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Cố định giao thức trước khi chạy: hàm, chiều, ngân sách, số lần chạy, hạt giống.</span><span class="en">Lock the protocol before running: functions, dimension, budget, runs, seeds.</span></li>
+          <li><span class="vi">Cùng ngân sách đánh giá hàm cho mọi thuật toán.</span><span class="en">Equal evaluation budgets for all algorithms.</span></li>
+          <li><span class="vi">Dùng hàm dịch tâm và xoay để tránh kết luận sai do thiên lệch.</span><span class="en">Use shifted and rotated functions to avoid biased conclusions.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Bộ hàm cổ điển dễ “học thuộc”: nhiều thuật toán được thiết kế khớp với tối ưu tại 0.</span><span class="en">Classic suites are easy to “overfit”: many algorithms are tuned to an optimum at 0.</span></li>
+          <li><span class="vi">Nên bổ sung bộ CEC (2017, 2022) cho đánh giá nghiêm ngặt hơn.</span><span class="en">Add the CEC suites (2017, 2022) for stricter evaluation.</span></li>
+          <li><span class="vi">Nhiều so sánh cần hiệu chỉnh (Holm, Bonferroni).</span><span class="en">Multiple comparisons need correction (Holm, Bonferroni).</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">σ<sub>u</sub></span> với <span class="m">β = 1</span> và <span class="m">β = 2</span>. Chuyện gì xảy ra khi <span class="m">β = 2</span>?</span><span class="en">Compute <span class="m">σ<sub>u</sub></span> for <span class="m">β = 1</span> and <span class="m">β = 2</span>. What happens at <span class="m">β = 2</span>?</span></li>
+          <li><span class="vi">Rastrigin 2 chiều có bao nhiêu cực tiểu cục bộ trong <span class="m">[−5.12, 5.12]²</span>?</span><span class="en">How many local minima does 2-D Rastrigin have in <span class="m">[−5.12, 5.12]²</span>?</span></li>
+          <li><span class="vi">Xếp hạng Friedman cho 3 thuật toán trên 4 hàm từ bảng cho trước.</span><span class="en">Compute Friedman ranks for 3 algorithms on 4 functions from a given table.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Vẽ histogram log–log của bước Lévy và bước Gauss.</span><span class="en">Plot log–log histograms of Lévy and Gaussian steps.</span></li>
+          <li><span class="vi">Thêm phép xoay ngẫu nhiên vào bộ hàm và chạy lại PSO, HHO.</span><span class="en">Add random rotations to the suite and re-run PSO and HHO.</span></li>
+          <li><span class="vi">Áp dụng hiệu chỉnh Holm cho 17 phép so sánh với PSO.</span><span class="en">Apply Holm correction to the 17 comparisons against PSO.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>R. N. Mantegna, “Fast, accurate algorithm for numerical simulation of Lévy stable stochastic processes,” <em>Phys. Rev. E</em>, vol. 49, no. 5, pp. 4677–4683, 1994, doi: <a href="https://doi.org/10.1103/PhysRevE.49.4677">10.1103/PhysRevE.49.4677</a>.</li>
+        <li>G. M. Viswanathan, S. V. Buldyrev, S. Havlin, M. G. E. da Luz, E. P. Raposo, and H. E. Stanley, “Optimizing the success of random searches,” <em>Nature</em>, vol. 401, no. 6756, pp. 911–914, 1999, doi: <a href="https://doi.org/10.1038/44831">10.1038/44831</a>.</li>
+        <li>X. Yao, Y. Liu, and G. Lin, “Evolutionary programming made faster,” <em>IEEE Trans. Evol. Computat.</em>, vol. 3, no. 2, pp. 82–102, 1999, doi: <a href="https://doi.org/10.1109/4235.771163">10.1109/4235.771163</a>.</li>
+        <li>J. Derrac, S. García, D. Molina, and F. Herrera, “A practical tutorial on the use of nonparametric statistical tests as a methodology for comparing evolutionary and swarm intelligence algorithms,” <em>Swarm and Evolutionary Computation</em>, vol. 1, no. 1, pp. 3–18, 2011, doi: <a href="https://doi.org/10.1016/j.swevo.2011.02.002">10.1016/j.swevo.2011.02.002</a>.</li>
+        <li>M. Jamil and X. S. Yang, “A literature survey of benchmark functions for global optimisation problems,” <em>IJMMNO</em>, vol. 4, no. 2, pp. 150, 2013, doi: <a href="https://doi.org/10.1504/IJMMNO.2013.055204">10.1504/IJMMNO.2013.055204</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Quần thể = ma trận</span><span class="en">Population = matrix</span></span>
+      <span><span class="vi">Lévy: bước ngắn và bước nhảy xa</span><span class="en">Lévy: short steps and long jumps</span></span>
+      <span><span class="vi">Hàm dịch tâm + kiểm định thống kê</span><span class="en">Shifted functions + statistical tests</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Derrac và cs., <em>Swarm and Evolutionary Computation</em> 1(1), 2011</span><span class="en">Original paper: Derrac et al., <em>Swarm and Evolutionary Computation</em> 1(1), 2011</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () {
+  const F = {
+    Sphere: { f: (x, y) => x * x + y * y, r: [-5, 5], opt: [[0, 0]], vi: 'Đơn đỉnh, tối ưu tại gốc.', en: 'Unimodal, optimum at the origin.' },
+    Rastrigin: { f: (x, y) => 20 + x * x - 10 * Math.cos(2 * Math.PI * x) + y * y - 10 * Math.cos(2 * Math.PI * y), r: [-5.12, 5.12], opt: [[0, 0]], vi: 'Lưới cực tiểu cục bộ đều đặn.', en: 'A regular grid of local minima.' },
+    Ackley: { f: (x, y) => -20 * Math.exp(-0.2 * Math.sqrt((x * x + y * y) / 2)) - Math.exp((Math.cos(2 * Math.PI * x) + Math.cos(2 * Math.PI * y)) / 2) + 20 + Math.E, r: [-5, 5], opt: [[0, 0]], vi: 'Gần như phẳng ở xa, một hố sâu ở giữa.', en: 'Nearly flat far away, one deep well in the middle.' },
+    Rosenbrock: { f: (x, y) => 100 * (y - x * x) ** 2 + (x - 1) ** 2, r: [-2, 2], opt: [[1, 1]], vi: 'Thung lũng cong hẹp; tối ưu (1, 1).', en: 'A narrow curved valley; optimum (1, 1).' },
+    Himmelblau: { f: (x, y) => (x * x + y - 11) ** 2 + (x + y * y - 7) ** 2, r: [-5, 5], opt: [[3, 2], [-2.805, 3.131], [-3.779, -3.283], [3.584, -1.848]], vi: 'Bốn cực tiểu toàn cục bằng 0.', en: 'Four global minima equal to 0.' },
+    'Goldstein–Price': { f: (x, y) => (1 + (x + y + 1) ** 2 * (19 - 14 * x + 3 * x * x - 14 * y + 6 * x * y + 3 * y * y)) * (30 + (2 * x - 3 * y) ** 2 * (18 - 32 * x + 12 * x * x + 48 * y - 36 * x * y + 27 * y * y)), r: [-2, 2], opt: [[0, -1]], vi: 'Toàn cục 3 tại (0, −1); cục bộ 84 tại (1.8, 0.2).', en: 'Global 3 at (0, −1); local 84 at (1.8, 0.2).' },
+  };
+  const cv = document.getElementById('c2-canvas'), box = document.getElementById('c2-funcs'), info = document.getElementById('c2-info');
+  let cur = 'Rastrigin';
+  function draw() {
+    const r = cv.getBoundingClientRect(), s = Math.max(120, Math.floor(r.width)), dpr = Math.min(2, devicePixelRatio || 1);
+    cv.width = s * dpr; cv.height = s * dpr; const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const fn = F[cur], n = 120, img = document.createElement('canvas'); img.width = n; img.height = n; const ig = img.getContext('2d'), id = ig.createImageData(n, n);
+    const vals = []; for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) { const x = fn.r[0] + (i + 0.5) / n * (fn.r[1] - fn.r[0]), y = fn.r[1] - (j + 0.5) / n * (fn.r[1] - fn.r[0]); vals.push(Math.log1p(fn.f(x, y) - (cur === 'Goldstein–Price' ? 3 : 0))); }
+    const lo = Math.min(...vals), hi = Math.max(...vals);
+    vals.forEach((v, k) => { const w = Math.pow(1 - Math.floor((v - lo) / (hi - lo) * 14) / 14, 1.6) * 0.9; const o = k * 4; id.data[o] = 245 + (31 - 245) * w; id.data[o + 1] = 240 + (111 - 240) * w; id.data[o + 2] = 230 + (120 - 230) * w; id.data[o + 3] = 255; });
+    ig.putImageData(id, 0, 0); g.imageSmoothingEnabled = true; g.drawImage(img, 0, 0, s, s);
+    g.strokeStyle = '#d9562f'; g.lineWidth = 2;
+    fn.opt.forEach(([x, y]) => { const px = (x - fn.r[0]) / (fn.r[1] - fn.r[0]) * s, py = s - (y - fn.r[0]) / (fn.r[1] - fn.r[0]) * s; g.beginPath(); g.moveTo(px - 7, py); g.lineTo(px + 7, py); g.moveTo(px, py - 7); g.lineTo(px, py + 7); g.stroke(); });
+    info.innerHTML = `<span class="vi">${fn.vi}</span><span class="en">${fn.en}</span>`;
+    box.querySelectorAll('button').forEach((b) => b.classList.toggle('solid', b.dataset.fn === cur));
+  }
+  Object.keys(F).forEach((k) => { const b = document.createElement('button'); b.className = 'btn'; b.type = 'button'; b.dataset.fn = k; b.textContent = k; b.onclick = () => { cur = k; draw(); }; box.appendChild(b); });
+  window.addEventListener('resize', draw); setTimeout(draw, 50);
+})();
+
+SI.boot();
+</script>
+</body>
+</html>

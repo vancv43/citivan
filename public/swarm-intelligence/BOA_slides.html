@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Tối ưu bầy bướm (BOA)" data-title-en="Butterfly Optimization Algorithm (BOA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tối ưu bầy bướm (BOA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 7 · Mục 7.2</span><span class="en">Chapter 7 · Section 7.2</span></p>
+    <h1 class="reveal d1"><span class="vi">Tối ưu bầy bướm</span><span class="en">Butterfly Optimization Algorithm</span><span class="sub"><span class="vi">Butterfly Optimization Algorithm — BOA</span><span class="en">BOA — following the strongest scent</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích cách bướm dùng khứu giác để tìm thức ăn và bạn đời.</span><span class="en">Explain how butterflies use smell to find food and mates.</span></li>
+        <li class="reveal d3"><span class="vi">Viết công thức hương <span class="m">f = cI<sup>a</sup></span> và ý nghĩa của <span class="m">c</span>, <span class="m">a</span>.</span><span class="en">Write the fragrance <span class="m">f = cI<sup>a</sup></span> and the meaning of <span class="m">c</span> and <span class="m">a</span>.</span></li>
+        <li class="reveal d4"><span class="vi">Phân biệt bước tìm toàn cục và bước tìm cục bộ, chuyển bằng xác suất <span class="m">p</span>.</span><span class="en">Distinguish global and local search steps switched by probability <span class="m">p</span>.</span></li>
+        <li class="reveal d5"><span class="vi">Nhận diện thiên lệch về gốc tọa độ trong công thức gốc.</span><span class="en">Recognize the origin bias in the original update.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Bướm lần theo mùi hương</span><span class="en">Butterflies follow scent</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Sankalap Arora và Satvir Singh</strong> đề xuất năm 2019 (<em>Soft Computing</em> 23).</span><span class="en">Proposed by <strong>Sankalap Arora and Satvir Singh</strong> in 2019 (<em>Soft Computing</em> 23).</span></li>
+          <li class="reveal d3"><span class="vi">Bướm có thụ thể hóa học khắp cơ thể; khứu giác giúp chúng tìm mật hoa, bạn đời và nơi đẻ trứng.</span><span class="en">Butterflies carry chemoreceptors all over their body; smell guides them to nectar, mates and egg-laying sites.</span></li>
+          <li class="reveal d4"><span class="vi">Mỗi con tỏa ra một mùi hương có cường độ phụ thuộc “độ khỏe” của nó; con khác cảm nhận và bay về phía mùi mạnh.</span><span class="en">Each butterfly emits a scent whose strength reflects its fitness; others sense it and fly toward the strongest.</span></li>
+          <li class="reveal d5"><span class="vi">Khi không cảm nhận được mùi nào nổi bật, bướm bay ngẫu nhiên giữa các con khác.</span><span class="en">When no scent stands out, a butterfly moves randomly among the others.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 380 270" role="img" aria-label="Bướm cảm nhận mùi hương từ bướm khác và từ hoa">
+          <defs><radialGradient id="sc"><stop offset="0" stop-color="#e6904f" stop-opacity="0.5"/><stop offset="1" stop-color="#e6904f" stop-opacity="0"/></radialGradient></defs>
+          <circle cx="250" cy="120" r="95" fill="url(#sc)"/>
+          <g fill="#d9562f"><circle cx="250" cy="120" r="9"/><circle cx="238" cy="112" r="6" opacity="0.7"/><circle cx="262" cy="112" r="6" opacity="0.7"/></g>
+          <path d="M80,200 q20,-30 40,-10 q20,20 40,-20 q20,-40 50,-30" stroke="#1c2a2e" stroke-dasharray="4 5" fill="none" class="draw" style="--len:300"/>
+          <g transform="translate(80,200)"><path d="M0,0 c-14,-14 -24,-2 -12,8 c-12,10 -2,20 12,6 c14,14 24,4 12,-6 c12,-10 2,-22 -12,-8 z" fill="#3a7fc1"/></g>
+          <g transform="translate(60,80)" opacity="0.8"><path d="M0,0 c-10,-10 -18,-1 -9,6 c-9,7 -1,15 9,4 c10,11 18,3 9,-4 c9,-7 1,-16 -9,-6 z" fill="#4b8f45"/></g>
+          <path d="M70,90 q40,20 90,90" stroke="#4b8f45" stroke-dasharray="2 5" fill="none"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="12" fill="#56676a"><text x="205" y="240"><tspan class="vi">nguồn hương mạnh nhất (g*)</tspan><tspan class="en">strongest scent (g*)</tspan></text><text x="20" y="245"><tspan class="vi">bay theo hương: tìm toàn cục</tspan><tspan class="en">follow the scent: global search</tspan></text><text x="20" y="60"><tspan class="vi">theo bướm khác: tìm cục bộ</tspan><tspan class="en">follow others: local search</tspan></text></g>
+        </svg>
+        <figcaption><span class="vi">Hai kiểu bay: theo hương mạnh nhất, hoặc theo bạn bè gần đó</span><span class="en">Two moves: toward the strongest scent, or among nearby peers</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mùi hương" data-label-en="Fragrance">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Mùi hương tăng chậm hơn cường độ kích thích</span><span class="en">Fragrance grows slower than the stimulus</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">f = c · I<sup>a</sup></span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi"><span class="m">I</span>: cường độ kích thích, gắn với giá trị hàm mục tiêu của con bướm.</span><span class="en"><span class="m">I</span>: stimulus intensity, tied to the butterfly's objective value.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">c</span>: tính chất cảm giác (sensory modality), thường bắt đầu 0.01 và tăng dần; <span class="m">a ∈ [0, 1]</span>: số mũ, thường 0.1.</span><span class="en"><span class="m">c</span>: sensory modality, usually starting at 0.01 and slowly increasing; <span class="m">a ∈ [0, 1]</span>: power exponent, usually 0.1.</span></li>
+          <li class="reveal d5"><span class="vi"><span class="m">a = 1</span>: mùi không bị hấp thụ, mọi con cảm nhận như nhau; <span class="m">a = 0</span>: không con nào cảm nhận được mùi của con khác.</span><span class="en"><span class="m">a = 1</span>: no absorption, all butterflies sense the same; <span class="m">a = 0</span>: no one senses anyone else.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tìm toàn cục và cục bộ" data-label-en="Global and local search">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Xác suất <span class="m">p</span> chọn giữa hai kiểu bay</span><span class="en">Probability <span class="m">p</span> chooses between two moves</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">x<span class="ss"><i>t+1</i><i>i</i></span> = x<span class="ss"><i>t</i><i>i</i></span> + (r² · g* − x<span class="ss"><i>t</i><i>i</i></span>) · f<sub>i</sub></span></div></div>
+          <div class="eq-box  reveal d3"><div class="eq"><span class="m">x<span class="ss"><i>t+1</i><i>i</i></span> = x<span class="ss"><i>t</i><i>i</i></span> + (r² · x<span class="ss"><i>t</i><i>j</i></span> − x<span class="ss"><i>t</i><i>k</i></span>) · f<sub>i</sub></span></div></div>
+      </div>
+      <ul class="bullets">
+          <li class="reveal d3"><span class="vi">Dòng trên: <strong>tìm toàn cục</strong>, bay về phía lời giải tốt nhất <span class="m">g*</span>, xảy ra khi <span class="m">rand &lt; p</span> (thường <span class="m">p = 0.8</span>).</span><span class="en">Top: <strong>global search</strong> toward the best <span class="m">g*</span>, when <span class="m">rand &lt; p</span> (usually <span class="m">p = 0.8</span>).</span></li>
+          <li class="reveal d4"><span class="vi">Dòng dưới: <strong>tìm cục bộ</strong> với hai con <span class="m">j, k</span> chọn ngẫu nhiên.</span><span class="en">Bottom: <strong>local search</strong> with two random butterflies <span class="m">j, k</span>.</span></li>
+          <li class="reveal d5"><span class="vi">Lời giải mới chỉ được nhận nếu tốt hơn (chọn tham lam).</span><span class="en">A new solution is accepted only if it is better (greedy selection).</span></li>
+      </ul>
+    </div>
+    <p class="note reveal d6"><span class="vi">Đây là dạng trong bài báo và mã gốc: <span class="m">r² · g* − x</span> (không phải <span class="m">r² · (g* − x)</span>). Số hạng <span class="m">−x · f</span> luôn kéo về gốc tọa độ; sách Okwu &amp; Tartibu viết dạng thứ hai. Hai dạng cho hành vi khác nhau.</span><span class="en">This is the form in the original paper and code: <span class="m">r² · g* − x</span> (not <span class="m">r² · (g* − x)</span>). The <span class="m">−x · f</span> term always pulls toward the origin; Okwu &amp; Tartibu print the second form. The two behave differently.</span></p>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của BOA</span><span class="en">BOA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Arora &amp; Singh (2019), theo bài và mã gốc.</span><span class="en">Arora &amp; Singh (2019), following the paper and original code.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo <span class="m">n</span> bướm; tính kích thích <span class="m">I</span> từ giá trị hàm.</span><span class="en">Initialize <span class="m">n</span> butterflies; compute stimulus <span class="m">I</span> from the objective.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính mùi hương <span class="m">f<sub>i</sub> = c I<sub>i</sub><sup>a</sup></span>.</span><span class="en">Compute fragrance <span class="m">f<sub>i</sub> = c I<sub>i</sub><sup>a</sup></span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Với xác suất <span class="m">p</span>: bay về con tốt nhất (toàn cục); ngược lại đi theo hai con ngẫu nhiên (cục bộ).</span><span class="en">With probability <span class="m">p</span>: fly toward the best (global); otherwise follow two random butterflies (local).</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Nhận vị trí mới nếu tốt hơn.</span><span class="en">Accept the new position if it is better.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Tăng <span class="m">c</span>; lặp đến hết ngân sách.</span><span class="en">Increase <span class="m">c</span>; repeat until the budget is spent.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">n bướm</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">n butterflies</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Kích thích</text><text x="875" y="89">I từ f(x)</text></g><g class="en"><text x="875" y="67">Stimulus</text><text x="875" y="89">I from f(x)</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Mùi hương; bước</text><text x="875" y="259">toàn cục / cục bộ</text></g><g class="en"><text x="875" y="237">Fragrance; global</text><text x="875" y="259">or local step</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Nhận nếu tốt hơn;</text><text x="625" y="259">tăng c</text></g><g class="en"><text x="625" y="237">Accept if better;</text><text x="625" y="259">increase c</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về g*</text></g><g class="en"><text x="125" y="248">Return g*</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của BOA</span><span class="en">BOA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">p</span></td><td><span class="vi">Xác suất chuyển sang tìm toàn cục</span><span class="en">Switch probability to global search</span></td><td>0.8</td></tr>
+        <tr><td><span class="m">a</span></td><td><span class="vi">Số mũ công suất</span><span class="en">Power exponent</span></td><td>0.1</td></tr>
+        <tr><td><span class="m">c</span></td><td><span class="vi">Hệ số cảm nhận, tăng dần</span><span class="en">Sensory modality, increasing</span></td><td>0.01 → <span class="m">c + 0.025/(cT)</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán BOA</span><span class="en">The BOA algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Mã giả</span><span class="en">Pseudocode</span></h2>
+        <p class="lead reveal d2"><span class="vi">Tham số: <span class="m">n, T, p, c, a</span>. Mã gốc tăng <span class="m">c</span> sau mỗi vòng: <span class="m">c ← c + 0.025 / (c · T)</span>.</span><span class="en">Parameters: <span class="m">n, T, p, c, a</span>. The original code increases <span class="m">c</span> after each iteration: <span class="m">c ← c + 0.025 / (c · T)</span>.</span></p>
+      </header>
+      <ol class="pseudo reveal d2">
+        <li><span class="vi">Khởi tạo <span class="m">n</span> con bướm; <span class="m">g*</span> ← con tốt nhất</span><span class="en">Initialize <span class="m">n</span> butterflies; <span class="m">g*</span> ← the best</span></li>
+        <li><span><span class="kw">while</span> <span class="vi">chưa dừng</span><span class="en">not stopped</span></span></li>
+        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi con bướm</span><span class="en">each butterfly</span></span>: <span class="m">f<sub>i</sub> = c · I<span class="ss"><i>a</i><i>i</i></span></span></li>
+        <li style="--ind:2"><span><span class="kw">if</span> <span class="m">rand &lt; p</span>:</span> <span class="vi">tìm toàn cục về <span class="m">g*</span></span><span class="en">global step toward <span class="m">g*</span></span></li>
+        <li style="--ind:2"><span><span class="kw">else</span>:</span> <span class="vi">tìm cục bộ với <span class="m">j, k</span> ngẫu nhiên</span><span class="en">local step with random <span class="m">j, k</span></span></li>
+        <li style="--ind:2"><span class="vi">Nhận lời giải mới nếu tốt hơn</span><span class="en">Accept the new solution if better</span></li>
+        <li style="--ind:1"><span class="vi">Cập nhật <span class="m">g*</span> và <span class="m">c</span></span><span class="en">Update <span class="m">g*</span> and <span class="m">c</span></span></li>
+        <li><span><span class="kw">return</span> <span class="m">g*</span></span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">15 con bướm trên cùng địa hình</span><span class="en">15 butterflies on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Màu vệt: cam là bước toàn cục, xanh là bước cục bộ. Vì <span class="m">c</span> nhỏ, mỗi bước rất ngắn; thuật toán tiến chậm nhưng không bao giờ lùi nhờ chọn tham lam.</span><span class="en">Trail colour: orange is a global step, blue a local one. With a small <span class="m">c</span>, steps are tiny; the search is slow but never moves backward thanks to greedy selection.</span></p>
+        <p class="note"><span class="vi">Tham số theo mã gốc: <span class="m">p = 0.8, c<sub>0</sub> = 0.01, a = 0.1</span>. Để ý xem bầy có bị kéo về vùng gần gốc tọa độ không.</span><span class="en">Settings as in the original code: <span class="m">p = 0.8, c<sub>0</sub> = 0.01, a = 0.1</span>. Watch whether the swarm is pulled toward the origin.</span></p>
+        <div class="key">
+          <span><i style="background:#e6904f"></i><span class="vi">bước toàn cục</span><span class="en">global step</span></span>
+          <span><i style="background:#3a7fc1"></i><span class="vi">bước cục bộ</span><span class="en">local step</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">g* tốt nhất</span><span class="en">best g*</span></span>
+        </div>
+      </div>
+      <div class="field" id="boa-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đối chiếu tài liệu tham khảo" data-label-en="Checking the reference book">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ trong sách tham khảo</span><span class="en">Example from the reference book</span></p>
+      <h2 class="reveal d1"><span class="vi">Okwu &amp; Tartibu (2021), chương 11: hàm Himmelblau</span><span class="en">Okwu &amp; Tartibu (2021), chapter 11: the Himmelblau function</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Nội dung</span><span class="en">Item</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="vi">Kết quả BOA</span><span class="en">BOA result</span></td><td><span class="vi">f = 0.015431 tại (3.0175, 1.9708)</span><span class="en">f = 0.015431 at (3.0175, 1.9708)</span></td><td><span class="vi">Tính lại: f = 0.0155, gần cực tiểu (3, 2) với f = 0; chưa hội tụ hẳn sau 1000 vòng</span><span class="en">Recomputed: f = 0.0155, near the minimum (3, 2) with f = 0; not fully converged after 1000 iterations</span></td></tr>
+        <tr><td><span class="vi">Công thức 11.2</span><span class="en">Equation 11.2</span></td><td><span class="vi">x + r² · (g* − x) · f</span><span class="en">x + r² · (g* − x) · f</span></td><td><span class="vi">Bài gốc: x + (r² · g* − x) · f</span><span class="en">Original paper: x + (r² · g* − x) · f</span></td></tr>
+        <tr><td><span class="vi">Himmelblau</span><span class="en">Himmelblau</span></td><td><span class="vi">—</span><span class="en">—</span></td><td><span class="vi">có 4 cực tiểu toàn cục f = 0: (3, 2), (−2.805, 3.131), (−3.779, −3.283), (3.584, −1.848)</span><span class="en">has 4 global minima f = 0: (3, 2), (−2.805, 3.131), (−3.779, −3.283), (3.584, −1.848)</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Khi báo cáo, ghi rõ dùng dạng công thức nào: kết quả của hai dạng có thể khác nhau đáng kể.</span><span class="en">When reporting, state which form of the update you used: the two can give quite different results.</span></p>
+  </div>
+</section>
+
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Mùi hương và một bước toàn cục</span><span class="en">Fragrance and one global step</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">f = c I<sup>a</sup></span></div>
+          <div class="eq"><span class="m">x ← x + (r² g* − x) f</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">c = 0.01, a = 0.1, I = 100</span>: <span class="m">f = 0.01 · 100<sup>0.1</sup> = 0.0158</span>.</span><span class="en"><span class="m">c = 0.01, a = 0.1, I = 100</span>: <span class="m">f = 0.01 · 100<sup>0.1</sup> = 0.0158</span>.</span></li>
+          <li><span class="vi">Vì <span class="m">a</span> nhỏ, mùi hương gần như không phụ thuộc chất lượng lời giải.</span><span class="en">Because <span class="m">a</span> is small, fragrance barely depends on solution quality.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Bước toàn cục</span><span class="en">Global step</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">x = 2, g* = 0, r = 0.5</span>: <span class="m">x ← 2 + (0 − 2) · 0.0158 = 1.968</span>.</span><span class="en"><span class="m">x = 2, g* = 0, r = 0.5</span>: <span class="m">x ← 2 + (0 − 2) · 0.0158 = 1.968</span>.</span></li>
+          <li><span class="vi">Số hạng <span class="m">r² g*</span> kéo về gốc tọa độ khi <span class="m">r</span> nhỏ: lý do BOA rất tốt trên Sphere nhưng kém trên Sphere dịch tâm.</span><span class="en">The term <span class="m">r² g*</span> pulls toward the origin when <span class="m">r</span> is small: why BOA excels on Sphere but fails on shifted Sphere.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của BOA</span><span class="en">BOA variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">BOA hỗn loạn</span><span class="en">Chaotic BOA</span></h3><p><span class="vi">Ánh xạ hỗn loạn cho <span class="m">p</span> và số ngẫu nhiên.</span><span class="en">Chaotic maps for <span class="m">p</span> and random numbers.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">BOA nhị phân</span><span class="en">Binary BOA</span></h3><p><span class="vi">Chọn đặc trưng.</span><span class="en">Feature selection.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">BOA + Lévy</span><span class="en">BOA + Lévy</span></h3><p><span class="vi">Bước Lévy cho pha cục bộ.</span><span class="en">Lévy steps in the local phase.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">BOA lai</span><span class="en">Hybrid BOA</span></h3><p><span class="vi">Kết hợp với ABC, PSO.</span><span class="en">Combined with ABC, PSO.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của BOA</span><span class="en">BOA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Các bài toán thường gặp với BOA.</span><span class="en">Problems commonly tackled with BOA.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế</span><span class="en">Design</span></h3><p><span class="vi">Lò xo, bình áp lực, dầm hàn.</span><span class="en">Spring, pressure vessel, welded beam.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">BOA nhị phân.</span><span class="en">Binary BOA.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Tham số pin mặt trời.</span><span class="en">Solar-cell parameters.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Mạng cảm biến</span><span class="en">Sensor networks</span></h3><p><span class="vi">Đặt nút, phân cụm.</span><span class="en">Node placement, clustering.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BOA</span><span class="en">Experiment · BOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">8.92e+0</td><td class="num">2.57e−2</td><td class="num">8.92e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">1.88e+1</td><td class="num">1.05e+1</td><td class="num">2.21e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">6.38e−8</td><td class="num">1.14e−8</td><td class="num">6.46e−8</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">4.92e−3</td><td class="num">2.69e−2</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">6.93e+3</td><td class="num">1.62e+3</td><td class="num">6.85e+3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">4.75e+1</td><td class="num">9.54e+0</td><td class="num">4.74e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>11.79</b>, đứng thứ <b>13/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>11.79</b>, position <b>13/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">Thiên lệch gốc tọa độ: trung vị F1 = 0 nhưng F6 (cùng hàm, dịch tâm) = 6.85e+3. Kết quả tốt trên F1 phần lớn do tối ưu nằm tại 0.</span><span class="en">Origin bias: median F1 = 0 but F6 (same function, shifted) = 6.85e+3. The good F1 result is largely due to the optimum lying at 0.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · BOA</span><span class="en">Experiment · BOA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/BOA.svg" alt="convergence BOA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/boa.py" class="c-sea">code/si/algorithms/boa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        g = prob.best_x
+        I = fx - fx.min() + 1e-12
+        fr = c * I ** a
+        Y = np.empty_like(X)
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            r = rng.random()
+            <span class="k">if</span> rng.random() &lt; p:
+                Y[i] = X[i] + (r * r * g - X[i]) * fr[i]
+            <span class="k">else</span>:
+                j, k = rng.integers(n, size=2)
+                Y[i] = X[i] + (r * r * X[j] - X[k]) * fr[i]
+        Y = prob.clip(Y)
+        fy = prob(Y)
+        better = fy &lt; fx
+        X[better], fx[better] = Y[better], fy[better]</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Ý tưởng gọn, nhưng cần đọc kỹ công thức</span><span class="en">A neat idea, but read the equations carefully</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Chỉ một công thức hương <span class="m">f = cI<sup>a</sup></span> điều khiển cả hai kiểu bay.</span><span class="en">One fragrance rule <span class="m">f = cI<sup>a</sup></span> drives both moves.</span></li>
+          <li><span class="vi">Chọn tham lam nên chất lượng mỗi cá thể không bao giờ giảm.</span><span class="en">Greedy selection means no individual ever gets worse.</span></li>
+          <li><span class="vi">Ứng dụng: điều khiển tần số tải, xử lý tín hiệu máy quay, lập lịch flow shop.</span><span class="en">Applications: load frequency control, rotating-machinery signal processing, flow-shop scheduling.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Số hạng <span class="m">−x · f</span> trong dạng gốc kéo về gốc tọa độ: kết quả trên hàm có tối ưu tại 0 có thể bị đánh giá quá cao.</span><span class="en">The <span class="m">−x · f</span> term in the original form pulls toward the origin: results on functions optimal at 0 may be inflated.</span></li>
+          <li><span class="vi">Hương phụ thuộc trực tiếp giá trị <span class="m">f(x)</span>, nên nhạy với việc dịch hoặc đổi thang hàm mục tiêu.</span><span class="en">Fragrance depends directly on <span class="m">f(x)</span>, so it is sensitive to shifting or rescaling the objective.</span></li>
+          <li><span class="vi">Biến thể: BOA cải tiến với trọng số quán tính, BOA nhị phân, BOA lai với ABC.</span><span class="en">Variants: improved BOA with inertia weights, binary BOA, BOA hybridized with ABC.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">c = 0.01, a = 0.1</span>, tính hương khi <span class="m">I = 1, 10, 100</span>. Nhận xét về tác dụng của <span class="m">a</span>.</span><span class="en">With <span class="m">c = 0.01, a = 0.1</span>, compute the fragrance for <span class="m">I = 1, 10, 100</span>. Comment on the effect of <span class="m">a</span>.</span></li>
+          <li><span class="vi">Một chiều: <span class="m">x = 4, g* = 2, r = 0.5, f = 0.1</span>. Tính bước toàn cục theo cả hai dạng công thức.</span><span class="en">One dimension: <span class="m">x = 4, g* = 2, r = 0.5, f = 0.1</span>. Compute the global step with both forms.</span></li>
+          <li><span class="vi">Vì sao BOA cần chọn tham lam để không đi lùi?</span><span class="en">Why does BOA need greedy selection to avoid moving backward?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài BOA theo cả hai dạng công thức; so sánh trên Sphere chuẩn và Sphere dịch tâm.</span><span class="en">Implement BOA with both update forms; compare on the standard and a shifted Sphere.</span></li>
+          <li><span class="vi">Chạy lại ví dụ Himmelblau; đếm xem 30 lần chạy rơi vào bao nhiêu trong 4 cực tiểu.</span><span class="en">Rerun the Himmelblau example; count which of the 4 minima 30 runs reach.</span></li>
+          <li><span class="vi">Khảo sát <span class="m">p ∈ {0.2, 0.5, 0.8}</span>.</span><span class="en">Study <span class="m">p ∈ {0.2, 0.5, 0.8}</span>.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. Saremi, S. Mirjalili, and A. Lewis, “Grasshopper Optimisation Algorithm: Theory and application,” <em>Advances in Engineering Software</em>, vol. 105, pp. 30–47, 2017, doi: <a href="https://doi.org/10.1016/j.advengsoft.2017.01.004">10.1016/j.advengsoft.2017.01.004</a>.</li>
+        <li>S. Z. Mirjalili, S. Mirjalili, S. Saremi, H. Faris, and I. Aljarah, “Grasshopper optimization algorithm for multi-objective optimization problems,” <em>Appl Intell</em>, vol. 48, no. 4, pp. 805–820, 2018, doi: <a href="https://doi.org/10.1007/s10489-017-1019-8">10.1007/s10489-017-1019-8</a>.</li>
+        <li>S. Arora and S. Singh, “Butterfly optimization algorithm: a novel approach for global optimization,” <em>Soft Comput</em>, vol. 23, no. 3, pp. 715–734, 2019, doi: <a href="https://doi.org/10.1007/s00500-018-3102-4">10.1007/s00500-018-3102-4</a>.</li>
+        <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+    </ol>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Hương <span class="m">f = cI<sup>a</sup></span></span><span class="en">Fragrance <span class="m">f = cI<sup>a</sup></span></span></span>
+      <span><span class="vi"><span class="m">p</span> chọn toàn cục hay cục bộ</span><span class="en"><span class="m">p</span> picks global or local</span></span>
+      <span><span class="vi">Đọc kỹ dạng công thức cập nhật</span><span class="en">Read the update form carefully</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Arora &amp; Singh, <em>Soft Computing</em> 23, 2019</span><span class="en">Original paper: Arora &amp; Singh, <em>Soft Computing</em> 23, 2019</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* BOA trên địa hình chung (cực tiểu), theo bài báo và mã gốc của Arora & Singh (2019) */
+new SI.Field2D(document.getElementById('boa-field'), {
+  n: 15, T: 60, seed: 9, p: 0.8, a: 0.1,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), mode: 0 }); S.c = 0.01; },
+  step(S) {
+    const P = S.pop, g = S.best.slice();
+    P.forEach((b, i) => {
+      const fr = S.c * Math.pow(SI.f(b.x), this.a);
+      let nx;
+      if (S.rnd() < this.p) { b.mode = 1; nx = b.x.map((v, d) => v + (S.rnd() * S.rnd() * g[d] - v) * fr); }
+      else { b.mode = 2; const j = Math.floor(S.rnd() * P.length), k = Math.floor(S.rnd() * P.length); nx = b.x.map((v, d) => v + (S.rnd() * S.rnd() * P[j].x[d] - P[k].x[d]) * fr); }
+      nx = nx.map(SI.clamp);
+      if (SI.f(nx) < SI.f(b.x)) b.x = nx;
+    });
+    S.c = S.c + 0.025 / (S.c * S.T);
+  },
+  draw(g, S, P) {
+    for (const b of S.pop) { g.lineWidth = 2; SI.trail(g, P, b, b.mode === 1 ? '#e6904f' : '#3a7fc1'); }
+    for (const b of S.pop) { const [x, y] = P.at(b); SI.dot(g, x, y, 4.2, b.mode === 2 ? '#3a7fc1' : '#e6904f'); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return `<span><b>c</b> = ${S.c.toFixed(3)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

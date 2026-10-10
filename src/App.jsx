@@ -22,6 +22,7 @@ const siteData = {
       { label: 'ORCID', href: 'https://orcid.org/0009-0008-0325-6809' },
       { label: 'GitHub', href: 'https://github.com/vancv43' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/citi-van-2a7251353/' },
+      { label: 'Swarm Intelligence Textbook', href: '/citivan/swarm-intelligence/' },
     ],
     cvLink: '#',
     heroImage: '/images/profile-photo.jpg',
@@ -147,6 +148,15 @@ const siteData = {
     ],
   },
   projects: [
+    {
+      id: 'P07',
+      year: 2026,
+      title: 'Swarm Intelligence Textbook: bilingual interactive slides, Python code and experiments for 18 algorithms',
+      funding: 'Teaching material, PTITHCM',
+      role: 'Author',
+      period: '2026',
+      link: '/citivan/swarm-intelligence/',
+    },
     {
       id: 'P06',
       year: 2025,
@@ -486,7 +496,7 @@ export default function App() {
                         <div key={item.id} className="list-row">
                           <div className="list-id">[{item.id}]</div>
                           <div className="list-text">
-                            <span className="highlight">“{item.title}”</span>, {item.funding}, {item.period}, ({item.role})
+                            <span className="highlight">{item.link ? <a href={item.link}>“{item.title}”</a> : <>“{item.title}”</>}</span>, {item.funding}, {item.period}, ({item.role})
                           </div>
                         </div>
                       ))}

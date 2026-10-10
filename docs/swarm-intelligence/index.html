@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Giáo trình Trí tuệ bầy đàn" data-title-en="Swarm Intelligence Textbook">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Giáo trình Trí tuệ bầy đàn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<style>
+/* ===========================================
+   THEME — cùng bảng màu với các chương
+   =========================================== */
+:root {
+  --paper: #f5f0e6; --paper-2: #ebe3d2; --paper-3: #e1d6bf;
+  --ink: #1c2a2e; --ink-soft: #56676a;
+  --sea: #1f6f78; --sky: #3a7fc1; --moss: #4b8f45; --ember: #d9562f; --sand: #f0cf7a;
+  --font-display: "Lora", Georgia, serif; --font-body: "Be Vietnam Pro", system-ui, sans-serif; --font-math: "STIX Two Text", serif;
+  --gutter: clamp(1rem, 5vw, 5rem);
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: clamp(0.95rem, 1.1vw, 1.06rem); line-height: 1.6; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+a { color: inherit; }
+html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !important; }
+.m { font-family: var(--font-math); font-style: italic; }
+.kicker { font-size: 0.8rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: var(--sea); display: flex; align-items: center; gap: 0.7em; }
+.kicker::before { content: ""; width: 2.2em; height: 2px; background: currentColor; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--gutter); }
+section.block { padding: clamp(2.5rem, 7vh, 5rem) 0; scroll-margin-top: 3.5rem; }
+.block h2 { font-size: clamp(1.6rem, 3.2vw, 2.5rem); margin: 0.4em 0 0.4em; }
+.lead { color: var(--ink-soft); max-width: 46em; font-size: 1.05em; margin-bottom: 1.4rem; }
+
+/* Thanh trên cùng: mục lục nhanh + đổi ngôn ngữ */
+.topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.6rem clamp(0.6rem, 2vw, 1.6rem); pointer-events: none; }
+.topbar > * { pointer-events: auto; }
+.parts-mini { display: flex; gap: 0.25rem; background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px; padding: 0.2em 0.35em; backdrop-filter: blur(4px); opacity: 0; transform: translateY(-8px); transition: opacity 0.3s, transform 0.3s; }
+.parts-mini.show { opacity: 1; transform: none; }
+.parts-mini a { text-decoration: none; font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); padding: 0.25em 0.65em; border-radius: 99px; }
+.parts-mini a:hover, .parts-mini a:focus-visible, .parts-mini a.cur { background: var(--sea); color: var(--paper); outline: none; }
+.lang-switch { display: flex; align-items: center; gap: 0.15em; font-size: 0.82rem; font-weight: 600; background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px; padding: 0.2em 0.35em; color: var(--ink-soft); backdrop-filter: blur(4px); margin-left: auto; }
+.lang-switch button { font: inherit; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer; padding: 0.25em 0.6em; border-radius: 99px; letter-spacing: 0.06em; }
+.lang-switch button[aria-pressed="true"] { background: var(--sea); color: var(--paper); }
+.lang-switch button:focus-visible { outline: 2px solid var(--ember); outline-offset: 1px; }
+@media (max-width: 640px) { .parts-mini { display: none; } }
+
+/* Hero */
+.hero { position: relative; min-height: 88vh; min-height: 88dvh; display: flex; align-items: flex-end; overflow: hidden; background: radial-gradient(ellipse 70% 60% at 100% 0%, rgba(31,111,120,0.08), transparent 70%), var(--paper); }
+.swarm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.hero .wrap { position: relative; z-index: 1; padding-bottom: clamp(3rem, 10vh, 6rem); width: 100%; }
+.hero h1 { font-size: clamp(2.4rem, 7vw, 5.6rem); margin: 0.25em 0 0.2em; max-width: 11em; }
+.hero h1 .sub { display: block; font-size: 0.36em; font-style: italic; font-weight: 500; color: var(--sea); margin-top: 0.4em; letter-spacing: 0; }
+.stats { display: flex; gap: 1.6rem; flex-wrap: wrap; margin-top: 1.2rem; }
+.stats div b { display: block; font-family: var(--font-display); font-size: 1.9rem; color: var(--sea); line-height: 1.1; }
+.stats div span { font-size: 0.85rem; color: var(--ink-soft); }
+.credit { margin-top: 1.4em; font-size: 0.9rem; color: var(--ink-soft); border-top: 1px solid rgba(28,42,46,0.15); padding-top: 0.8em; max-width: 30em; }
+.cta { display: inline-flex; gap: 0.6em; margin-top: 1.4em; flex-wrap: wrap; }
+.btn { display: inline-block; text-decoration: none; font-weight: 600; font-size: 0.88rem; border: 1.5px solid var(--sea); color: var(--sea); padding: 0.5em 1.1em; border-radius: 99px; transition: background 0.2s, color 0.2s; background: var(--paper); }
+.btn.solid, .btn:hover, .btn:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+.btn .cnt { font-weight: 400; opacity: 0.8; }
+
+/* Năm phần */
+.part-tiles { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.7rem; }
+@media (max-width: 980px) { .part-tiles { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 520px) { .part-tiles { grid-template-columns: 1fr; } }
+.part-tile { text-decoration: none; background: var(--paper-2); border-radius: 16px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.3rem; border-top: 4px solid var(--sea); transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease); }
+.part-tile:nth-child(2) { border-top-color: #4b8f45; } .part-tile:nth-child(3) { border-top-color: #d9562f; } .part-tile:nth-child(4) { border-top-color: #3a7fc1; } .part-tile:nth-child(5) { border-top-color: #c9a227; }
+.part-tile:hover, .part-tile:focus-visible { transform: translateY(-3px); box-shadow: 0 10px 26px rgba(28,42,46,0.1); outline: none; }
+.part-tile .pn { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sea); }
+.part-tile b { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; line-height: 1.25; }
+.part-tile .pr { font-size: 0.8rem; color: var(--ink-soft); margin-top: auto; }
+
+/* Thẻ chương */
+.part:nth-of-type(even) { background: rgba(235,227,210,0.35); }
+.chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: clamp(0.8rem, 1.6vw, 1.2rem); }
+.chap { background: var(--paper); border-radius: 18px; padding: 1.3rem 1.3rem 1.1rem; display: flex; flex-direction: column; gap: 0.6rem; border: 1px solid rgba(28,42,46,0.1); position: relative; scroll-margin-top: 4rem; }
+.part:nth-of-type(odd) .chap { background: var(--paper-2); }
+.chap.st-todo { border-style: dashed; }
+.chap .no { font-family: var(--font-display); font-size: 2.6rem; line-height: 1; color: var(--sea); opacity: 0.25; position: absolute; right: 1.1rem; top: 0.8rem; }
+.chap .status { align-self: flex-start; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.04em; padding: 0.2em 0.7em; border-radius: 99px; }
+.st-ready .status { background: var(--sea); color: var(--paper); }
+.st-part .status { background: #f6e6b8; color: #6b5310; }
+.st-todo .status { background: var(--paper-3); color: var(--ink-soft); }
+.chap h3 { font-size: 1.28rem; padding-right: 2.6rem; }
+.secs { list-style: none; display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.88rem; }
+.secs li { display: grid; grid-template-columns: 1.1em 2.4em 1fr; align-items: baseline; color: var(--ink); }
+.secs li b { font-weight: 600; color: var(--sea); font-variant-numeric: tabular-nums; }
+.secs .mk { font-size: 0.85em; }
+.secs .s-d .mk { color: var(--sea); } .secs .s-p .mk { color: #c9a227; } .secs .s-t .mk { color: #9aa6a7; }
+.secs .s-t { color: var(--ink-soft); }
+.decks { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-top: auto; padding-top: 0.7rem; border-top: 1px solid rgba(28,42,46,0.1); }
+.legend { display: flex; gap: 1.2rem; flex-wrap: wrap; font-size: 0.85rem; color: var(--ink-soft); margin: -0.4rem 0 1.4rem; }
+.legend span { display: inline-flex; gap: 0.4em; align-items: center; }
+
+/* Dòng thời gian */
+.timeline-wrap { overflow-x: auto; padding-bottom: 0.6rem; }
+.timeline { position: relative; display: grid; grid-template-columns: repeat(17, minmax(72px, 1fr)); gap: 0.25rem; min-width: 1240px; }
+.timeline::before { content: ""; position: absolute; left: 0; right: 0; top: 0.55rem; height: 2px; background: var(--paper-3); }
+.tl { position: relative; text-decoration: none; padding-top: 1.7rem; display: flex; flex-direction: column; font-size: 0.78rem; color: var(--ink-soft); }
+.tl::before { content: ""; position: absolute; top: 0; left: 0; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: var(--paper); border: 3px dashed #9aa6a7; transition: transform 0.3s var(--ease); }
+.tl.on::before { border: 3px solid var(--sea); }
+.tl:hover::before, .tl:focus-visible::before { transform: scale(1.3); background: var(--sea); }
+.tl:focus-visible { outline: none; }
+.tl b { font-family: var(--font-display); font-size: 1.35rem; color: var(--ink); }
+.tl .a { font-weight: 600; color: var(--ink); font-size: 0.9rem; }
+.tl .c { color: var(--sea); }
+
+/* Khung mỗi chương */
+.template { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.8rem; }
+@media (max-width: 1000px) { .template { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 560px) { .template { grid-template-columns: 1fr 1fr; } }
+.template div { background: var(--paper-2); border-radius: 14px; padding: 1rem; display: flex; flex-direction: column; gap: 0.25rem; }
+.template .tn { font-family: var(--font-display); font-size: 1.6rem; color: var(--sea); opacity: 0.5; line-height: 1; }
+.template b { font-family: var(--font-display); font-size: 1.05rem; }
+.template div > span:last-child { font-size: 0.85rem; color: var(--ink-soft); }
+
+/* Bảng so sánh */
+.table-wrap { overflow-x: auto; border-radius: 14px; background: var(--paper-2); }
+table { border-collapse: collapse; width: 100%; min-width: 760px; font-size: 0.9rem; }
+th, td { text-align: left; padding: 0.7em 1em; border-bottom: 1px solid rgba(28,42,46,0.1); vertical-align: top; }
+th { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sea); }
+td:first-child { font-weight: 600; white-space: nowrap; }
+tbody tr:last-child td { border-bottom: 0; }
+
+/* Cách dùng */
+.howto { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1rem; }
+.howto div { border-left: 3px solid var(--sea); padding: 0.2em 0 0.2em 1em; }
+.howto b { display: block; font-family: var(--font-display); font-size: 1.12rem; margin-bottom: 0.2em; }
+.howto span { color: var(--ink-soft); font-size: 0.92rem; }
+kbd { font-family: var(--font-body); font-size: 0.8em; border: 1px solid rgba(28,42,46,0.25); border-bottom-width: 2px; border-radius: 5px; padding: 0.05em 0.4em; background: var(--paper); }
+
+.notes { font-size: 0.85rem; color: var(--ink-soft); max-width: 60em; }
+footer { padding: 2rem 0 3rem; color: var(--ink-soft); font-size: 0.85rem; border-top: 1px solid rgba(28,42,46,0.1); }
+
+.rv { opacity: 0; transform: translateY(16px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.rv.in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } html { scroll-behavior: auto; } }
+.res td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.res a { color: var(--sea); font-weight: 600; text-decoration: none; }
+.flag { color: var(--ember, #d9562f); }
+.dl { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
+.note { font-size: 0.85rem; color: var(--ink-soft); margin-top: 0.8rem; }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <nav class="parts-mini" aria-label="Các phần / Parts">
+    <a href="#part-I">I</a><a href="#part-II">II</a><a href="#part-III">III</a><a href="#part-IV">IV</a><a href="#part-V">V</a>
+  </nav>
+  <div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+</div>
+
+<header class="hero slide" aria-label="Giáo trình Trí tuệ bầy đàn" data-label-en="Swarm Intelligence Textbook">
+  <canvas class="swarm-canvas" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <p class="kicker"><span class="vi">Giáo trình · Slide tương tác</span><span class="en">Textbook · Interactive slides</span></p>
+    <h1><span class="vi">Trí tuệ bầy đàn</span><span class="en">Swarm Intelligence</span><span class="sub"><span class="vi">Swarm Intelligence — từ nền tảng toán học đến ứng dụng</span><span class="en">From mathematical foundations to applications</span></span></h1>
+    <div class="stats">
+      <div><b>5</b><span><span class="vi">phần</span><span class="en">parts</span></span></div>
+      <div><b>18</b><span><span class="vi">chương</span><span class="en">chapters</span></span></div>
+      <div><b>18</b><span><span class="vi">chương đã có slide</span><span class="en">chapters with slides</span></span></div>
+      <div><b>23</b><span><span class="vi">thuật toán có mã Python</span><span class="en">algorithms in Python</span></span></div>
+    </div>
+    <div class="cta">
+      <a class="btn solid" href="#structure"><span class="vi">Xem cấu trúc giáo trình ↓</span><span class="en">See the book structure ↓</span></a>
+      <a class="btn lang-link" href="CH1_slides.html"><span class="vi">Bắt đầu từ chương 1 →</span><span class="en">Start with chapter 1 →</span></a>
+      <a class="btn" href="#results"><span class="vi">Mã nguồn và kết quả ↓</span><span class="en">Code and results ↓</span></a>
+    </div>
+    <p class="credit">Châu Văn Vân · PTITHCM</p>
+  </div>
+</header>
+
+<main>
+
+<section class="block" id="structure" aria-labelledby="st-h">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Cấu trúc giáo trình</span><span class="en">Book structure</span></p>
+    <h2 id="st-h" class="rv"><span class="vi">Năm phần, mười tám chương</span><span class="en">Five parts, eighteen chapters</span></h2>
+    <p class="lead rv"><span class="vi">Đi từ nền tảng lý thuyết, qua các họ thuật toán theo nguồn cảm hứng sinh học, đến các mở rộng nâng cao và ứng dụng thực tế.</span><span class="en">From theory, through algorithm families grouped by biological inspiration, to advanced extensions and real-world applications.</span></p>
+    <div class="part-tiles">
+      <a class="part-tile rv" href="#part-I"><span class="pn"><span class="vi">Phần</span><span class="en">Part</span> I</span><b><span class="vi">Nền tảng lý thuyết và bài toán tối ưu</span><span class="en">Foundations and optimization problems</span></b><span class="pr"><span class="vi">Chương</span><span class="en">Chapters</span> 1–2</span></a>
+      <a class="part-tile rv" href="#part-II"><span class="pn"><span class="vi">Phần</span><span class="en">Part</span> II</span><b><span class="vi">Thuật toán kinh điển và côn trùng</span><span class="en">Classic algorithms and insects</span></b><span class="pr"><span class="vi">Chương</span><span class="en">Chapters</span> 3–7</span></a>
+      <a class="part-tile rv" href="#part-III"><span class="pn"><span class="vi">Phần</span><span class="en">Part</span> III</span><b><span class="vi">Động vật săn mồi và tập tính xã hội</span><span class="en">Predators and social hunters</span></b><span class="pr"><span class="vi">Chương</span><span class="en">Chapters</span> 8–10</span></a>
+      <a class="part-tile rv" href="#part-IV"><span class="pn"><span class="vi">Phần</span><span class="en">Part</span> IV</span><b><span class="vi">Sinh vật biển, vi sinh vật và chiến lược bước Lévy</span><span class="en">Marine life, microbes and Lévy-flight strategies</span></b><span class="pr"><span class="vi">Chương</span><span class="en">Chapters</span> 11–13</span></a>
+      <a class="part-tile rv" href="#part-V"><span class="pn"><span class="vi">Phần</span><span class="en">Part</span> V</span><b><span class="vi">Mở rộng nâng cao, lai ghép và ứng dụng</span><span class="en">Advanced extensions, hybrids and applications</span></b><span class="pr"><span class="vi">Chương</span><span class="en">Chapters</span> 14–18</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="tpl-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Khung mỗi chương</span><span class="en">Inside every chapter</span></p>
+    <h2 id="tpl-h" class="rv"><span class="vi">Tám phần lặp lại ở mọi chương thuật toán</span><span class="en">Eight parts, repeated in every algorithm chapter</span></h2>
+    <div class="template">
+<div class="rv"><span class="tn">1</span><b><span class="vi">Mục tiêu và cảm hứng</span><span class="en">Objectives and inspiration</span></b><span><span class="vi">Người học làm được gì; hành vi tự nhiên phía sau.</span><span class="en">What learners can do; the natural behaviour behind it.</span></span></div>
+<div class="rv"><span class="tn">2</span><b><span class="vi">Ý tưởng và thành phần</span><span class="en">Idea and components</span></b><span><span class="vi">Ánh xạ từ sinh học sang bài toán tối ưu.</span><span class="en">Mapping biology onto an optimization problem.</span></span></div>
+<div class="rv"><span class="tn">3</span><b><span class="vi">Các bước và lưu đồ</span><span class="en">Steps and flowchart</span></b><span><span class="vi">Thuật toán từng bước, lưu đồ, mã giả.</span><span class="en">Step-by-step algorithm, flowchart, pseudocode.</span></span></div>
+<div class="rv"><span class="tn">4</span><b><span class="vi">Mô hình và tham số</span><span class="en">Model and parameters</span></b><span><span class="vi">Công thức, ý nghĩa từng số hạng, giá trị mặc định.</span><span class="en">Equations, meaning of each term, default values.</span></span></div>
+<div class="rv"><span class="tn">5</span><b><span class="vi">Mô phỏng tương tác</span><span class="en">Interactive demo</span></b><span><span class="vi">Chạy từng vòng lặp bằng nút Một bước.</span><span class="en">Run one iteration per Step click.</span></span></div>
+<div class="rv"><span class="tn">6</span><b><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></b><span><span class="vi">Một bước tính bằng số, đã kiểm tra lại.</span><span class="en">One numeric step, double-checked.</span></span></div>
+<div class="rv"><span class="tn">7</span><b><span class="vi">Thực nghiệm và mã nguồn</span><span class="en">Experiments and code</span></b><span><span class="vi">Mã Python, 30 lần chạy, Wilcoxon, Friedman.</span><span class="en">Python code, 30 runs, Wilcoxon, Friedman.</span></span></div>
+<div class="rv"><span class="tn">8</span><b><span class="vi">Đánh giá, bài tập, tài liệu</span><span class="en">Assessment, exercises, references</span></b><span><span class="vi">Ưu nhược điểm, bài tập, bài báo gốc có DOI.</span><span class="en">Pros and cons, exercises, original papers with DOIs.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="leg-h" style="padding: 0">
+  <div class="wrap">
+    <h2 id="leg-h" class="rv" style="position:absolute;left:-9999px"><span class="vi">Chú giải</span><span class="en">Legend</span></h2>
+    <div class="legend rv">
+      <span><span style="color:var(--sea)">●</span> <span class="vi">đã có slide</span><span class="en">covered in slides</span></span>
+      <span><span style="color:#c9a227">◐</span> <span class="vi">có một phần, đang bổ sung</span><span class="en">partly covered, being extended</span></span>
+      <span><span style="color:#9aa6a7">○</span> <span class="vi">đang biên soạn</span><span class="en">in preparation</span></span>
+    </div>
+  </div>
+</section>
+
+<section class="block part" id="part-I" aria-labelledby="ph-I">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Phần</span><span class="en">Part</span> I · <span class="vi">Chương</span><span class="en">Chapters</span> 1–2</p>
+    <h2 id="ph-I" class="rv"><span class="vi">Nền tảng lý thuyết và bài toán tối ưu</span><span class="en">Foundations and optimization problems</span></h2>
+    <p class="lead rv"><span class="vi">Ngôn ngữ chung cho cả cuốn sách: bầy đàn là gì, bài toán tối ưu trông ra sao, và đo một thuật toán tốt đến đâu.</span><span class="en">The shared language of the book: what a swarm is, what optimization problems look like, and how to measure an algorithm.</span></p>
+    <div class="chapters">
+      <article class="chap rv st-ready" id="ch1">
+        <span class="no">01</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Giới thiệu về trí tuệ bầy đàn và không gian tìm kiếm</span><span class="en">Introduction to swarm intelligence and search spaces</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.1</b> <span class="vi">Tổng quan: hệ đa tác nhân, tự tổ chức, phối hợp phân tán, hiện tượng trồi</span><span class="en">Overview: multi-agent systems, self-organization, distributed coordination, emergence</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.2</b> <span class="vi">Phương pháp cổ điển (dựa gradient, tìm kiếm trực tiếp) và hạn chế của chúng</span><span class="en">Classical methods (gradient-based, direct search) and their limitations</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.3</b> <span class="vi">Phân loại bài toán: liên tục, rời rạc, phi tuyến; ràng buộc và hàm phạt</span><span class="en">Problem classes: continuous, discrete, nonlinear; constraints and penalties</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.4</b> <span class="vi">Metaheuristic: cân bằng khám phá và khai thác</span><span class="en">Metaheuristics: balancing exploration and exploitation</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.5</b> <span class="vi">Phân loại thuật toán lấy cảm hứng tự nhiên: tiến hóa, sinh học, bầy đàn, vật lý</span><span class="en">A taxonomy of nature-inspired algorithms: evolutionary, bio-inspired, swarm, physics-based</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>1.6</b> <span class="vi">Đánh giá thuật toán: độ phức tạp, tốc độ hội tụ, định lý No Free Lunch</span><span class="en">Assessing algorithms: complexity, convergence rate, the No Free Lunch theorem</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH1_slides.html">Chương 1 <span class="cnt">· 18 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch2">
+        <span class="no">02</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Cơ sở toán học và bộ hàm kiểm thử</span><span class="en">Mathematical foundations and benchmarks</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>2.1</b> <span class="vi">Động lực học quần thể: không gian trạng thái, ma trận khoảng cách, hàm mục tiêu</span><span class="en">Population dynamics: state space, distance matrix, objective function</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>2.2</b> <span class="vi">Phân phối xác suất, bước đi ngẫu nhiên và bước Lévy</span><span class="en">Probability distributions, random walks and Lévy flights</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>2.3</b> <span class="vi">Hàm kiểm thử: Sphere, Rosenbrock, Rastrigin, Ackley, Griewank; và các hàm 2 biến trong ví dụ: Booth, Himmelblau, Goldstein–Price, Bukin N.6, Wayburn–Seader</span><span class="en">Benchmarks: Sphere, Rosenbrock, Rastrigin, Ackley, Griewank; plus the 2-D examples Booth, Himmelblau, Goldstein–Price, Bukin N.6, Wayburn–Seader</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>2.4</b> <span class="vi">Phân tích thống kê: kiểm định Wilcoxon rank-sum, Friedman, độ lệch chuẩn</span><span class="en">Statistical analysis: Wilcoxon rank-sum, Friedman test, standard deviation</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH2_slides.html">Chương 2 <span class="cnt">· 15 slide</span> →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block part" id="part-II" aria-labelledby="ph-II">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Phần</span><span class="en">Part</span> II · <span class="vi">Chương</span><span class="en">Chapters</span> 3–7</p>
+    <h2 id="ph-II" class="rv"><span class="vi">Thuật toán kinh điển và côn trùng</span><span class="en">Classic algorithms and insects</span></h2>
+    <p class="lead rv"><span class="vi">Các thuật toán nền móng (chim, kiến, ong, đom đóm) và bốn thuật toán mô phỏng côn trùng khác.</span><span class="en">The founding algorithms (birds, ants, bees, fireflies) and four more insect-inspired methods.</span></p>
+    <div class="chapters">
+      <article class="chap rv st-ready" id="ch3">
+        <span class="no">03</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Tối ưu bầy đàn (PSO)</span><span class="en">Particle Swarm Optimization (PSO)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>3.1</b> <span class="vi">Nguyên lý sinh học: bầy chim bay và đàn cá bơi</span><span class="en">Biological basis: flocking birds and schooling fish</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>3.2</b> <span class="vi">Mô hình toán học: cập nhật vận tốc, vị trí; trọng số quán tính w, hệ số gia tốc c₁, c₂</span><span class="en">Model: velocity and position updates; inertia weight w, acceleration coefficients c₁, c₂</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>3.3</b> <span class="vi">Tương tác thông tin: pbest và gbest</span><span class="en">Information sharing: pbest and gbest</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>3.4</b> <span class="vi">Biến thể: Binary PSO, GA-PSO, EPSO, DEPSO; QPSO ở chương 16</span><span class="en">Variants: Binary PSO, GA-PSO, EPSO, DEPSO; QPSO in chapter 16</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>3.5</b> <span class="vi">Thuật toán chi tiết, lưu đồ, ví dụ tính tay; mã Python và thực nghiệm 30 lần chạy</span><span class="en">Detailed algorithm, flowchart, worked examples; Python code and a 30-run experiment</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="PSO_slides.html">PSO <span class="cnt">· 33 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch4">
+        <span class="no">04</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Tối ưu đàn kiến (ACO)</span><span class="en">Ant Colony Optimization (ACO)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>4.1</b> <span class="vi">Nguyên lý sinh học: tìm đường, stigmergy và pheromone</span><span class="en">Biological basis: path finding, stigmergy and pheromone</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>4.2</b> <span class="vi">Quy tắc chuyển trạng thái xác suất và bay hơi pheromone</span><span class="en">Probabilistic state transition and pheromone evaporation</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>4.3</b> <span class="vi">Tối ưu tổ hợp: TSP (mô phỏng, tính tay, thực nghiệm eil51, berlin52, st70); VRP ở chương 18</span><span class="en">Combinatorial optimization: TSP (simulation, hand example, eil51, berlin52, st70 experiments); VRP in chapter 18</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>4.4</b> <span class="vi">Biến thể: Ant System, MAX–MIN Ant System, Ant Colony System</span><span class="en">Variants: Ant System, MAX–MIN Ant System, Ant Colony System</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>4.5</b> <span class="vi">Thuật toán chi tiết, mã giả, ACO liên tục (ACOᵣ)</span><span class="en">Detailed algorithm, pseudocode, continuous ACO (ACOᵣ)</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="ACO_slides.html">ACO <span class="cnt">· 23 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch5">
+        <span class="no">05</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Đàn ong và đom đóm (ABC & FA)</span><span class="en">Bees and fireflies (ABC & FA)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>5.1</b> <span class="vi">ABC: ong thợ, ong quan sát, ong trinh sát; điệu múa lắc; phân biệt với Bees Algorithm</span><span class="en">ABC: employed, onlooker and scout bees; the waggle dance; versus the Bees Algorithm</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>5.2</b> <span class="vi">FA: độ hấp dẫn theo khoảng cách, hệ số hấp thụ ánh sáng γ</span><span class="en">FA: distance-dependent attractiveness, light absorption γ</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>5.3</b> <span class="vi">Bài tập thực hành và so sánh hiệu năng ABC với FA trên cùng giao thức</span><span class="en">Labs and an ABC vs FA comparison under one protocol</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="ABC_slides.html">ABC · 5.1 <span class="cnt">· 22 slide</span> →</a><a class="btn lang-link" href="FA_slides.html">FA · 5.2 <span class="cnt">· 22 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch6">
+        <span class="no">06</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Bẫy và ánh sáng: kiến sư tử, bướm đêm (ALO & MFO)</span><span class="en">Traps and light: antlions and moths (ALO & MFO)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>6.1</b> <span class="vi">ALO: bước đi ngẫu nhiên, bẫy co dần, ưu tú</span><span class="en">ALO: random walks, shrinking traps, elitism</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>6.2</b> <span class="vi">MFO: định hướng ngang, xoắn ốc quanh ngọn lửa, số ngọn lửa giảm dần</span><span class="en">MFO: transverse orientation, spiralling around flames, shrinking flame count</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>6.3</b> <span class="vi">Đối chiếu ví dụ trong sách tham khảo: Booth, Goldstein–Price</span><span class="en">Checking the reference book examples: Booth, Goldstein–Price</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="ALO_slides.html">ALO · 6.1 <span class="cnt">· 22 slide</span> →</a><a class="btn lang-link" href="MFO_slides.html">MFO · 6.2 <span class="cnt">· 22 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch7">
+        <span class="no">07</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Châu chấu và bướm (GOA & BOA)</span><span class="en">Grasshoppers and butterflies (GOA & BOA)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>7.1</b> <span class="vi">GOA: lực xã hội hút, đẩy và vùng thoải mái; hệ số co c</span><span class="en">GOA: social attraction, repulsion and comfort zone; shrinking coefficient c</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>7.2</b> <span class="vi">BOA: mùi hương f = cIᵃ, tìm toàn cục và cục bộ</span><span class="en">BOA: fragrance f = cIᵃ, global and local search</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>7.3</b> <span class="vi">So sánh GOA và BOA; đối chiếu ví dụ Bukin N.6 và Himmelblau</span><span class="en">GOA vs BOA; checking the Bukin N.6 and Himmelblau examples</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="GOA_slides.html">GOA · 7.1 <span class="cnt">· 21 slide</span> →</a><a class="btn lang-link" href="BOA_slides.html">BOA · 7.2 <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block part" id="part-III" aria-labelledby="ph-III">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Phần</span><span class="en">Part</span> III · <span class="vi">Chương</span><span class="en">Chapters</span> 8–10</p>
+    <h2 id="ph-III" class="rv"><span class="vi">Động vật săn mồi và tập tính xã hội</span><span class="en">Predators and social hunters</span></h2>
+    <p class="lead rv"><span class="vi">Chiến thuật săn theo nhóm, thứ bậc xã hội, và hai loài thú săn mồi bằng sóng.</span><span class="en">Group hunting tactics, social hierarchy, and two mammals that hunt with waves.</span></p>
+    <div class="chapters">
+      <article class="chap rv st-ready" id="ch8">
+        <span class="no">08</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Tối ưu bầy diều hâu Harris (HHO)</span><span class="en">Harris Hawks Optimization (HHO)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>8.1</b> <span class="vi">Nguyên lý sinh học: vồ bất ngờ theo nhóm</span><span class="en">Biological basis: the cooperative surprise pounce</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>8.2</b> <span class="vi">Pha khám phá: đậu chờ theo vị trí đồng đàn và vị trí ngẫu nhiên</span><span class="en">Exploration: perching by group members and random positions</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>8.3</b> <span class="vi">Chuyển pha bằng năng lượng thoát thân E</span><span class="en">Phase switching by the escaping energy E</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>8.4</b> <span class="vi">Khai thác: vây mềm, vây cứng và lao nhanh kiểu Lévy</span><span class="en">Exploitation: soft and hard besiege, Lévy rapid dives</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>8.5</b> <span class="vi">Mã giả, ví dụ tính tay, thực nghiệm và phân tích thiên lệch gốc tọa độ</span><span class="en">Pseudocode, worked example, experiments and an origin-bias analysis</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="HHO_slides.html">HHO <span class="cnt">· 22 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch9">
+        <span class="no">09</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Tối ưu bầy sói xám (GWO)</span><span class="en">Grey Wolf Optimizer (GWO)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>9.1</b> <span class="vi">Phân cấp xã hội α, β, δ, ω</span><span class="en">Social hierarchy α, β, δ, ω</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>9.2</b> <span class="vi">Cơ chế săn: vây bắt, săn đuổi, tấn công</span><span class="en">Hunting: encircling, chasing, attacking</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>9.3</b> <span class="vi">Cập nhật vị trí theo ba con dẫn đầu; ví dụ tính tay một bước</span><span class="en">Position update from the three leaders; a one-step hand example</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>9.4</b> <span class="vi">Biến thể và ứng dụng: Binary GWO, MOGWO, GWO lai</span><span class="en">Variants and applications: Binary GWO, MOGWO, hybrid GWO</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="GWO_slides.html">GWO <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch10">
+        <span class="no">10</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Cá voi, dơi và bầy sếu (WOA, BA & thuật toán bầy sếu)</span><span class="en">Whales, bats and cranes (WOA, BA & a crane-inspired algorithm)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>10.1</b> <span class="vi">WOA: lưới bong bóng và cập nhật vị trí xoắn ốc</span><span class="en">WOA: bubble-net attack and spiral position update</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>10.2</b> <span class="vi">BA: định vị bằng tiếng vọng, tần số, độ to, tốc độ xung</span><span class="en">BA: echolocation, frequency, loudness, pulse rate</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>10.3</b> <span class="vi">Bầy sếu đầu đỏ (RCO): kiếm ăn phân tán, tụ tập nghỉ đêm, nhảy múa, tránh nguy hiểm*</span><span class="en">Red-crowned cranes (RCO): dispersed foraging, roosting, dancing, danger avoidance*</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>10.4</b> <span class="vi">So sánh WOA, BA, GWO và RCO trên cùng giao thức thực nghiệm</span><span class="en">Comparing WOA, BA, GWO and RCO under one experimental protocol</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="WOA_slides.html">WOA · 10.1 <span class="cnt">· 21 slide</span> →</a><a class="btn lang-link" href="BA_slides.html">BA · 10.2 <span class="cnt">· 22 slide</span> →</a><a class="btn lang-link" href="RCO_slides.html">RCO · 10.3 <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block part" id="part-IV" aria-labelledby="ph-IV">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Phần</span><span class="en">Part</span> IV · <span class="vi">Chương</span><span class="en">Chapters</span> 11–13</p>
+    <h2 id="ph-IV" class="rv"><span class="vi">Sinh vật biển, vi sinh vật và chiến lược bước Lévy</span><span class="en">Marine life, microbes and Lévy-flight strategies</span></h2>
+    <p class="lead rv"><span class="vi">Kẻ săn mồi dưới đại dương, chuỗi salp, tảo, vi khuẩn và chim cúc cu: nhiều thuật toán ở đây dùng bước Lévy của chương 2.</span><span class="en">Ocean predators, salp chains, algae, bacteria and cuckoos: many of these rely on the Lévy flights of chapter 2.</span></p>
+    <div class="chapters">
+      <article class="chap rv st-ready" id="ch11">
+        <span class="no">11</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Động vật săn mồi biển (MPA)</span><span class="en">Marine Predators Algorithm (MPA)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>11.1</b> <span class="vi">Nguyên lý sinh học: chuyển động Brownian và Lévy giữa kẻ săn mồi và con mồi</span><span class="en">Biological basis: Brownian and Lévy movement between predator and prey</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>11.2</b> <span class="vi">Ba giai đoạn theo tỉ số vận tốc: cao, bằng nhau, thấp</span><span class="en">Three phases by velocity ratio: high, unit, low</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>11.3</b> <span class="vi">Hiệu ứng FADs để thoát cực trị địa phương</span><span class="en">The FADs effect for escaping local optima</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="MPA_slides.html">MPA <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch12">
+        <span class="no">12</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Chuỗi salp và tảo nhân tạo (SSA & AAA)</span><span class="en">Salp chains and artificial algae (SSA & AAA)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>12.1</b> <span class="vi">SSA: chuỗi salp, cá thể dẫn đầu và cá thể bám đuôi</span><span class="en">SSA: salp chains, the leader and the followers</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>12.2</b> <span class="vi">AAA: sinh trưởng, nhân bản thích nghi, di chuyển theo ánh sáng</span><span class="en">AAA: growth, adaptive reproduction, light-driven movement</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="SSA_slides.html">SSA · 12.1 <span class="cnt">· 21 slide</span> →</a><a class="btn lang-link" href="AAA_slides.html">AAA · 12.2 <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch13">
+        <span class="no">13</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Vi khuẩn và chim cúc cu (BFO & CS)</span><span class="en">Bacteria and cuckoos (BFO & CS)</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>13.1</b> <span class="vi">BFO: hóa hướng động, sinh sản, loại bỏ và phát tán của E. coli</span><span class="en">BFO: chemotaxis, reproduction, elimination and dispersal of E. coli</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>13.2</b> <span class="vi">Cuckoo Search: đẻ trứng ký sinh kết hợp bước Lévy</span><span class="en">Cuckoo Search: brood parasitism with Lévy flights</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="BFO_slides.html">BFO · 13.1 <span class="cnt">· 21 slide</span> →</a><a class="btn lang-link" href="CS_slides.html">CS · 13.2 <span class="cnt">· 21 slide</span> →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block part" id="part-V" aria-labelledby="ph-V">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Phần</span><span class="en">Part</span> V · <span class="vi">Chương</span><span class="en">Chapters</span> 14–18</p>
+    <h2 id="ph-V" class="rv"><span class="vi">Mở rộng nâng cao, lai ghép và ứng dụng</span><span class="en">Advanced extensions, hybrids and applications</span></h2>
+    <p class="lead rv"><span class="vi">Từ một thuật toán đến hệ thống thật: nhiều mục tiêu, không gian nhị phân, lai ghép, và ứng dụng trong AI, kỹ thuật.</span><span class="en">From one algorithm to real systems: many objectives, binary spaces, hybrids, and applications in AI and engineering.</span></p>
+    <div class="chapters">
+      <article class="chap rv st-ready" id="ch14">
+        <span class="no">14</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Tối ưu đa mục tiêu dựa trên bầy đàn</span><span class="en">Multi-objective swarm intelligence</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>14.1</b> <span class="vi">Lý thuyết Pareto: quan hệ trội, biên Pareto, độ đa dạng</span><span class="en">Pareto theory: dominance, the Pareto front, diversity</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>14.2</b> <span class="vi">Kho lưu trữ ngoài và khoảng cách đông đúc</span><span class="en">External archives and crowding distance</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>14.3</b> <span class="vi">MOPSO (có thực nghiệm so với NSGA-II trên ZDT1–3); MOGWO, MOHHO, MOALO, MOGOA</span><span class="en">MOPSO (with experiments vs NSGA-II on ZDT1–3); MOGWO, MOHHO, MOALO, MOGOA</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH14_slides.html">Chương 14 <span class="cnt">· 16 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch15">
+        <span class="no">15</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Bầy đàn nhị phân và tối ưu rời rạc</span><span class="en">Binary swarms and discrete optimization</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>15.1</b> <span class="vi">Hàm chuyển đổi dạng S và dạng V</span><span class="en">S-shaped and V-shaped transfer functions</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>15.2</b> <span class="vi">Chọn đặc trưng cho học máy (thực nghiệm BPSO); Binary HHO, ALO, GWO</span><span class="en">Feature selection for machine learning (BPSO experiment); Binary HHO, ALO, GWO</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>15.3</b> <span class="vi">Bài toán cái túi 0/1, sơ đồ mạng và đồ thị</span><span class="en">0/1 knapsack, network and graph optimization</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH15_slides.html">Chương 15 <span class="cnt">· 14 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-ready" id="ch16">
+        <span class="no">16</span>
+        <span class="status"><span class="vi">Có slide</span><span class="en">Slides ready</span></span>
+        <h3><span class="vi">Giải thuật di truyền, lai ghép và biến thể lượng tử</span><span class="en">Genetic algorithms, hybrids and quantum-inspired variants</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>16.1</b> <span class="vi">Nền tảng GA: chọn lọc, lai ghép, đột biến; khác biệt giữa GA và PSO</span><span class="en">GA basics: selection, crossover, mutation; how GA differs from PSO</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>16.2</b> <span class="vi">Lai ghép: phân loại Talbi, GA-PSO (có thực nghiệm), tìm kiếm Tabu</span><span class="en">Hybrids: Talbi's taxonomy, GA-PSO (with experiments), Tabu Search</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>16.3</b> <span class="vi">Lấy cảm hứng lượng tử: QPSO (có thực nghiệm), QIEA với cổng xoay</span><span class="en">Quantum-inspired: QPSO (with experiments), QIEA with rotation gates</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH16_slides.html">Chương 16 <span class="cnt">· 18 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-part" id="ch17">
+        <span class="no">17</span>
+        <span class="status"><span class="vi">Có slide · đang bổ sung</span><span class="en">Slides · being extended</span></span>
+        <h3><span class="vi">Ứng dụng trong trí tuệ nhân tạo và khoa học dữ liệu</span><span class="en">Applications in AI and data science</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>17.1</b> <span class="vi">Mạng nơ-ron: mô hình nơ-ron, MLP, huấn luyện trọng số bằng PSO so với Adam</span><span class="en">Neural networks: the neuron model, MLPs, PSO weight training vs Adam</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>17.2</b> <span class="vi">Tối ưu siêu tham số Random Forest: PSO so với tìm kiếm ngẫu nhiên</span><span class="en">Random Forest hyper-parameter tuning: PSO vs random search</span></li>
+        <li class="s-p"><span class="mk" aria-hidden="true">◐</span><b>17.3</b> <span class="vi">Tìm kiếm kiến trúc mạng sâu: giới thiệu, chưa có thực nghiệm riêng</span><span class="en">Deep architecture search: introduced, no dedicated experiment yet</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>17.4</b> <span class="vi">Xử lý ảnh: phân ngưỡng Otsu đa mức bằng PSO</span><span class="en">Image processing: multi-level Otsu thresholding with PSO</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH17_slides.html">Chương 17 <span class="cnt">· 15 slide</span> →</a></div>
+      </article>
+      <article class="chap rv st-part" id="ch18">
+        <span class="no">18</span>
+        <span class="status"><span class="vi">Có slide · đang bổ sung</span><span class="en">Slides · being extended</span></span>
+        <h3><span class="vi">Ứng dụng kỹ thuật và hướng phát triển</span><span class="en">Engineering applications and future directions</span></h3>
+        <ul class="secs">
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>18.1</b> <span class="vi">Định tuyến xe CVRP: ACO so với Clarke–Wright</span><span class="en">Capacitated vehicle routing: ACO vs Clarke–Wright</span></li>
+        <li class="s-p"><span class="mk" aria-hidden="true">◐</span><b>18.2</b> <span class="vi">Robot bầy đàn: khái niệm, quy tắc Reynolds; UAV chưa có thực nghiệm</span><span class="en">Swarm robotics: concepts, Reynolds rules; no UAV experiment yet</span></li>
+        <li class="s-p"><span class="mk" aria-hidden="true">◐</span><b>18.3</b> <span class="vi">Ứng dụng kỹ thuật: logistics, năng lượng, thiết kế, mạng (tổng quan)</span><span class="en">Engineering applications: logistics, energy, design, networks (overview)</span></li>
+        <li class="s-d"><span class="mk" aria-hidden="true">●</span><b>18.4</b> <span class="vi">Môi trường động (có thực nghiệm), tối ưu quy mô lớn, các họ khác (GSA, SA)</span><span class="en">Dynamic environments (with experiments), large-scale optimization, other families (GSA, SA)</span></li>
+        </ul>
+        <div class="decks"><a class="btn lang-link" href="CH18_slides.html">Chương 18 <span class="cnt">· 16 slide</span> →</a></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="tl-h">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Dòng thời gian</span><span class="en">Timeline</span></p>
+    <h2 id="tl-h" class="rv"><span class="vi">Các thuật toán trong giáo trình theo năm ra đời</span><span class="en">The book's algorithms by year of publication</span></h2>
+    <p class="lead rv"><span class="vi">Mọi thuật toán đều có slide, mã nguồn và thực nghiệm; bấm để mở.</span><span class="en">Every algorithm has slides, code and experiments; click to open.</span></p>
+    <div class="timeline-wrap rv"><nav class="timeline" aria-label="Timeline">
+<a class="tl lang-link on" href="ACO_slides.html"><b>1992</b><span class="a">ACO</span><span>Dorigo</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 4</span></a>
+<a class="tl lang-link on" href="PSO_slides.html"><b>1995</b><span class="a">PSO</span><span>Kennedy & Eberhart</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 3</span></a>
+<a class="tl lang-link on" href="BFO_slides.html"><b>2002</b><span class="a">BFO</span><span>Passino</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 13</span></a>
+<a class="tl lang-link on" href="ABC_slides.html"><b>2005</b><span class="a">ABC</span><span>Karaboga</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 5</span></a>
+<a class="tl lang-link on" href="FA_slides.html"><b>2008</b><span class="a">FA</span><span>Yang</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 5</span></a>
+<a class="tl lang-link on" href="CS_slides.html"><b>2009</b><span class="a">CS</span><span>Yang & Deb</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 13</span></a>
+<a class="tl lang-link on" href="BA_slides.html"><b>2010</b><span class="a">BA</span><span>Yang</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 10</span></a>
+<a class="tl lang-link on" href="GWO_slides.html"><b>2014</b><span class="a">GWO</span><span>Mirjalili et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 9</span></a>
+<a class="tl lang-link on" href="ALO_slides.html"><b>2015</b><span class="a">ALO</span><span>Mirjalili</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 6</span></a>
+<a class="tl lang-link on" href="MFO_slides.html"><b>2015</b><span class="a">MFO</span><span>Mirjalili</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 6</span></a>
+<a class="tl lang-link on" href="AAA_slides.html"><b>2015</b><span class="a">AAA</span><span>Uymaz et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 12</span></a>
+<a class="tl lang-link on" href="WOA_slides.html"><b>2016</b><span class="a">WOA</span><span>Mirjalili & Lewis</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 10</span></a>
+<a class="tl lang-link on" href="GOA_slides.html"><b>2017</b><span class="a">GOA</span><span>Saremi et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 7</span></a>
+<a class="tl lang-link on" href="SSA_slides.html"><b>2017</b><span class="a">SSA</span><span>Mirjalili et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 12</span></a>
+<a class="tl lang-link on" href="BOA_slides.html"><b>2019</b><span class="a">BOA</span><span>Arora & Singh</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 7</span></a>
+<a class="tl lang-link on" href="HHO_slides.html"><b>2019</b><span class="a">HHO</span><span>Heidari et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 8</span></a>
+<a class="tl lang-link on" href="MPA_slides.html"><b>2020</b><span class="a">MPA</span><span>Faramarzi et al.</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 11</span></a>
+<a class="tl lang-link on" href="RCO_slides.html"><b>2025</b><span class="a">RCO</span><span>Kang & Ma</span><span class="c"><span class="vi">Chương</span><span class="en">Ch.</span> 10</span></a>
+    </nav></div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="cmp-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">So sánh nhanh</span><span class="en">At a glance</span></p>
+    <h2 id="cmp-h" class="rv"><span class="vi">Mỗi bầy cân bằng khám phá và khai thác theo cách riêng</span><span class="en">Each swarm balances exploration and exploitation its own way</span></h2>
+    <div class="table-wrap rv">
+      <table>
+        <thead><tr>
+          <th><span class="vi">Thuật toán</span><span class="en">Algorithm</span></th>
+          <th><span class="vi">Chương</span><span class="en">Chapter</span></th>
+          <th><span class="vi">Cơ chế chính</span><span class="en">Key mechanism</span></th>
+          <th><span class="vi">Chuyển từ khám phá sang khai thác</span><span class="en">Exploration → exploitation switch</span></th>
+          <th><span class="vi">Tham số riêng</span><span class="en">Own parameters</span></th>
+        </tr></thead>
+        <tbody>
+          <tr><td>PSO</td><td>3</td><td><span class="vi">Quán tính + pbest + gbest</span><span class="en">Inertia + pbest + gbest</span></td><td><span class="vi">Trọng số quán tính <span class="m">w</span> giảm dần; kẹp <span class="m">v<sub>max</sub></span></span><span class="en">Decreasing inertia weight <span class="m">w</span>; <span class="m">v<sub>max</sub></span> clamping</span></td><td><span class="m">w, c<sub>1</sub>, c<sub>2</sub>, v<sub>max</sub></span></td></tr>
+          <tr><td>ACO</td><td>4</td><td><span class="vi">Dựng lời giải theo xác suất <span class="m">τ<sup>α</sup>η<sup>β</sup></span></span><span class="en">Probabilistic construction by <span class="m">τ<sup>α</sup>η<sup>β</sup></span></span></td><td><span class="vi">Pheromone tích lũy; bay hơi giữ đa dạng</span><span class="en">Pheromone builds up; evaporation keeps diversity</span></td><td><span class="m">α, β, ρ, m</span></td></tr>
+          <tr><td>ABC</td><td>5.1</td><td><span class="vi">Ong thợ, ong quan sát, ong trinh sát</span><span class="en">Employed, onlooker, scout bees</span></td><td><span class="vi">Roulette cho khai thác; trinh sát cho khám phá</span><span class="en">Roulette for exploitation; scouts for exploration</span></td><td><span class="m">SN, limit</span></td></tr>
+          <tr><td>FA</td><td>5.2</td><td><span class="vi">Hút về con sáng hơn, <span class="m">β<sub>0</sub>e<sup>−γr²</sup></span></span><span class="en">Attraction to brighter, <span class="m">β<sub>0</sub>e<sup>−γr²</sup></span></span></td><td><span class="vi">Giảm biên độ ngẫu nhiên <span class="m">α</span>; <span class="m">γ</span> quyết định tầm nhìn</span><span class="en">Shrinking random step <span class="m">α</span>; <span class="m">γ</span> sets visibility</span></td><td><span class="m">β<sub>0</sub>, γ, α</span></td></tr>
+          <tr><td>ALO</td><td>6.1</td><td><span class="vi">Bước đi ngẫu nhiên quanh kiến sư tử và ưu tú</span><span class="en">Random walks around antlions and the elite</span></td><td><span class="vi">Miệng bẫy co theo <span class="m">I = 10<sup>w</sup>t/T</span></span><span class="en">Trap shrinks with <span class="m">I = 10<sup>w</sup>t/T</span></span></td><td><span class="vi">không có</span><span class="en">none</span></td></tr>
+          <tr><td>MFO</td><td>6.2</td><td><span class="vi">Xoắn ốc logarit quanh ngọn lửa</span><span class="en">Logarithmic spiral around flames</span></td><td><span class="vi">Số ngọn lửa <span class="m">FN</span> giảm; <span class="m">r</span>: −1 → −2</span><span class="en">Flame count <span class="m">FN</span> drops; <span class="m">r</span>: −1 → −2</span></td><td><span class="m">b</span></td></tr>
+          <tr><td>GOA</td><td>7.1</td><td><span class="vi">Lực xã hội hút / đẩy + kéo về mục tiêu</span><span class="en">Social attraction / repulsion + pull to target</span></td><td><span class="vi">Hệ số <span class="m">c</span> giảm tuyến tính</span><span class="en">Linearly decreasing <span class="m">c</span></span></td><td><span class="m">c<sub>max</sub>, c<sub>min</sub>, f, l</span></td></tr>
+          <tr><td>BOA</td><td>7.2</td><td><span class="vi">Mùi hương <span class="m">f = cI<sup>a</sup></span></span><span class="en">Fragrance <span class="m">f = cI<sup>a</sup></span></span></td><td><span class="vi">Xác suất <span class="m">p</span> chọn toàn cục hay cục bộ</span><span class="en">Probability <span class="m">p</span> picks global or local</span></td><td><span class="m">p, c, a</span></td></tr>
+          <tr><td>HHO</td><td>8</td><td><span class="vi">Khám phá + bốn kiểu vây + lao nhanh Lévy</span><span class="en">Exploration + four sieges + Lévy dives</span></td><td><span class="vi">Năng lượng <span class="m">E</span> giảm từ 2 về 0</span><span class="en">Energy <span class="m">E</span> decays from 2 to 0</span></td><td><span class="vi">không có</span><span class="en">none</span></td></tr>
+          <tr><td>GWO</td><td>9</td><td><span class="vi">Trung bình ba ước lượng từ α, β, δ</span><span class="en">Average of three estimates from α, β, δ</span></td><td><span class="m">a: 2 → 0</span><span class="vi">, khám phá khi <span class="m">|A| &gt; 1</span></span><span class="en">, explore while <span class="m">|A| &gt; 1</span></span></td><td><span class="vi">không có</span><span class="en">none</span></td></tr>
+          <tr><td>WOA</td><td>10.1</td><td><span class="vi">Vây bắt / xoắn ốc / theo con ngẫu nhiên</span><span class="en">Encircle / spiral / follow a random whale</span></td><td><span class="m">a: 2 → 0</span><span class="vi">, khám phá khi <span class="m">|A| ≥ 1</span></span><span class="en">, explore while <span class="m">|A| ≥ 1</span></span></td><td><span class="m">b</span></td></tr>
+          <tr><td>BA</td><td>10.2</td><td><span class="vi">Tần số, vận tốc về con tốt nhất, đi cục bộ</span><span class="en">Frequency-tuned velocity toward the best, local walks</span></td><td><span class="vi">Độ to <span class="m">A</span> giảm, tốc độ xung <span class="m">r</span> tăng</span><span class="en">Loudness <span class="m">A</span> falls, pulse rate <span class="m">r</span> rises</span></td><td><span class="m">f<sub>min</sub>, f<sub>max</sub>, A<sub>0</sub>, r<sub>0</sub>, α, γ</span></td></tr>
+          <tr><td>RCO</td><td>10.3</td><td><span class="vi">Kiếm ăn phân tán, nghỉ đêm, nhảy múa, tránh nguy hiểm</span><span class="en">Dispersed foraging, roosting, dancing, danger avoidance</span></td><td><span class="vi">Hệ số <span class="m">c<sub>2</sub>, c<sub>3</sub></span> giảm; ngưỡng thoát hiểm <span class="m">(t/T)<sup>½</sup></span></span><span class="en">Decreasing <span class="m">c<sub>2</sub>, c<sub>3</sub></span>; escape threshold <span class="m">(t/T)<sup>½</sup></span></span></td><td><span class="m">p<sub>c</sub></span></td></tr>
+          <tr><td>MPA</td><td>11</td><td><span class="vi">Brownian và Lévy theo ba pha; hiệu ứng FADs</span><span class="en">Brownian and Lévy moves in three phases; FADs effect</span></td><td><span class="vi">Chia ba theo số vòng: khám phá → chuyển tiếp → khai thác</span><span class="en">Thirds of the run: explore → transition → exploit</span></td><td><span class="m">P, FADs</span></td></tr>
+          <tr><td>SSA</td><td>12.1</td><td><span class="vi">Con dẫn đầu quanh thức ăn, con bám đuôi lấy trung bình</span><span class="en">Leaders around the food, followers average</span></td><td><span class="vi"><span class="m">c<sub>1</sub> = 2e<sup>−(4t/T)²</sup></span> giảm nhanh</span><span class="en"><span class="m">c<sub>1</sub> = 2e<sup>−(4t/T)²</sup></span> decays fast</span></td><td><span class="vi">không có</span><span class="en">none</span></td></tr>
+          <tr><td>AAA</td><td>12.2</td><td><span class="vi">Xoắn ốc, tiến hóa, thích nghi của khuẩn lạc tảo</span><span class="en">Helical motion, evolution, adaptation of algal colonies</span></td><td><span class="vi">Năng lượng và ma sát theo kích thước khuẩn lạc</span><span class="en">Energy and friction set by colony size</span></td><td><span class="m">Δ, e, A<sub>p</sub></span></td></tr>
+          <tr><td>BFO</td><td>13.1</td><td><span class="vi">Hóa hướng động, sinh sản, loại bỏ – phát tán</span><span class="en">Chemotaxis, reproduction, elimination–dispersal</span></td><td><span class="vi">Phát tán ngẫu nhiên với xác suất <span class="m">P<sub>ed</sub></span></span><span class="en">Random dispersal with probability <span class="m">P<sub>ed</sub></span></span></td><td><span class="m">C, N<sub>s</sub>, N<sub>re</sub>, N<sub>ed</sub>, P<sub>ed</sub></span></td></tr>
+          <tr><td>CS</td><td>13.2</td><td><span class="vi">Bước Lévy + bỏ tổ bị phát hiện</span><span class="en">Lévy flights + abandoning discovered nests</span></td><td><span class="vi">Tỉ lệ bỏ tổ <span class="m">p<sub>a</sub></span> giữ khám phá</span><span class="en">Abandon rate <span class="m">p<sub>a</sub></span> keeps exploring</span></td><td><span class="m">p<sub>a</sub>, β</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+
+<section class="block" id="results" aria-labelledby="res-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Thực nghiệm và mã nguồn</span><span class="en">Experiments and code</span></p>
+    <h2 id="res-h" class="rv"><span class="vi">18 thuật toán trên cùng một giao thức</span><span class="en">18 algorithms under one protocol</span></h2>
+    <p class="lead rv"><span class="vi">D = 10, 20 000 lần đánh giá hàm, quần thể 30, 30 lần chạy, tham số mặc định của bài gốc. Giao thức được khóa trước khi chạy; không chỉnh tham số theo kết quả.</span><span class="en">D = 10, 20,000 function evaluations, population 30, 30 runs, default parameters of the original papers. The protocol was locked before running; nothing was tuned on the results.</span></p>
+    <div class="table-wrap rv">
+      <table class="res">
+        <thead><tr><th>#</th><th><span class="vi">Thuật toán</span><span class="en">Algorithm</span></th><th><span class="vi">Chương</span><span class="en">Chapter</span></th><th><span class="vi">Hạng Friedman</span><span class="en">Friedman rank</span></th><th><span class="vi">so PSO: + / ≈ / −</span><span class="en">vs PSO: + / ≈ / −</span></th><th><span class="vi">Trung vị F1 Sphere</span><span class="en">Median F1 Sphere</span></th><th><span class="vi">Trung vị F6 Sphere dịch</span><span class="en">Median F6 shifted Sphere</span></th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><a class="lang-link" href="ABC_slides.html">ABC</a></td><td>5.1</td><td class="num">4.36</td><td class="num">5 / 2 / 0</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>2</td><td><a class="lang-link" href="AAA_slides.html">AAA</a></td><td>12.2</td><td class="num">5.21</td><td class="num">4 / 3 / 0</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>3</td><td><a class="lang-link" href="MPA_slides.html">MPA</a></td><td>11</td><td class="num">5.21</td><td class="num">3 / 2 / 2</td><td class="num">0</td><td class="num">1.5e−6</td></tr>
+          <tr><td>4</td><td><a class="lang-link" href="PSO_slides.html">PSO</a></td><td>3</td><td class="num">5.93</td><td class="num">—</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>5</td><td><a class="lang-link" href="HHO_slides.html">HHO</a></td><td>8</td><td class="num">6.79</td><td class="num">4 / 1 / 2</td><td class="num">0</td><td class="num">3.5e+3 <span class="flag" title="origin bias">⚑</span></td></tr>
+          <tr><td>6</td><td><a class="lang-link" href="GWO_slides.html">GWO</a></td><td>9</td><td class="num">7.00</td><td class="num">3 / 1 / 3</td><td class="num">0</td><td class="num">6.6e+0 <span class="flag" title="origin bias">⚑</span></td></tr>
+          <tr><td>7</td><td><a class="lang-link" href="ACO_slides.html">ACO<sub>R</sub></a></td><td>4</td><td class="num">7.21</td><td class="num">1 / 4 / 2</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>8</td><td><a class="lang-link" href="WOA_slides.html">WOA</a></td><td>10.1</td><td class="num">7.64</td><td class="num">4 / 1 / 2</td><td class="num">0</td><td class="num">1.3e+3 <span class="flag" title="origin bias">⚑</span></td></tr>
+          <tr><td>9</td><td><a class="lang-link" href="FA_slides.html">FA</a></td><td>5.2</td><td class="num">8.64</td><td class="num">1 / 2 / 4</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>10</td><td><a class="lang-link" href="ALO_slides.html">ALO</a></td><td>6.1</td><td class="num">8.79</td><td class="num">0 / 2 / 5</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>11</td><td><a class="lang-link" href="MFO_slides.html">MFO</a></td><td>6.2</td><td class="num">9.50</td><td class="num">0 / 4 / 3</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>12</td><td><a class="lang-link" href="SSA_slides.html">SSA</a></td><td>12.1</td><td class="num">10.21</td><td class="num">0 / 2 / 5</td><td class="num">0</td><td class="num">0</td></tr>
+          <tr><td>13</td><td><a class="lang-link" href="BOA_slides.html">BOA</a></td><td>7.2</td><td class="num">11.79</td><td class="num">1 / 1 / 5</td><td class="num">0</td><td class="num">6.9e+3 <span class="flag" title="origin bias">⚑</span></td></tr>
+          <tr><td>14</td><td><a class="lang-link" href="CS_slides.html">CS</a></td><td>13.2</td><td class="num">12.14</td><td class="num">0 / 0 / 7</td><td class="num">8.2e−3</td><td class="num">1.1e−2</td></tr>
+          <tr><td>15</td><td><a class="lang-link" href="GOA_slides.html">GOA</a></td><td>7.1</td><td class="num">13.71</td><td class="num">0 / 0 / 7</td><td class="num">8.7e−8</td><td class="num">7.3e−8</td></tr>
+          <tr><td>16</td><td><a class="lang-link" href="RCO_slides.html">RCO</a></td><td>10.3</td><td class="num">14.86</td><td class="num">0 / 0 / 7</td><td class="num">7.4e−3</td><td class="num">1.4e−2</td></tr>
+          <tr><td>17</td><td><a class="lang-link" href="BA_slides.html">BA</a></td><td>10.2</td><td class="num">15.86</td><td class="num">0 / 0 / 7</td><td class="num">7.8e+1</td><td class="num">5.2e+2</td></tr>
+          <tr><td>18</td><td><a class="lang-link" href="BFO_slides.html">BFO</a></td><td>13.1</td><td class="num">16.14</td><td class="num">0 / 0 / 7</td><td class="num">2.7e+1</td><td class="num">2.5e+1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note rv"><span class="vi">Friedman trên 7 hàm: p = 1.3e-07. Wilcoxon rank-sum với PSO, α = 0.05. ⚑ thiên lệch gốc tọa độ: giải đúng Sphere tại 0 nhưng thất bại khi dịch tâm. Thứ hạng chỉ đúng cho bộ thử và ngân sách này (No Free Lunch).</span><span class="en">Friedman over 7 functions: p = 1.3e-07. Wilcoxon rank-sum vs PSO, α = 0.05. ⚑ origin bias: solves Sphere at 0 but fails once shifted. Rankings hold only for this suite and budget (No Free Lunch).</span></p>
+    <div class="dl rv">
+      <a class="btn solid" href="SwarmIntelligence_code.zip" download><span class="vi">Tải mã nguồn và kết quả (.zip)</span><span class="en">Download code and results (.zip)</span></a>
+      <a class="btn" href="code/README.md">README</a>
+      <a class="btn" href="code/PROTOCOL.md"><span class="vi">Giao thức thực nghiệm</span><span class="en">Experimental protocol</span></a>
+      <a class="btn" href="code/results/summary_all/table.csv"><span class="vi">Bảng kết quả (CSV)</span><span class="en">Results table (CSV)</span></a>
+      <a class="btn" href="code/refs/references.json"><span class="vi">Tài liệu tham khảo (JSON)</span><span class="en">References (JSON)</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="how-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Cách dùng</span><span class="en">How to use</span></p>
+    <h2 id="how-h" class="rv"><span class="vi">Trình chiếu, tự học hay so sánh</span><span class="en">Present, self-study or compare</span></h2>
+    <div class="howto">
+      <div class="rv"><b><span class="vi">Chuyển trang</span><span class="en">Navigate</span></b><span><span class="vi"><kbd>←</kbd> <kbd>→</kbd>, <kbd>Space</kbd>, cuộn chuột hoặc vuốt. Nút <strong>☰ Mục lục</strong> góc trên bên trái quay về trang này.</span><span class="en"><kbd>←</kbd> <kbd>→</kbd>, <kbd>Space</kbd>, scroll or swipe. The <strong>☰ Contents</strong> button at the top left returns here.</span></span></div>
+      <div class="rv"><b><span class="vi">Đổi ngôn ngữ</span><span class="en">Switch language</span></b><span><span class="vi">Nút <strong>VN | EN</strong> góc trên bên phải, hoặc phím <kbd>L</kbd>. Lựa chọn được nhớ cho mọi chương.</span><span class="en">The <strong>VN | EN</strong> button at the top right, or the <kbd>L</kbd> key. The choice carries across chapters.</span></span></div>
+      <div class="rv"><b><span class="vi">Mô phỏng</span><span class="en">Simulations</span></b><span><span class="vi">Tự chạy khi tới slide; dùng <strong>Chạy</strong>, <strong>Một bước</strong>, <strong>Đặt lại</strong> để giảng từng vòng lặp.</span><span class="en">They start when you reach the slide; use <strong>Run</strong>, <strong>Step</strong>, <strong>Reset</strong> to teach one iteration at a time.</span></span></div>
+      <div class="rv"><b><span class="vi">So sánh công bằng</span><span class="en">Fair comparison</span></b><span><span class="vi">Mọi mô phỏng thuật toán dùng chung một địa hình 2D có một cực tiểu toàn cục và bốn cực tiểu cục bộ; mọi thực nghiệm dùng chung giao thức và mã trong thư mục <code>code/</code>.</span><span class="en">All algorithm demos share one 2D landscape with one global and four local minima; all experiments share one protocol and the code in <code>code/</code>.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="errata" aria-labelledby="err-h" style="padding-top:0">
+  <div class="wrap">
+    <p class="kicker rv"><span class="vi">Đối chiếu tài liệu tham khảo</span><span class="en">Checking the reference book</span></p>
+    <h2 id="err-h" class="rv"><span class="vi">Đính chính: Okwu &amp; Tartibu (2021)</span><span class="en">Errata: Okwu &amp; Tartibu (2021)</span></h2>
+    <p class="lead rv"><span class="vi">Sách <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em> (Springer, SCI 927) được dùng làm tài liệu đọc thêm. Mọi ví dụ số trong sách đã được tính lại; dưới đây là các điểm cần lưu ý khi đọc.</span><span class="en"><em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em> (Springer, SCI 927) serves as further reading. Every numerical example was recomputed; the points below need care when reading it.</span></p>
+    <div class="table-wrap rv">
+      <table>
+        <thead><tr><th><span class="vi">Chương sách</span><span class="en">Book chapter</span></th><th><span class="vi">Sách ghi</span><span class="en">The book says</span></th><th><span class="vi">Kiểm chứng</span><span class="en">Verified</span></th></tr></thead>
+        <tbody>
+          <tr><td>2 · PSO</td><td><span class="vi">Ví dụ có ràng buộc bỏ qua ràng buộc; “−170 tại (5, −5, 5)”</span><span class="en">The constrained example ignores its constraints; “−170 at (5, −5, 5)”</span></td><td><span class="vi">f(5, −5, 5) = −166; −170 đạt tại (5, −5, 3) nhưng vi phạm ràng buộc. Nghiệm đúng ≈ −23.67 tại (1.454, −1.699, 3)</span><span class="en">f(5, −5, 5) = −166; −170 occurs at (5, −5, 3) but is infeasible. True optimum ≈ −23.67 at (1.454, −1.699, 3)</span></td></tr>
+          <tr><td>3 · ABC</td><td><span class="vi">Trộn Bees Algorithm (Pham) với ABC (Karaboga); bảng 3.2 chép sai vài số</span><span class="en">Mixes the Bees Algorithm (Pham) with ABC (Karaboga); table 3.2 has copying errors</span></td><td><span class="vi">Ví dụ: mục 3, bộ 5 là 16/77 = 0.2078 (in 0.1078); mục 4, bộ 5 là 7/34 = 0.2059 (in 0.1058)</span><span class="en">E.g. section 3, set 5 is 16/77 = 0.2078 (printed 0.1078); section 4, set 5 is 7/34 = 0.2059 (printed 0.1058)</span></td></tr>
+          <tr><td>4 · ACO</td><td><span class="vi">Công thức 4.2 là quy tắc ACS nhưng ví dụ cho cả ba kiến rải pheromone</span><span class="en">Equation 4.2 is the ACS rule, yet the example lets all three ants deposit</span></td><td><span class="vi">Ví dụ thực chất là Ant System; số liệu đúng, tuyến 52 là tối ưu</span><span class="en">The example is really Ant System; numbers are right and 52 is optimal</span></td></tr>
+          <tr><td>5 · GWO</td><td><span class="vi">Không cho r₁, r₂; dấu |·| đặt sai; số liệu α chép không khớp</span><span class="en">No r₁, r₂ given; misplaced |·|; inconsistent α values</span></td><td><span class="vi">Xem ví dụ tính lại có r cố định ở chương 9</span><span class="en">See the reproducible version with fixed r in chapter 9</span></td></tr>
+          <tr><td>7 · FA</td><td><span class="vi">Công thức 7.5 dùng dấu “−” giữa hai bình phương</span><span class="en">Equation 7.5 has “−” between the squared terms</span></td><td><span class="vi">r = √((xᵢ − xⱼ)² + (yᵢ − yⱼ)²)</span><span class="en">r = √((xᵢ − xⱼ)² + (yᵢ − yⱼ)²)</span></td></tr>
+          <tr><td>8 · BA</td><td><span class="vi">Ví dụ ba con dơi sai tần số, vị trí, cách chọn con tốt nhất, dấu trong r, ε = 1.1; nghiệm 10 chiều cho hàm 2 biến</span><span class="en">Three-bat example: wrong frequency, positions, best-bat rule, sign in r, ε = 1.1; a 10-D answer for a 2-variable function</span></td><td><span class="vi">Trình bày lại theo Yang (2010), chương 10.2</span><span class="en">Re-presented after Yang (2010), section 10.2</span></td></tr>
+          <tr><td>9 · ALO</td><td><span class="vi">Hàm Booth: nghiệm “[1, 2]”; công thức 9.7 thiếu ngoặc; “10w”</span><span class="en">Booth: answer “[1, 2]”; equation 9.7 missing parentheses; “10w”</span></td><td><span class="vi">Nghiệm (1, 3), f(1, 2) = 5; (X − a)(d − c)/(b − a) + c; 10ʷ</span><span class="en">Optimum (1, 3), f(1, 2) = 5; (X − a)(d − c)/(b − a) + c; 10ʷ</span></td></tr>
+          <tr><td>10 · GOA</td><td><span class="vi">Hàm Bukin thiếu căn và trị tuyệt đối; nghiệm “[10, 1]”; ghi tác giả “Mirjalili 2015”</span><span class="en">Bukin lacks the root and absolute value; answer “[10, 1]”; credited to “Mirjalili 2015”</span></td><td><span class="vi">Cực tiểu (−10, 1), f = 0; tác giả Saremi, Mirjalili &amp; Lewis (2017)</span><span class="en">Minimum (−10, 1), f = 0; by Saremi, Mirjalili &amp; Lewis (2017)</span></td></tr>
+          <tr><td>11 · BOA</td><td><span class="vi">Công thức 11.2 đặt ngoặc khác bài gốc</span><span class="en">Equation 11.2 brackets differ from the original</span></td><td><span class="vi">Bài gốc: x + (r²·g* − x)·f</span><span class="en">Original: x + (r²·g* − x)·f</span></td></tr>
+          <tr><td>12 · MFO</td><td><span class="vi">Công thức số ngọn lửa sai; thiếu |·| trong D; “84” là cực tiểu cục bộ</span><span class="en">Wrong flame-number formula; missing |·| in D; “84” is a local minimum</span></td><td><span class="vi">FN = round(N − l(N − 1)/T); Goldstein–Price toàn cục f = 3 tại (0, −1)</span><span class="en">FN = round(N − l(N − 1)/T); Goldstein–Price global f = 3 at (0, −1)</span></td></tr>
+          <tr><td>13 · GA</td><td><span class="vi">Bài cái túi được giải bằng liệt kê 32 tổ hợp, không chạy GA; dòng 31–32 bảng 13.2 sai, thiếu tổ hợp 11111</span><span class="en">The knapsack is solved by listing all 32 combinations, not by a GA; rows 31–32 of table 13.2 are wrong and 11111 is missing</span></td><td><span class="vi">Đáp số tối ưu 16 (G, M, A, O; 34 kg) vẫn đúng</span><span class="en">The optimum 16 (G, M, A, O; 34 kg) is still correct</span></td></tr>
+          <tr><td>14 · ANN</td><td><span class="vi">“10 hidden layers” với 39 mẫu dữ liệu; gọi R là “R²”</span><span class="en">“10 hidden layers” on 39 samples; R reported as “R²”</span></td><td><span class="vi">Nhiều khả năng là 1 lớp ẩn 10 nơ-ron (mặc định MATLAB); đồ thị hồi quy MATLAB hiển thị R</span><span class="en">Most likely one hidden layer of 10 neurons (MATLAB default); MATLAB regression plots show R</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section class="block" aria-labelledby="note-h" style="padding-top:0">
+  <div class="wrap notes">
+    <p class="kicker rv" id="note-h"><span class="vi">Ghi chú</span><span class="en">Notes</span></p>
+    <p class="rv"><span class="vi">* Mục 10.3: không tìm thấy bài báo gốc nào có tên “Sarus Crane Optimization”. Giáo trình dùng thuật toán bầy sếu có nguồn kiểm chứng: <em>Red-Crowned Crane Optimization</em> (Kang &amp; Ma, <em>Biomimetics</em> 10(9), 2025, doi: 10.3390/biomimetics10090565). Trong giao thức của giáo trình, RCO đứng 16/18, khác với kết luận của bài gốc.</span><span class="en">* Section 10.3: no original paper titled “Sarus Crane Optimization” could be found. The book uses a verifiable crane-inspired method: <em>Red-Crowned Crane Optimization</em> (Kang &amp; Ma, <em>Biomimetics</em> 10(9), 2025, doi: 10.3390/biomimetics10090565). Under the book's protocol RCO ranks 16/18, unlike the original paper's conclusion.</span></p>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Châu Văn Vân · PTITHCM — <span class="vi">Giáo trình Trí tuệ bầy đàn, bản slide tương tác song ngữ.</span><span class="en">Swarm Intelligence Textbook, bilingual interactive slides.</span></p>
+  </div>
+</footer>
+
+<script src="assets/si-deck.js"></script>
+<script>
+/* Nền bầy chim, hiệu ứng hiện dần, thanh phần nhanh khi đã cuộn qua phần đầu */
+(function () {
+  const hero = document.querySelector('.hero');
+  const sc = new SwarmCanvas(hero.querySelector('.swarm-canvas'));
+  sc.start();
+  const mini = document.querySelector('.parts-mini');
+  new IntersectionObserver((es) => { const v = es[0].isIntersecting; v ? sc.start() : sc.stop(); mini.classList.toggle('show', !v); }).observe(hero);
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.08 });
+  document.querySelectorAll('.rv').forEach((el) => io.observe(el));
+  // đánh dấu phần đang xem trên thanh nhanh
+  const links = [...mini.querySelectorAll('a')];
+  const spy = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) links.forEach((a) => a.classList.toggle('cur', a.getAttribute('href') === '#' + e.target.id));
+  }), { rootMargin: '-45% 0px -50% 0px' });
+  document.querySelectorAll('section.part').forEach((s) => spy.observe(s));
+  SI.setupLang(null);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Thuật toán bầy salp (SSA)" data-title-en="Salp Swarm Algorithm (SSA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Thuật toán bầy salp (SSA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 12 · Mục 12.1</span><span class="en">Chapter 12 · Section 12.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Thuật toán bầy salp</span><span class="en">Salp Swarm Algorithm</span><span class="sub"><span class="vi">Salp Swarm Algorithm — SSA</span><span class="en">SSA — a leader pulls a chain</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Mô tả chuỗi salp và vai trò của con dẫn đầu, con bám đuôi.</span><span class="en">Describe salp chains and the roles of leader and followers.</span></li>
+        <li class="reveal d3"><span class="vi">Viết công thức cập nhật con dẫn đầu với hệ số <span class="m">c<sub>1</sub></span> giảm theo hàm mũ.</span><span class="en">Write the leader update with the exponentially decaying <span class="m">c<sub>1</sub></span>.</span></li>
+        <li class="reveal d4"><span class="vi">Viết quy tắc bám đuôi <span class="m">x<sub>i</sub> = (x<sub>i</sub> + x<sub>i−1</sub>)/2</span> và giải thích ý nghĩa.</span><span class="en">Write the follower rule <span class="m">x<sub>i</sub> = (x<sub>i</sub> + x<sub>i−1</sub>)/2</span> and explain it.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả thực nghiệm và nhận diện điểm yếu của SSA.</span><span class="en">Read the experiments and identify SSA's weak points.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Salp: sinh vật biển bơi theo chuỗi</span><span class="en">Salps: marine animals that swim in chains</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Mirjalili và cs.</strong> đề xuất năm 2017 (<em>Advances in Engineering Software</em> 114).</span><span class="en">Proposed by <strong>Mirjalili et al.</strong> in 2017 (<em>Advances in Engineering Software</em> 114).</span></li>
+          <li class="reveal d3"><span class="vi">Salp có thân trong suốt hình thùng, di chuyển bằng cách bơm nước qua cơ thể.</span><span class="en">Salps have transparent barrel-shaped bodies and move by pumping water through them.</span></li>
+          <li class="reveal d4"><span class="vi">Ở đại dương sâu, salp thường nối thành <strong>chuỗi</strong>, có thể giúp di chuyển và kiếm ăn hiệu quả hơn.</span><span class="en">In deep oceans salps often link into <strong>chains</strong>, which may help locomotion and foraging.</span></li>
+          <li class="reveal d5"><span class="vi">SSA chia quần thể thành con dẫn đầu (bơi quanh nguồn thức ăn) và con bám đuôi (đi theo con phía trước).</span><span class="en">SSA splits the population into leaders (swimming around the food) and followers (trailing the one ahead).</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 400 240" role="img" aria-label="Chuỗi salp">
+          <g id="ssa-chain"></g>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600"><text x="20" y="225" fill="#d9562f"><tspan class="vi">con dẫn đầu</tspan><tspan class="en">leader</tspan></text><text x="250" y="225" fill="#1f6f78"><tspan class="vi">các con bám đuôi</tspan><tspan class="en">followers</tspan></text></g>
+        </svg>
+        <figcaption><span class="vi">Một chuỗi salp: mỗi con đi theo con phía trước</span><span class="en">A salp chain: each one follows the one ahead</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Chỉ con <span class="hl c-soc">dẫn đầu</span> biết thức ăn ở đâu. Mỗi con còn lại chỉ nhìn <span class="hl c-sea">con phía trước</span> và bơi tới điểm giữa, nên thông tin lan dần dọc chuỗi.</span><span class="en">Only the <span class="hl c-soc">leader</span> knows where the food is. Every other salp only watches <span class="hl c-sea">the one ahead</span> and swims to the midpoint, so information propagates down the chain.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Thức ăn F</span><span class="en">Food F</span></b><span><span class="vi">lời giải tốt nhất hiện có</span><span class="en">the best solution so far</span></span></div>
+      <div class="force reveal d4" style="border-color: #c9a227"><b style="color:#c9a227"><span class="vi">Dẫn đầu</span><span class="en">Leaders</span></b><span><span class="vi">bơi quanh F với biên độ giảm dần</span><span class="en">swim around F with shrinking amplitude</span></span></div>
+      <div class="force reveal d5" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Bám đuôi</span><span class="en">Followers</span></b><span><span class="vi">tới điểm giữa mình và con phía trước</span><span class="en">move to the midpoint with the one ahead</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Chuỗi và thức ăn</span><span class="en">Chain and food</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi"><span class="vi">Chuỗi</span><span class="en">Chain</span></span><span class="en"><span class="vi">Chuỗi</span><span class="en">Chain</span></span></dt><dd><span class="vi">Quần thể <span class="m">x<sub>1</sub>, …, x<sub>n</sub></span> theo thứ tự</span><span class="en">The ordered population <span class="m">x<sub>1</sub>, …, x<sub>n</sub></span></span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi"><span class="vi">Dẫn đầu</span><span class="en">Leaders</span></span><span class="en"><span class="vi">Dẫn đầu</span><span class="en">Leaders</span></span></dt><dd><span class="vi">Mã gốc dùng nửa đầu quần thể làm con dẫn đầu</span><span class="en">The original code uses the first half as leaders</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi"><span class="vi">Bám đuôi</span><span class="en">Followers</span></span><span class="en"><span class="vi">Bám đuôi</span><span class="en">Followers</span></span></dt><dd><span class="vi">Nửa sau, mỗi con theo con ngay phía trước</span><span class="en">The second half, each trailing the one just ahead</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Thức ăn</span><span class="en">Food</span></h3><span class="m">F = x<sub>best</sub></span></div>
+        <div class="card ember mathcard reveal d4"><h3><span class="vi">Hệ số thăm dò</span><span class="en">Exploration factor</span></h3><span class="m">c<sub>1</sub> = 2e<sup>−(4t/T)²</sup></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của SSA</span><span class="en">SSA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Chỉ một tham số tự điều chỉnh là <span class="m">c<sub>1</sub></span>.</span><span class="en">The only self-adjusting parameter is <span class="m">c<sub>1</sub></span>.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo chuỗi salp ngẫu nhiên; F ← con tốt nhất.</span><span class="en">Initialize the chain at random; F ← best salp.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính <span class="m">c<sub>1</sub></span> theo vòng lặp.</span><span class="en">Compute <span class="m">c<sub>1</sub></span> for this iteration.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Cập nhật con dẫn đầu quanh F.</span><span class="en">Update the leaders around F.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Cập nhật con bám đuôi theo con phía trước.</span><span class="en">Update the followers from the one ahead.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Kẹp biên, đánh giá, cập nhật F; lặp lại.</span><span class="en">Clamp, evaluate, update F; repeat.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 5</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">chuỗi salp</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">the chain</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="67">F ←</text><text x="375" y="89">con tốt nhất</text></g><g class="en"><text x="375" y="67">F ←</text><text x="375" y="89">best salp</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="78">Tính c₁</text></g><g class="en"><text x="625" y="78">Compute c₁</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Cập nhật</text><text x="875" y="89">dẫn đầu</text></g><g class="en"><text x="875" y="67">Update</text><text x="875" y="89">leaders</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Cập nhật</text><text x="875" y="259">bám đuôi</text></g><g class="en"><text x="875" y="237">Update</text><text x="875" y="259">followers</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Đánh giá;</text><text x="625" y="259">cập nhật F</text></g><g class="en"><text x="625" y="237">Evaluate;</text><text x="625" y="259">update F</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">t < T ?</text></g><g class="en"><text x="385" y="248" font-size="15">t < T ?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về F</text></g><g class="en"><text x="125" y="248">Return F</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Con dẫn đầu" data-label-en="Leader update">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Con dẫn đầu bơi quanh thức ăn</span><span class="en">Leaders swim around the food</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="m" style="font-size: calc(var(--eq-size) * 0.9); text-align:center; line-height:1.7; white-space:normal">x<span class="ss"><i>1</i><i>j</i></span> = F<sub>j</sub> + c<sub>1</sub>((ub<sub>j</sub> − lb<sub>j</sub>)c<sub>2</sub> + lb<sub>j</sub>) &nbsp;<span class="up"><span class="vi">nếu</span><span class="en">if</span></span> c<sub>3</sub> &lt; 0.5</div></div>
+          <div class="eq-box  reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.9); text-align:center; line-height:1.7; white-space:normal">x<span class="ss"><i>1</i><i>j</i></span> = F<sub>j</sub> − c<sub>1</sub>((ub<sub>j</sub> − lb<sub>j</sub>)c<sub>2</sub> + lb<sub>j</sub>) &nbsp;<span class="up"><span class="vi">ngược lại</span><span class="en">otherwise</span></span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">c<sub>1</sub> = 2 e<sup>−(4t/T)²</sup></span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi"><span class="m">c<sub>2</sub>, c<sub>3</sub> ~ U(0, 1)</span> cho từng chiều; <span class="m">c<sub>3</sub></span> chọn hướng cộng hay trừ.</span><span class="en"><span class="m">c<sub>2</sub>, c<sub>3</sub> ~ U(0, 1)</span> per dimension; <span class="m">c<sub>3</sub></span> picks the sign.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">c<sub>1</sub></span> giảm từ 2 về khoảng 0 rất nhanh: tại <span class="m">t = T/4</span> chỉ còn <span class="m">0.74</span>.</span><span class="en"><span class="m">c<sub>1</sub></span> falls from 2 to about 0 quickly: at <span class="m">t = T/4</span> it is already <span class="m">0.74</span>.</span></li>
+          <li class="reveal d5"><span class="vi">Bài báo in điều kiện “<span class="m">c<sub>3</sub> ≥ 0</span>” (luôn đúng); mã gốc dùng ngưỡng 0.5 như ở đây.</span><span class="en">The paper prints “<span class="m">c<sub>3</sub> ≥ 0</span>” (always true); the original code uses the 0.5 threshold shown here.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Con bám đuôi" data-label-en="Follower update">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Con bám đuôi tới điểm giữa</span><span class="en">Followers move to the midpoint</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">x<span class="ss"><i>i</i><i>j</i></span> = ½ (x<span class="ss"><i>i</i><i>j</i></span> + x<span class="ss"><i>i−1</i><i>j</i></span>), &nbsp; i ≥ 2</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Bài báo dẫn ra công thức này từ định luật chuyển động Newton với vận tốc đầu bằng 0 và bước thời gian bằng 1.</span><span class="en">The paper derives this from Newton's law of motion with zero initial speed and unit time step.</span></li>
+          <li class="reveal d4"><span class="vi">Thông tin từ F lan dọc chuỗi với tốc độ một bậc mỗi vòng, giúp giữ đa dạng.</span><span class="en">Information from F travels one link per iteration down the chain, preserving diversity.</span></li>
+          <li class="reveal d5"><span class="vi">Con bám đuôi không dùng số ngẫu nhiên nào: mọi tính ngẫu nhiên đến từ con dẫn đầu.</span><span class="en">Followers use no random numbers: all randomness comes from the leaders.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của SSA</span><span class="en">SSA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">n</span></td><td><span class="vi">Số salp</span><span class="en">Number of salps</span></td><td>30</td></tr>
+        <tr><td><span class="m">c<sub>1</sub></span></td><td><span class="vi">Biên độ quanh thức ăn, tự giảm</span><span class="en">Amplitude around the food, self-decaying</span></td><td><span class="m">2e<sup>−(4t/T)²</sup></span></td></tr>
+        <tr><td><span class="m">c<sub>2</sub>, c<sub>3</sub></span></td><td><span class="vi">Số ngẫu nhiên đều cho từng chiều</span><span class="en">Uniform random numbers per dimension</span></td><td>U(0, 1)</td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">SSA không có tham số cần chỉnh ngoài n và T.</span><span class="en">SSA has no tunable parameter besides n and T.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">Chuỗi 12 salp trên địa hình chung</span><span class="en">A chain of 12 salps on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Đường nối thể hiện thứ tự trong chuỗi; chấm cam là con dẫn đầu, chấm xanh là con bám đuôi.</span><span class="en">Lines show the chain order; orange dots are leaders, teal dots followers.</span></p>
+        <p class="note"><span class="vi">Theo mã gốc: nửa đầu chuỗi là con dẫn đầu.</span><span class="en">As in the original code: the first half of the chain are leaders.</span></p>
+        <div class="key">
+          <span><i style="background:#e6904f"></i><span class="vi">dẫn đầu</span><span class="en">leaders</span></span>
+          <span><i style="background:#1f6f78"></i><span class="vi">bám đuôi</span><span class="en">followers</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">thức ăn F</span><span class="en">food F</span></span>
+        </div>
+      </div>
+      <div class="field" id="ssa-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước của con dẫn đầu và một con bám đuôi</span><span class="en">One leader step and one follower step</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">F = (1, 2), &nbsp; lb = −5, &nbsp; ub = 5, &nbsp; t/T = 0.25</span></div>
+          <div class="eq"><span class="m">c<sub>2</sub> = (0.5, 0.2), &nbsp; c<sub>3</sub> = (0.7, 0.3)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">c<sub>1</sub> = 2e<sup>−1</sup> = 0.7358</span>; <span class="m">(ub − lb)c<sub>2</sub> + lb = (0, −3)</span>.</span><span class="en"><span class="m">c<sub>1</sub> = 2e<sup>−1</sup> = 0.7358</span>; <span class="m">(ub − lb)c<sub>2</sub> + lb = (0, −3)</span>.</span></li>
+          <li><span class="vi">Bước: <span class="m">c<sub>1</sub> · (0, −3) = (0, −2.2073)</span>.</span><span class="en">Step: <span class="m">c<sub>1</sub> · (0, −3) = (0, −2.2073)</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chiều 1: <span class="m">c<sub>3</sub> = 0.7 ≥ 0.5</span> nên <span class="m">F − 0 = 1</span>; chiều 2: <span class="m">c<sub>3</sub> = 0.3</span> nên <span class="m">F + (−2.2073) = −0.207</span>.</span><span class="en">Dim 1: <span class="m">c<sub>3</sub> = 0.7 ≥ 0.5</span> so <span class="m">F − 0 = 1</span>; dim 2: <span class="m">c<sub>3</sub> = 0.3</span> so <span class="m">F + (−2.2073) = −0.207</span>.</span></li>
+          <li><span class="vi">Con dẫn đầu mới: <span class="m">(1, −0.207)</span>.</span><span class="en">New leader: <span class="m">(1, −0.207)</span>.</span></li>
+          <li><span class="vi">Con bám đuôi tại <span class="m">(3, 4)</span> tới <span class="m">((3 + 1)/2, (4 − 0.207)/2) = (2, 1.896)</span>.</span><span class="en">A follower at <span class="m">(3, 4)</span> moves to <span class="m">((3 + 1)/2, (4 − 0.207)/2) = (2, 1.896)</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng cải tiến</span><span class="en">Directions of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">MSSA</span><span class="en">MSSA</span></h3><p><span class="vi">Bản đa mục tiêu trong cùng bài báo gốc, dùng kho Pareto.</span><span class="en">The multi-objective version in the same original paper, with a Pareto archive.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">SSA nhị phân</span><span class="en">Binary SSA</span></h3><p><span class="vi">Hàm chuyển S/V cho chọn đặc trưng.</span><span class="en">S/V transfer functions for feature selection.</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">SSA hỗn loạn</span><span class="en">Chaotic SSA</span></h3><p><span class="vi">Thay <span class="m">c<sub>2</sub>, c<sub>3</sub></span> bằng ánh xạ hỗn loạn.</span><span class="en">Replace <span class="m">c<sub>2</sub>, c<sub>3</sub></span> with chaotic maps.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">Bám đuôi có trọng số</span><span class="en">Weighted followers</span></h3><p><span class="vi">Thêm hệ số quán tính vào quy tắc điểm giữa.</span><span class="en">Add an inertia weight to the midpoint rule.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của SSA</span><span class="en">SSA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Bài báo gốc đã áp dụng SSA cho nhiều bài toán thiết kế kỹ thuật.</span><span class="en">The original paper applied SSA to many engineering design problems.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Thiết kế kỹ thuật</span><span class="en">Engineering design</span></h3><p><span class="vi">Cánh quạt tàu thủy, dầm, bình áp lực.</span><span class="en">Marine propellers, beams, pressure vessels.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Quang học</span><span class="en">Optics</span></h3><p><span class="vi">Thiết kế ống dẫn sóng tinh thể quang tử (trong bài gốc).</span><span class="en">Photonic crystal waveguide design (in the original paper).</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Năng lượng</span><span class="en">Energy</span></h3><p><span class="vi">Ước lượng tham số pin quang điện.</span><span class="en">PV parameter estimation.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chọn đặc trưng, huấn luyện mạng nơ-ron.</span><span class="en">Feature selection, neural network training.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · SSA</span><span class="en">Experiment · SSA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">1.73e+2</td><td class="num">3.63e+2</td><td class="num">8.82e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">1.66e+1</td><td class="num">6.67e+0</td><td class="num">1.64e+1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F4 · Ackley</td><td class="num">5.98e−1</td><td class="num">9.13e−1</td><td class="num">1.30e−5</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">2.19e−1</td><td class="num">1.08e−1</td><td class="num">2.07e−1</td><td><span class="sg-minus">−</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">2.73e+1</td><td class="num">1.28e+1</td><td class="num">2.64e+1</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>10.21</b>, đứng thứ <b>12/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>10.21</b>, position <b>12/18</b> among the textbook’s 18 algorithms.</span></li>
+        
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · SSA</span><span class="en">Experiment · SSA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/SSA.svg" alt="convergence SSA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/ssa.py" class="c-sea">code/si/algorithms/ssa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        t += 1
+        c1 = 2 * np.exp(-(4 * t / T) ** 2)
+        F = prob.best_x.copy()
+        <span class="k">for</span> i <span class="k">in</span> range(n):
+            <span class="k">if</span> i &lt; n / 2:
+                c2, c3 = rng.random(prob.dim), rng.random(prob.dim)
+                step = c1 * ((prob.ub - prob.lb) * c2 + prob.lb)
+                X[i] = np.where(c3 &lt; 0.5, F + step, F - step)
+            <span class="k">else</span>:
+                X[i] = (X[i] + X[i - 1]) / 2
+        X = prob.clip(X)
+        prob(X)
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Đơn giản tối đa</span><span class="en">As simple as it gets</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Không có tham số cần chỉnh; mã cực ngắn.</span><span class="en">No parameter to tune; extremely short code.</span></li>
+          <li><span class="vi">Cơ chế bám đuôi giữ đa dạng tốt hơn khi mọi cá thể cùng đuổi theo một điểm.</span><span class="en">The follower chain keeps more diversity than everyone chasing one point.</span></li>
+          <li><span class="vi">Kết quả F6 = F1 (bằng 0): SSA không thiên lệch về gốc tọa độ trên Sphere.</span><span class="en">F6 equals F1 (both 0): SSA shows no origin bias on Sphere.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Con dẫn đầu nhảy theo biên độ tỉ lệ với cả miền tìm kiếm cho tới khi <span class="m">c<sub>1</sub></span> nhỏ; khai thác chậm trên hàm đa đỉnh.</span><span class="en">Leaders jump with an amplitude proportional to the whole range until <span class="m">c<sub>1</sub></span> is small; slow exploitation on multimodal functions.</span></li>
+          <li><span class="vi">Trong thực nghiệm, SSA kém PSO trên F2–F5 và F7 (thứ hạng Friedman 10.21).</span><span class="en">In the experiments SSA is worse than PSO on F2–F5 and F7 (Friedman rank 10.21).</span></li>
+          <li><span class="vi">Hàm <span class="m">c<sub>1</sub></span> giảm rất nhanh: sau nửa quá trình gần như chỉ còn bám đuôi.</span><span class="en">The <span class="m">c<sub>1</sub></span> schedule decays fast: after half the run, mostly followers move.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">c<sub>1</sub></span> tại <span class="m">t/T = 0, 0.25, 0.5, 1</span>.</span><span class="en">Compute <span class="m">c<sub>1</sub></span> at <span class="m">t/T = 0, 0.25, 0.5, 1</span>.</span></li>
+          <li><span class="vi">Sau bao nhiêu vòng thì thông tin của F tới con salp thứ 10?</span><span class="en">After how many iterations does information from F reach salp 10?</span></li>
+          <li><span class="vi">Vì sao điều kiện “<span class="m">c<sub>3</sub> ≥ 0</span>” trong bài báo là lỗi in?</span><span class="en">Why is “<span class="m">c<sub>3</sub> ≥ 0</span>” in the paper a misprint?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy SSA với tỉ lệ dẫn đầu 1 con và n/2 con; so sánh.</span><span class="en">Run SSA with 1 leader and with n/2 leaders; compare.</span></li>
+          <li><span class="vi">Thay lịch <span class="m">c<sub>1</sub></span> bằng giảm tuyến tính; đo trên Rastrigin.</span><span class="en">Replace the <span class="m">c<sub>1</sub></span> schedule with a linear decay; measure on Rastrigin.</span></li>
+          <li><span class="vi">Vẽ đường đi của con salp cuối chuỗi.</span><span class="en">Plot the path of the last salp in the chain.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>S. A. Uymaz, G. Tezel, and E. Yel, “Artificial algae algorithm (AAA) for nonlinear global optimization,” <em>Applied Soft Computing</em>, vol. 31, pp. 153–171, 2015, doi: <a href="https://doi.org/10.1016/j.asoc.2015.03.003">10.1016/j.asoc.2015.03.003</a>.</li>
+        <li>S. Mirjalili, A. H. Gandomi, S. Z. Mirjalili, S. Saremi, H. Faris, and S. M. Mirjalili, “Salp Swarm Algorithm: A bio-inspired optimizer for engineering design problems,” <em>Advances in Engineering Software</em>, vol. 114, pp. 163–191, 2017, doi: <a href="https://doi.org/10.1016/j.advengsoft.2017.07.002">10.1016/j.advengsoft.2017.07.002</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Dẫn đầu quanh thức ăn</span><span class="en">Leaders around the food</span></span>
+      <span><span class="vi">Bám đuôi tới điểm giữa</span><span class="en">Followers to the midpoint</span></span>
+      <span><span class="vi"><span class="m">c<sub>1</sub> = 2e<sup>−(4t/T)²</sup></span></span><span class="en"><span class="m">c<sub>1</sub> = 2e<sup>−(4t/T)²</sup></span></span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Mirjalili và cs., <em>Advances in Engineering Software</em> 114, 2017</span><span class="en">Original paper: Mirjalili et al., <em>Advances in Engineering Software</em> 114, 2017</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () { const g = document.getElementById('ssa-chain'); let h = '';
+  for (let i = 0; i < 9; i++) { const x = 40 + i * 38, y = 110 + Math.sin(i * 0.7) * 30; h += `<ellipse cx="${x}" cy="${y}" rx="16" ry="11" fill="${i === 0 ? '#f6d8cb' : '#d5e7e6'}" stroke="${i === 0 ? '#d9562f' : '#1f6f78'}" stroke-width="1.5"/>`; if (i) h += `<line x1="${x - 38 + 16}" y1="${110 + Math.sin((i - 1) * 0.7) * 30}" x2="${x - 16}" y2="${y}" stroke="#56676a"/>`; }
+  g.innerHTML = h; })();
+new SI.Field2D(document.getElementById('ssa-field'), {
+  n: 12, T: 60, seed: 7,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) }); },
+  step(S) {
+    const c1 = 2 * Math.exp(-Math.pow(4 * S.t / S.T, 2)), F = S.best.slice();
+    S.pop.forEach((a, i) => {
+      if (i < this.n / 2) a.x = a.x.map((_, d) => { const st = c1 * ((SI.HI - SI.LO) * S.rnd() + SI.LO); return SI.clamp(S.rnd() < 0.5 ? F[d] + st : F[d] - st); });
+      else a.x = a.x.map((v, d) => SI.clamp((v + S.pop[i - 1].x[d]) / 2));
+    });
+    S.c1 = c1;
+  },
+  draw(g, S, P) {
+    g.strokeStyle = 'rgba(28,42,46,0.45)'; g.lineWidth = 1.2; g.beginPath();
+    S.pop.forEach((a, i) => { const [x, y] = P.at(a); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke();
+    S.pop.forEach((a, i) => { const [x, y] = P.at(a); SI.dot(g, x, y, 5, i < this.n / 2 ? '#e6904f' : '#1f6f78'); });
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return `<span><b>c₁</b> = ${(S.c1 ?? 2).toFixed(3)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>

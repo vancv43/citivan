@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Động vật săn mồi biển (MPA)" data-title-en="Marine Predators Algorithm (MPA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Động vật săn mồi biển (MPA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 11 · Trí tuệ bầy đàn</span><span class="en">Chapter 11 · Swarm Intelligence</span></p>
+    <h1 class="reveal d1"><span class="vi">Động vật săn mồi biển</span><span class="en">Marine Predators Algorithm</span><span class="sub"><span class="vi">Marine Predators Algorithm — MPA</span><span class="en">MPA — Brownian and Lévy strategies in the ocean</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích vì sao kẻ săn mồi biển chuyển giữa bước Brownian và bước Lévy.</span><span class="en">Explain why marine predators switch between Brownian and Lévy movement.</span></li>
+        <li class="reveal d3"><span class="vi">Mô tả ba pha của MPA theo tỉ số vận tốc giữa con mồi và kẻ săn mồi.</span><span class="en">Describe MPA's three phases by the prey/predator velocity ratio.</span></li>
+        <li class="reveal d4"><span class="vi">Viết công thức cập nhật của từng pha, hệ số <span class="m">CF</span> và hiệu ứng FADs.</span><span class="en">Write each phase's update, the factor <span class="m">CF</span> and the FADs effect.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc kết quả thực nghiệm: MPA mạnh ở hàm chuẩn nhưng yếu hơn ở hàm dịch tâm.</span><span class="en">Read the experiments: MPA is strong on standard functions but weaker on shifted ones.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Cá mập, cá ngừ và chiến lược tìm mồi</span><span class="en">Sharks, tuna and foraging strategies</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Do <strong>Faramarzi, Heidarinejad, Mirjalili và Gandomi</strong> đề xuất năm 2020 (<em>Expert Systems with Applications</em> 152).</span><span class="en">Proposed by <strong>Faramarzi, Heidarinejad, Mirjalili and Gandomi</strong> in 2020 (<em>Expert Systems with Applications</em> 152).</span></li>
+          <li class="reveal d3"><span class="vi">Dữ liệu gắn thẻ trên nhiều loài cá săn mồi cho thấy: nơi mồi thưa, chúng di chuyển kiểu <strong>Lévy</strong>; nơi mồi dày, kiểu <strong>Brownian</strong> (Humphries và cs., 2010).</span><span class="en">Tagging data on many predator species show <strong>Lévy</strong> movement where prey is sparse and <strong>Brownian</strong> where it is dense (Humphries et al., 2010).</span></li>
+          <li class="reveal d4"><span class="vi">Kẻ săn mồi chọn chiến lược theo tốc độ tương đối với con mồi.</span><span class="en">Predators choose a strategy based on their speed relative to the prey.</span></li>
+          <li class="reveal d5"><span class="vi">Kẻ săn mồi còn hay tụ lại quanh các <strong>FADs</strong> (thiết bị tập trung cá) và nhớ những nơi săn thành công.</span><span class="en">They also gather around <strong>FADs</strong> (fish aggregating devices) and remember successful foraging spots.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 400 260" role="img" aria-label="Chuyển động Brownian và Lévy">
+          <path id="mpa-brown" fill="none" stroke="#3a7fc1" stroke-width="1.6" class="draw" style="--len:900"/>
+          <path id="mpa-levy" fill="none" stroke="#d9562f" stroke-width="1.6" class="draw d2" style="--len:1400"/>
+          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" font-weight="600">
+            <text x="20" y="250" fill="#3a7fc1"><tspan class="vi">Brownian: bước đều, quanh quẩn</tspan><tspan class="en">Brownian: even steps, stays local</tspan></text>
+            <text x="20" y="20" fill="#d9562f"><tspan class="vi">Lévy: nhiều bước ngắn, thỉnh thoảng nhảy xa</tspan><tspan class="en">Lévy: many short steps, occasional long jumps</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Hai kiểu bước đi ngẫu nhiên</span><span class="en">Two kinds of random walk</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi cá thể vừa là <span class="hl c-soc">kẻ săn mồi</span> vừa là <span class="hl c-in">con mồi</span>. Một phần ba đầu, mồi chạy nhanh hơn nên ta khám phá; một phần ba giữa, vừa khám phá vừa khai thác; một phần ba cuối, kẻ săn mồi nhanh hơn nên ta <span class="hl c-cog">khai thác</span> bằng bước Lévy.</span><span class="en">Each individual is both <span class="hl c-soc">predator</span> and <span class="hl c-in">prey</span>. In the first third prey outruns the predator, so we explore; in the middle third we explore and exploit; in the last third the predator is faster, so we <span class="hl c-cog">exploit</span> with Lévy steps.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Pha 1 · tỉ số cao</span><span class="en">Phase 1 · high ratio</span></b><span><span class="vi">Brownian, khám phá</span><span class="en">Brownian, exploration</span></span></div>
+      <div class="force reveal d4" style="border-color: #c9a227"><b style="color:#c9a227"><span class="vi">Pha 2 · tỉ số bằng 1</span><span class="en">Phase 2 · unit ratio</span></b><span><span class="vi">nửa Lévy, nửa Brownian</span><span class="en">half Lévy, half Brownian</span></span></div>
+      <div class="force reveal d5" style="border-color: #d9562f"><b style="color:#d9562f"><span class="vi">Pha 3 · tỉ số thấp</span><span class="en">Phase 3 · low ratio</span></b><span><span class="vi">Lévy, khai thác</span><span class="en">Lévy, exploitation</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Hai ma trận và hai cơ chế nhớ</span><span class="en">Two matrices and two memory mechanisms</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi">Prey</span><span class="en">Prey</span></dt><dd><span class="vi">Ma trận <span class="m">n × d</span> các vị trí đang tìm kiếm</span><span class="en">The <span class="m">n × d</span> matrix of searching positions</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi">Elite</span><span class="en">Elite</span></dt><dd><span class="vi">Ma trận <span class="m">n × d</span> lặp lại kẻ săn mồi giỏi nhất</span><span class="en">An <span class="m">n × d</span> matrix repeating the top predator</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi">R<sub>B</sub>, R<sub>L</sub></span><span class="en">R<sub>B</sub>, R<sub>L</sub></span></dt><dd><span class="vi">Vector ngẫu nhiên Gauss (Brownian) và Lévy</span><span class="en">Gaussian (Brownian) and Lévy random vectors</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi"><span class="vi">Trí nhớ biển</span><span class="en">Marine memory</span></span><span class="en"><span class="vi">Trí nhớ biển</span><span class="en">Marine memory</span></span></dt><dd><span class="vi">Giữ vị trí cũ nếu vị trí mới kém hơn</span><span class="en">Keep the old position if the new one is worse</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sand mathcard reveal d3"><h3><span class="vi">Hệ số thích nghi</span><span class="en">Adaptive factor</span></h3><span class="m">CF = (1 − t/T)<sup>2t/T</sup></span></div>
+        <div class="card ember mathcard reveal d4"><h3><span class="vi">Hằng số</span><span class="en">Constants</span></h3><span class="m">P = 0.5, &nbsp; FADs = 0.2</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của MPA</span><span class="en">MPA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Ba pha nối tiếp theo thời gian, mỗi vòng đều qua trí nhớ biển và FADs.</span><span class="en">Three phases in sequence; every iteration passes through marine memory and FADs.</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo con mồi ngẫu nhiên; Elite ← lời giải tốt nhất.</span><span class="en">Initialize prey at random; Elite ← best solution.</span></span></li>
+          <li class="reveal d2 loop-body"><span><span class="vi">Tính <span class="m">CF</span> và chọn pha theo <span class="m">t / T</span>.</span><span class="en">Compute <span class="m">CF</span> and pick the phase from <span class="m">t / T</span>.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Cập nhật vị trí theo công thức của pha.</span><span class="en">Update positions with the phase rule.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Trí nhớ biển: giữ vị trí tốt hơn giữa cũ và mới.</span><span class="en">Marine memory: keep the better of old and new.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Hiệu ứng FADs: nhảy xa ngẫu nhiên hoặc bước vi phân.</span><span class="en">FADs effect: a random long jump or a differential step.</span></span></li>
+          <li class="reveal d6 loop-body"><span><span class="vi">Trí nhớ biển lần nữa; cập nhật Elite; lặp lại.</span><span class="en">Marine memory again; update Elite; repeat.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">2 – 6</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
+      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+        <defs>
+          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
+          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
+          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">con mồi</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">prey</text></g><rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="375" y="67">Elite ←</text><text x="375" y="89">tốt nhất</text></g><g class="en"><text x="375" y="67">Elite ←</text><text x="375" y="89">best</text></g><rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="625" y="67">Tính CF;</text><text x="625" y="89">chọn pha</text></g><g class="en"><text x="625" y="67">Compute CF;</text><text x="625" y="89">pick phase</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="67">Cập nhật</text><text x="875" y="89">theo pha</text></g><g class="en"><text x="875" y="67">Phase</text><text x="875" y="89">update</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Trí nhớ biển</text><text x="875" y="259">+ FADs</text></g><g class="en"><text x="875" y="237">Marine memory</text><text x="875" y="259">+ FADs</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Trí nhớ biển;</text><text x="625" y="259">cập nhật Elite</text></g><g class="en"><text x="625" y="237">Marine memory;</text><text x="625" y="259">update Elite</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">t < T ?</text></g><g class="en"><text x="385" y="248" font-size="15">t < T ?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="237">Trả về</text><text x="125" y="259">Elite</text></g><g class="en"><text x="125" y="237">Return</text><text x="125" y="259">Elite</text></g>
+          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H268"/><path class="draw d2" style="--len:60" d="M480,72 H518"/><path class="draw d3" style="--len:60" d="M730,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
+          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
+          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        </g>
+      </svg>
+    </figure>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Pha 1 và 2" data-label-en="Phases 1 and 2">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Pha 1 (t &lt; T/3) và pha 2 (T/3 ≤ t &lt; 2T/3)</span><span class="en">Phase 1 (t &lt; T/3) and phase 2 (T/3 ≤ t &lt; 2T/3)</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">step = R<sub>B</sub> ⊗ (Elite − R<sub>B</sub> ⊗ Prey), &nbsp; Prey = Prey + P · R ⊗ step</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="eq"><span class="m">i ≤ n/2: &nbsp; step = R<sub>L</sub> ⊗ (Elite − R<sub>L</sub> ⊗ Prey), &nbsp; Prey = Prey + P · R ⊗ step</span></div></div>
+          <div class="eq-box sand reveal d4"><div class="eq"><span class="m">i &gt; n/2: &nbsp; step = R<sub>B</sub> ⊗ (R<sub>B</sub> ⊗ Elite − Prey), &nbsp; Prey = Elite + P · CF ⊗ step</span></div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Pha 1: mọi cá thể đi kiểu Brownian quanh vị trí của mình, có hướng về Elite. Đây là pha khám phá.</span><span class="en">Phase 1: everyone takes Brownian steps from its own position, biased toward Elite. Exploration.</span></li>
+          <li class="reveal d4"><span class="vi">Pha 2: nửa đầu đi Lévy (khai thác quanh vị trí cũ), nửa sau đi Brownian quanh Elite, thu hẹp dần theo <span class="m">CF</span>.</span><span class="en">Phase 2: the first half takes Lévy steps (exploiting near their positions), the second half takes Brownian steps around Elite, shrinking with <span class="m">CF</span>.</span></li>
+          <li class="reveal d5"><span class="vi"><span class="m">⊗</span> là phép nhân từng phần tử; <span class="m">R ~ U(0, 1)</span>.</span><span class="en"><span class="m">⊗</span> is element-wise multiplication; <span class="m">R ~ U(0, 1)</span>.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide model" aria-label="Pha 3 và FADs" data-label-en="Phase 3 and FADs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô hình toán học</span><span class="en">Mathematical model</span></p>
+      <h2 class="reveal d1"><span class="vi">Pha 3 (t ≥ 2T/3) và hiệu ứng FADs</span><span class="en">Phase 3 (t ≥ 2T/3) and the FADs effect</span></h2>
+    </header>
+    <div class="cols even">
+      <div class="stack">
+          <div class="eq-box  reveal d2"><div class="eq"><span class="m">step = R<sub>L</sub> ⊗ (R<sub>L</sub> ⊗ Elite − Prey), &nbsp; Prey = Elite + P · CF ⊗ step</span></div></div>
+          <div class="eq-box sand reveal d3"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">nếu</span><span class="en">if</span></span> r &lt; FADs: Prey + CF [X<sub>min</sub> + R ⊗ (X<sub>max</sub> − X<sub>min</sub>)] ⊗ U</div></div>
+          <div class="eq-box sand reveal d4"><div class="m" style="font-size: calc(var(--eq-size) * 0.85); text-align:center; line-height:1.7; white-space:normal"><span class="up"><span class="vi">ngược lại</span><span class="en">else</span></span>: Prey + [FADs(1 − r) + r](Prey<sub>r1</sub> − Prey<sub>r2</sub>)</div></div>
+      </div>
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d3"><span class="vi">Pha 3: mọi cá thể bước Lévy quanh Elite với biên độ <span class="m">CF</span> giảm dần về 0.</span><span class="en">Phase 3: everyone takes Lévy steps around Elite with amplitude <span class="m">CF</span> shrinking to 0.</span></li>
+          <li class="reveal d4"><span class="vi"><span class="m">U</span>: vector nhị phân, mỗi phần tử bằng 1 với xác suất FADs. Bước nhảy xa giúp thoát cực trị cục bộ.</span><span class="en"><span class="m">U</span>: a binary vector, each entry 1 with probability FADs. The long jump helps escape local optima.</span></li>
+          <li class="reveal d5"><span class="vi"><span class="m">r1, r2</span>: hai hoán vị ngẫu nhiên của quần thể; nhánh này là một bước vi phân giống DE.</span><span class="en"><span class="m">r1, r2</span>: two random permutations of the population; this branch is a DE-like differential step.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số của MPA</span><span class="en">MPA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">n</span></td><td><span class="vi">Số cá thể</span><span class="en">Population size</span></td><td>25 – 30</td></tr>
+        <tr><td><span class="m">P</span></td><td><span class="vi">Hệ số bước</span><span class="en">Step factor</span></td><td>0.5</td></tr>
+        <tr><td><span class="m">FADs</span></td><td><span class="vi">Xác suất hiệu ứng FADs</span><span class="en">Probability of the FADs effect</span></td><td>0.2</td></tr>
+        <tr><td><span class="m">R<sub>L</sub></span></td><td><span class="vi">Bước Lévy, <span class="m">β = 1.5</span>, nhân 0.05 trong mã gốc</span><span class="en">Lévy step, <span class="m">β = 1.5</span>, scaled by 0.05 in the original code</span></td><td>—</td></tr>
+        <tr><td><span class="m">CF</span></td><td><span class="vi">Hệ số thích nghi, tự giảm từ 1 về 0</span><span class="en">Adaptive factor, decays from 1 to 0</span></td><td><span class="m">(1 − t/T)<sup>2t/T</sup></span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Mỗi vòng tốn 2n lần đánh giá hàm (sau cập nhật và sau FADs); phải tính đủ khi so sánh với thuật toán khác.</span><span class="en">Each iteration costs 2n evaluations (after the update and after FADs); count both when comparing with other algorithms.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">12 cá thể trên địa hình chung</span><span class="en">12 individuals on the shared landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Màu cho biết pha hiện tại: xanh là Brownian (pha 1), vàng là pha 2, cam là Lévy (pha 3). Hình vuông cam là Elite.</span><span class="en">Colour shows the current phase: blue Brownian (phase 1), yellow phase 2, orange Lévy (phase 3). The orange square is Elite.</span></p>
+        <p class="note"><span class="vi">Theo mã gốc: <span class="m">P = 0.5, FADs = 0.2</span>, bước Lévy nhân 0.05, trí nhớ biển sau mỗi lần cập nhật.</span><span class="en">As in the original code: <span class="m">P = 0.5, FADs = 0.2</span>, Lévy step scaled by 0.05, marine memory after each update.</span></p>
+        <div class="key">
+          <span><i style="background:#3a7fc1"></i><span class="vi">pha 1</span><span class="en">phase 1</span></span>
+          <span><i style="background:#c9a227"></i><span class="vi">pha 2</span><span class="en">phase 2</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">pha 3</span><span class="en">phase 3</span></span>
+        </div>
+      </div>
+      <div class="field" id="mpa-field">
+        <canvas aria-label="simulation"></canvas>
+        <div class="field-stat"></div>
+        <div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay · pha 1</span><span class="en">Worked example · phase 1</span></p>
+      <h2 class="reveal d1"><span class="vi">Một bước Brownian của một con mồi</span><span class="en">One Brownian step of one prey</span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">Prey = (2, −1), &nbsp; Elite = (0.5, 0.5), &nbsp; P = 0.5</span></div>
+          <div class="eq"><span class="m">R<sub>B</sub> = (0.3, −0.8), &nbsp; R = (0.6, 0.4)</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Theo từng chiều: <span class="m">step = R<sub>B</sub>(Elite − R<sub>B</sub> · Prey)</span>.</span><span class="en">Per dimension: <span class="m">step = R<sub>B</sub>(Elite − R<sub>B</sub> · Prey)</span>.</span></li>
+          <li><span class="vi">Chiều 1: <span class="m">0.3 (0.5 − 0.6) = −0.03</span>; chiều 2: <span class="m">−0.8 (0.5 − 0.8) = 0.24</span>.</span><span class="en">Dim 1: <span class="m">0.3 (0.5 − 0.6) = −0.03</span>; dim 2: <span class="m">−0.8 (0.5 − 0.8) = 0.24</span>.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Kết quả</span><span class="en">Result</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi"><span class="m">Prey = (2 + 0.5·0.6·(−0.03), −1 + 0.5·0.4·0.24) = (1.991, −0.952)</span></span><span class="en"><span class="m">Prey = (2 + 0.5·0.6·(−0.03), −1 + 0.5·0.4·0.24) = (1.991, −0.952)</span></span></li>
+          <li><span class="vi">Bước rất ngắn: ở pha 1 hệ số <span class="m">P · R</span> nhỏ nên cá thể dò quanh vị trí cũ.</span><span class="en">A very short step: in phase 1 the factor <span class="m">P · R</span> is small, so the prey probes near its position.</span></li>
+          <li><span class="vi"><span class="m">CF</span> tại <span class="m">t = T/2</span> bằng <span class="m">0.5</span>, tại <span class="m">t = 3T/4</span> bằng <span class="m">0.125</span>: biên độ pha 3 nhỏ dần.</span><span class="en"><span class="m">CF</span> is <span class="m">0.5</span> at <span class="m">t = T/2</span> and <span class="m">0.125</span> at <span class="m">t = 3T/4</span>: phase-3 steps shrink.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Hướng cải tiến</span><span class="en">Directions of improvement</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">P và FADs động</span><span class="en">Dynamic P and FADs</span></h3><p><span class="vi">Các nghiên cứu tham số cho thấy P và FADs ảnh hưởng mạnh tới kết quả; một hướng là cho P giảm dần theo thời gian.</span><span class="en">Parameter studies show P and FADs strongly affect results; one direction is to decrease P over time.</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">MPA đa mục tiêu</span><span class="en">Multi-objective MPA</span></h3><p><span class="vi">Thêm kho Pareto như MOPSO (chương 14).</span><span class="en">Add a Pareto archive as in MOPSO (chapter 14).</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">MPA nhị phân</span><span class="en">Binary MPA</span></h3><p><span class="vi">Dùng hàm chuyển S hoặc V (chương 15) cho chọn đặc trưng.</span><span class="en">Use S- or V-shaped transfer functions (chapter 15) for feature selection.</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">Lai với tìm kiếm cục bộ</span><span class="en">Hybrids with local search</span></h3><p><span class="vi">Thêm bước Nelder–Mead hoặc gradient quanh Elite ở pha 3.</span><span class="en">Add a Nelder–Mead or gradient step around Elite in phase 3.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">Ứng dụng của MPA</span><span class="en">MPA applications</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">MPA được dùng nhiều trong năng lượng và kỹ thuật vì ít tham số và có cơ chế thoát cực trị.</span><span class="en">MPA is popular in energy and engineering thanks to few parameters and a built-in escape mechanism.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Điện mặt trời</span><span class="en">Photovoltaics</span></h3><p><span class="vi">Ước lượng tham số mô hình pin quang điện.</span><span class="en">Parameter estimation of PV cell models.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Hệ thống điện</span><span class="en">Power systems</span></h3><p><span class="vi">Phân bố công suất tối ưu, điều độ kinh tế.</span><span class="en">Optimal power flow, economic dispatch.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Thiết kế kỹ thuật</span><span class="en">Engineering design</span></h3><p><span class="vi">Bình áp lực, dầm hàn, lò xo nén.</span><span class="en">Pressure vessel, welded beam, compression spring.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Học máy</span><span class="en">Machine learning</span></h3><p><span class="vi">Chọn đặc trưng, tinh chỉnh siêu tham số.</span><span class="en">Feature selection, hyperparameter tuning.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · MPA</span><span class="en">Experiment · MPA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">3.51e+0</td><td class="num">5.70e−1</td><td class="num">3.52e+0</td><td><span class="sg-eq">≈</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">4.57e−4</td><td class="num">2.50e−3</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F5 · Griewank</td><td class="num">2.22e−5</td><td class="num">1.21e−4</td><td class="num">0</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">9.04e−6</td><td class="num">2.20e−5</td><td class="num">1.53e−6</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">7.80e+0</td><td class="num">2.99e+0</td><td class="num">8.46e+0</td><td><span class="sg-minus">−</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; tham số mặc định của bài gốc; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; default parameters of the original paper; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>5.21</b>, đứng thứ <b>3/18</b> trong 18 thuật toán của giáo trình.</span><span class="en">Average Friedman rank: <b>5.21</b>, position <b>3/18</b> among the textbook’s 18 algorithms.</span></li>
+        <li><span class="vi">MPA tốt hơn PSO trên F3, F4, F5 nhưng kém hơn trên F6, F7 (bản dịch tâm). Nhiều khả năng do pha 2, 3 dùng <span class="m">R ⊗ Elite</span>, số hạng này kéo về phía gốc tọa độ.</span><span class="en">MPA beats PSO on F3, F4, F5 but loses on F6, F7 (shifted versions). Likely because phases 2 and 3 use <span class="m">R ⊗ Elite</span>, a term that pulls toward the origin.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · MPA</span><span class="en">Experiment · MPA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/MPA.svg" alt="convergence MPA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/mpa.py" class="c-sea">code/si/algorithms/mpa.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        elite = prob.best_x.copy()
+        CF = (1 - t / T) ** (2 * t / T) <span class="k">if</span> t &lt; T <span class="k">else</span> 0.0
+        RL = 0.05 * levy(rng, X.shape)
+        RB = rng.normal(size=X.shape)
+        R = rng.random(X.shape)
+        Y = X.copy()
+        <span class="k">if</span> t &lt; T / 3:
+            Y = X + P * R * (RB * (elite - RB * X))
+        <span class="k">elif</span> t &lt; 2 * T / 3:
+            h = n // 2
+            Y[:h] = X[:h] + P * R[:h] * (RL[:h] * (elite - RL[:h] * X[:h]))
+            Y[h:] = elite + P * CF * (RB[h:] * (RB[h:] * elite - X[h:]))
+        <span class="k">else</span>:
+            Y = elite + P * CF * (RL * (RL * elite - X))
+        Y = prob.clip(Y)</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Nhiều cơ chế, ít tham số</span><span class="en">Many mechanisms, few parameters</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Ba pha cố định theo thời gian cho chuyển dịch rõ ràng từ khám phá sang khai thác.</span><span class="en">Three time-based phases give a clear shift from exploration to exploitation.</span></li>
+          <li><span class="vi">Trí nhớ biển và FADs giúp giữ lời giải tốt và thoát cực trị.</span><span class="en">Marine memory and FADs keep good solutions and escape local optima.</span></li>
+          <li><span class="vi">Trong thực nghiệm của giáo trình, MPA đứng nhóm đầu (thứ hạng Friedman 5.21).</span><span class="en">In the textbook's experiments MPA ranks near the top (Friedman rank 5.21).</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Các số hạng <span class="m">R ⊗ Elite</span> tạo thiên lệch về gốc tọa độ: kết quả F6, F7 kém hơn hẳn F1, F3.</span><span class="en">The <span class="m">R ⊗ Elite</span> terms create an origin bias: F6, F7 are clearly worse than F1, F3.</span></li>
+          <li><span class="vi">Ranh giới pha cứng theo <span class="m">t/T</span> nên phải biết trước số vòng lặp.</span><span class="en">Hard phase boundaries at fixed <span class="m">t/T</span> require knowing the iteration budget in advance.</span></li>
+          <li><span class="vi">Mỗi vòng tốn <span class="m">2n</span> lần đánh giá.</span><span class="en">Each iteration costs <span class="m">2n</span> evaluations.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Tính <span class="m">CF</span> tại <span class="m">t/T = 0.1, 0.5, 0.9</span>.</span><span class="en">Compute <span class="m">CF</span> at <span class="m">t/T = 0.1, 0.5, 0.9</span>.</span></li>
+          <li><span class="vi">Lặp lại ví dụ tính tay với <span class="m">R<sub>B</sub> = (−0.5, 0.2)</span>.</span><span class="en">Redo the worked example with <span class="m">R<sub>B</sub> = (−0.5, 0.2)</span>.</span></li>
+          <li><span class="vi">Giải thích vì sao số hạng <span class="m">R<sub>B</sub> ⊗ Elite</span> gây thiên lệch về gốc tọa độ.</span><span class="en">Explain why the <span class="m">R<sub>B</sub> ⊗ Elite</span> term causes origin bias.</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Chạy <span class="m">si/algorithms/mpa.py</span> trên F1 và F6; so sánh sai số.</span><span class="en">Run <span class="m">si/algorithms/mpa.py</span> on F1 and F6; compare the errors.</span></li>
+          <li><span class="vi">Sửa pha 2, 3 thành <span class="m">Elite + P·CF·R ⊗ (Elite − Prey)</span> và đo lại trên F6, F7.</span><span class="en">Change phases 2, 3 to <span class="m">Elite + P·CF·R ⊗ (Elite − Prey)</span> and re-measure F6, F7.</span></li>
+          <li><span class="vi">Khảo sát <span class="m">FADs ∈ {0, 0.2, 0.5}</span> trên Rastrigin.</span><span class="en">Study <span class="m">FADs ∈ {0, 0.2, 0.5}</span> on Rastrigin.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: các bài báo gốc</span><span class="en">Further reading: the original papers</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>N. E. Humphries et al., “Environmental context explains Lévy and Brownian movement patterns of marine predators,” <em>Nature</em>, vol. 465, no. 7301, pp. 1066–1069, 2010, doi: <a href="https://doi.org/10.1038/nature09116">10.1038/nature09116</a>.</li>
+        <li>A. Faramarzi, M. Heidarinejad, S. Mirjalili, and A. H. Gandomi, “Marine Predators Algorithm: A nature-inspired metaheuristic,” <em>Expert Systems with Applications</em>, vol. 152, pp. 113377, 2020, doi: <a href="https://doi.org/10.1016/j.eswa.2020.113377">10.1016/j.eswa.2020.113377</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Brownian ở đầu, Lévy ở cuối</span><span class="en">Brownian early, Lévy late</span></span>
+      <span><span class="vi">Trí nhớ biển + FADs</span><span class="en">Marine memory + FADs</span></span>
+      <span><span class="vi">Cẩn thận thiên lệch gốc tọa độ</span><span class="en">Mind the origin bias</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Faramarzi và cs., <em>Expert Systems with Applications</em> 152, 2020</span><span class="en">Original paper: Faramarzi et al., <em>Expert Systems with Applications</em> 152, 2020</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+(function () {
+  const rnd = SI.rng(3); let x = 200, y = 130, d = `M${x},${y}`;
+  for (let i = 0; i < 160; i++) { x += SI.gauss(rnd) * 4; y += SI.gauss(rnd) * 4; d += `L${x.toFixed(1)},${y.toFixed(1)}`; }
+  document.getElementById('mpa-brown').setAttribute('d', d);
+  x = 200; y = 130; d = `M${x},${y}`;
+  for (let i = 0; i < 160; i++) { const s = SI.levy(rnd) * 100 * 4, a = rnd() * 2 * Math.PI; x = Math.max(10, Math.min(390, x + s * Math.cos(a))); y = Math.max(30, Math.min(235, y + s * Math.sin(a))); d += `L${x.toFixed(1)},${y.toFixed(1)}`; }
+  document.getElementById('mpa-levy').setAttribute('d', d);
+})();
+/* MPA trên địa hình chung, theo mã gốc: P = 0.5, FADs = 0.2, Lévy nhân 0.05 */
+new SI.Field2D(document.getElementById('mpa-field'), {
+  n: 12, T: 60, seed: 5, P: 0.5, FADs: 0.2,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd), ph: 1 }); },
+  step(S) {
+    const T = S.T, t = S.t - 1, E = S.best.slice(), n = this.n, rnd = S.rnd;
+    const CF = Math.pow(1 - t / T, 2 * t / T), L = () => 5 * SI.levy(rnd), B = () => SI.gauss(rnd);
+    const ph = t < T / 3 ? 1 : t < 2 * T / 3 ? 2 : 3;
+    S.pop.forEach((a, i) => {
+      const y = a.x.map((x, d) => {
+        if (ph === 1) { const rb = B(); return x + this.P * rnd() * rb * (E[d] - rb * x); }
+        if (ph === 2 && i < n / 2) { const rl = L(); return x + this.P * rnd() * rl * (E[d] - rl * x); }
+        if (ph === 2) { const rb = B(); return E[d] + this.P * CF * rb * (rb * E[d] - x); }
+        const rl = L(); return E[d] + this.P * CF * rl * (rl * E[d] - x);
+      }).map(SI.clamp);
+      if (SI.f(y) < SI.f(a.x)) a.x = y;
+      a.ph = ph;
+    });
+    if (rnd() < this.FADs) {
+      S.pop.forEach((a) => { const y = a.x.map((x) => SI.clamp(x + (rnd() < this.FADs ? CF * (SI.LO + rnd() * (SI.HI - SI.LO)) : 0))); if (SI.f(y) < SI.f(a.x)) a.x = y; });
+    } else {
+      const r = rnd(); S.pop.forEach((a) => { const p = S.pop[Math.floor(rnd() * n)].x, q = S.pop[Math.floor(rnd() * n)].x; const y = a.x.map((x, d) => SI.clamp(x + (this.FADs * (1 - r) + r) * (p[d] - q[d]))); if (SI.f(y) < SI.f(a.x)) a.x = y; });
+    }
+    S.CF = CF;
+  },
+  draw(g, S, P) {
+    const col = { 1: '#3a7fc1', 2: '#c9a227', 3: '#d9562f' };
+    for (const a of S.pop) SI.trail(g, P, a, 'rgba(28,42,46,0.3)');
+    for (const a of S.pop) { const [x, y] = P.at(a); SI.dot(g, x, y, 5, col[a.ph]); }
+    const [bx, by] = P.pt(S.best); g.fillStyle = '#d9562f'; g.fillRect(bx - 6, by - 6, 12, 12); g.strokeStyle = '#1c2a2e'; g.lineWidth = 1.2; g.strokeRect(bx - 6, by - 6, 12, 12);
+  },
+  status(S) { return `<span><b>CF</b> = ${(S.CF ?? 1).toFixed(3)}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>
