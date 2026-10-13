@@ -332,6 +332,8 @@ const siteData = {
       landing: "https://wseas.com/journals/articles.php?id=11630",
       pdf: "https://wseas.com/journals/articles.php?id=11630",
       bibtex: "@article{Tuan_2026, title={On Deploying Bilinear Neural Network Method to Various Solutions of\n(3+1)-dimensional Potential Yu-Toda-Sasa-Fukuyama Equation}, volume={21}, ISSN={2224-2856}, url={http://dx.doi.org/10.37394/23203.2026.21.10}, DOI={10.37394/23203.2026.21.10}, journal={WSEAS TRANSACTIONS ON SYSTEMS AND CONTROL}, publisher={World Scientific and Engineering Academy and Society (WSEAS)}, author={Tuan, Nguyen Minh and Van Van, Chau and Son, Nguyen Hong and Thua, Huynh Trong and Thanh, Le Ha}, year={2026}, month=May, pages={95} }",
+      rank: "Q4",
+      rankNote: "SCImago SJR 2025 = 0.173; Artificial Intelligence, Control and Optimization, Control and Systems Engineering, Mathematics (misc.) Q4",
       link: "https://doi.org/10.37394/23203.2026.21.10",
     },
     {
@@ -348,6 +350,8 @@ const siteData = {
       landing: "https://accscience.com/journal/IJOCTA/16/3/10.36922/IJOCTA026020008",
       pdf: "https://accscience.com/journal/IJOCTA/16/3/10.36922/IJOCTA026020008",
       bibtex: "@article{Tuan_2026, title={Optimizing predictive accuracy in general medical exams using hybrid machine learning and metaheuristic optimization methods}, volume={16}, ISSN={2146-5703}, url={http://dx.doi.org/10.36922/ijocta026020008}, DOI={10.36922/ijocta026020008}, number={3}, journal={An International Journal of Optimization and Control: Theories &amp; Applications (IJOCTA)}, publisher={AccScience Publishing}, author={Tuan, Nguyen Minh and Duy, Tran Trung and Meesad, Phayung and Son, Nguyen Hong and Hien, Nguyen Trong and Thua, Huynh Trong and Tinh, Vo Van and Van, Chau Van and Trang, Nguyen Le Nha}, year={2026}, month=Apr, pages={888} }",
+      rank: "Q2",
+      rankNote: "SCImago SJR 2025 = 0.555; Applied Mathematics Q2; Control and Optimization Q2",
       link: "https://doi.org/10.36922/ijocta026020008",
     },
     {
@@ -601,6 +605,57 @@ function Banner({ src }) {
   );
 }
 
+function PubStats({ pubs, type }) {
+  const years = [...new Set(pubs.map((p) => p.year))].sort((a, b) => b - a);
+  const count = (y, f) => pubs.filter((p) => (y === null || p.year === y) && f(p)).length;
+  const isC = (p) => p.type === 'Conference';
+  const isJ = (p) => p.type === 'Journal';
+  const quartiles = ['Q1', 'Q2', 'Q3', 'Q4'];
+  const cols =
+    type === 'All'
+      ? [['Conferences', isC], ['Journals', isJ], ['Total', () => true]]
+      : type === 'Conference'
+        ? [['Conferences', isC]]
+        : [['Journals', isJ], ...quartiles.map((q) => [q, (p) => isJ(p) && p.rank === q])];
+  return (
+    <div className="stats-wrap">
+      <table className="stats-table">
+        <thead>
+          <tr>
+            <th>Year</th>
+            {cols.map(([label]) => (
+              <th key={label}>{label}</th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {years.map((y) => (
+            <tr key={y}>
+              <td>{y}</td>
+              {cols.map(([label, f]) => (
+                <td key={label}>{count(y, f) || '–'}</td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+        <tfoot>
+          <tr>
+            <td>Total</td>
+            {cols.map(([label, f]) => (
+              <td key={label}>{count(null, f)}</td>
+            ))}
+          </tr>
+        </tfoot>
+      </table>
+      {type === 'Journal' && (
+        <p className="stats-note">
+          Quartile = best SJR quartile from SCImago (the ranking shown by the Rapid Journal Quality Check extension).
+        </p>
+      )}
+    </div>
+  );
+}
+
 function PubLinks({ item }) {
   const [showCite, setShowCite] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -618,6 +673,11 @@ function PubLinks({ item }) {
       )}
       {item.index && (
         <span className={item.index.startsWith('Scopus') ? 'index-badge' : 'index-badge muted'}>{item.index}</span>
+      )}
+      {item.rank && (
+        <span className={`rank-badge rank-${item.rank.toLowerCase()}`} title={item.rankNote}>
+          SJR {item.rank}
+        </span>
       )}
       {item.pdf && (
         <a className="pub-btn pdf" href={item.pdf} target="_blank" rel="noopener noreferrer" title="Download PDF from the publisher">
@@ -833,6 +893,8 @@ export default function App() {
                   </button>
                 ))}
               </div>
+
+              <PubStats pubs={siteData.publications} type={pubType} />
 
               {[...new Set(filteredPublications.map((p) => p.year))]
                 .sort((a, b) => b - a)
