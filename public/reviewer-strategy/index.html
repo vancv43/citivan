@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Chiến lược phản biện bài báo</title>
+<meta name="description" content="Reviewer Strategy: methods, criteria, decision rules and a worked journal review (VN | EN)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<style>
+/* ===========================================
+   THEME — đổi màu / phông toàn bộ deck tại đây
+   =========================================== */
+:root {
+  --paper: #f5f0e6;        /* nền giấy */
+  --paper-2: #ebe3d2;      /* nền thẻ */
+  --paper-3: #e1d6bf;
+  --ink: #1c2a2e;          /* chữ chính */
+  --ink-soft: #56676a;     /* chữ phụ */
+  --sea: #1f6f78;          /* màu nhấn chính (biển) */
+  --sky: #3a7fc1;          /* quán tính */
+  --moss: #4b8f45;         /* nhận thức */
+  --ember: #d9562f;        /* xã hội / gbest / tổng hợp */
+  --sand: #f0cf7a;         /* tô sáng */
+
+  --font-display: "Lora", Georgia, serif;
+  --font-body: "Be Vietnam Pro", system-ui, sans-serif;
+  --font-math: "STIX Two Text", "Times New Roman", serif;
+
+  --title-size: clamp(1.9rem, 5.6vw, 4.6rem);
+  --h2-size: clamp(1.3rem, 3.4vw, 2.6rem);
+  --h3-size: clamp(1rem, 2vw, 1.45rem);
+  --body-size: clamp(0.85rem, 1.55vw, 1.22rem);
+  --small-size: clamp(0.68rem, 1.05vw, 0.9rem);
+  --eq-size: clamp(1rem, 2.5vw, 2rem);
+
+  --slide-padding: clamp(1rem, 5vw, 5rem);
+  --content-gap: clamp(0.6rem, 2.2vh, 1.8rem);
+  --element-gap: clamp(0.3rem, 1vh, 0.9rem);
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 0.7s;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ===========================================
+   VIEWPORT FITTING: MANDATORY BASE STYLES
+   =========================================== */
+html, body { height: 100%; overflow: hidden; }
+html { scroll-snap-type: y mandatory; scroll-behavior: smooth; }
+.slide {
+  width: 100vw; height: 100vh; height: 100dvh;
+  overflow: hidden; scroll-snap-align: start;
+  display: flex; flex-direction: column; position: relative;
+}
+.slide-content {
+  flex: 1; display: flex; flex-direction: column; justify-content: center;
+  max-height: 100%; overflow: hidden; padding: var(--slide-padding);
+  gap: var(--content-gap);
+}
+img { max-width: 100%; object-fit: contain; }
+
+@media (max-height: 700px) {
+  :root {
+    --slide-padding: clamp(0.75rem, 3vw, 2rem);
+    --content-gap: clamp(0.4rem, 1.5vh, 1rem);
+    --title-size: clamp(1.4rem, 4.5vw, 2.8rem);
+    --h2-size: clamp(1.05rem, 3vw, 1.8rem);
+    --eq-size: clamp(0.95rem, 2.2vw, 1.5rem);
+  }
+}
+@media (max-height: 600px) {
+  :root {
+    --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+    --content-gap: clamp(0.3rem, 1vh, 0.75rem);
+    --title-size: clamp(1.2rem, 4vw, 2.2rem);
+    --body-size: clamp(0.72rem, 1.25vw, 0.95rem);
+  }
+  .nav-dots, .keyboard-hint, .decorative { display: none; }
+}
+@media (max-height: 500px) {
+  :root {
+    --slide-padding: clamp(0.4rem, 2vw, 1rem);
+    --title-size: clamp(1rem, 3.5vw, 1.6rem);
+    --h2-size: clamp(0.92rem, 2.5vw, 1.25rem);
+    --body-size: clamp(0.66rem, 1.05vw, 0.85rem);
+    --small-size: clamp(0.6rem, 0.9vw, 0.75rem);
+    --eq-size: clamp(0.85rem, 1.9vw, 1.2rem);
+  }
+}
+@media (max-height: 500px) {
+  .fig svg { max-height: 46vh; }
+  #demo-svg { max-height: 50vh; }
+  .demo-desc { min-height: 0; }
+  .bars { row-gap: 0; }
+  .bars .bar i { height: 6px; }
+  .steps { gap: 0.1rem; }
+  .steps li::before { width: 1.5em; height: 1.5em; }
+  .loop-note, .lead.opt { display: none; }
+}
+@media (max-height: 500px) {
+  .slide-content { padding-top: max(var(--slide-padding), 2.4rem); }
+}
+@media (max-width: 600px) {
+  .slide-content { padding-top: max(var(--slide-padding), 3rem); }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.2s !important; }
+  html { scroll-behavior: auto; }
+}
+
+/* ===========================================
+   BASE TYPOGRAPHY & SURFACE
+   =========================================== */
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--body-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.slide {
+  background:
+    radial-gradient(ellipse 70% 60% at 100% 0%, rgba(31,111,120,0.07), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 0% 100%, rgba(217,86,47,0.05), transparent 70%),
+    var(--paper);
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; line-height: 1.15; letter-spacing: -0.01em; }
+h1 { font-size: var(--title-size); }
+h2 { font-size: var(--h2-size); }
+h3 { font-size: var(--h3-size); }
+.kicker {
+  font-size: var(--small-size); font-weight: 600; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--sea);
+  display: flex; align-items: center; gap: 0.7em;
+}
+.kicker::before { content: ""; width: 2.2em; height: 2px; background: currentColor; }
+.lead { color: var(--ink-soft); max-width: 46em; }
+.note { font-size: var(--small-size); color: var(--ink-soft); }
+.note em { font-style: normal; color: var(--ink); }
+strong { font-weight: 600; }
+.c-in { color: var(--sky); } .c-cog { color: var(--moss); } .c-soc { color: var(--ember); } .c-sea { color: var(--sea); }
+
+header.slide-head { display: flex; flex-direction: column; gap: 0.35em; }
+
+/* Lists ------------------------------------------------ */
+.bullets { list-style: none; display: flex; flex-direction: column; gap: clamp(0.35rem, 1.2vh, 0.9rem); }
+.bullets li { padding-left: 1.3em; position: relative; }
+.bullets li::before {
+  content: ""; position: absolute; left: 0; top: 0.62em;
+  width: 0.48em; height: 0.48em; border-radius: 50%; background: var(--sea);
+}
+.bullets.sub li::before { background: transparent; border: 1.5px solid var(--sea); }
+
+/* Layout helpers -------------------------------------- */
+.cols { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(1rem, 3.5vw, 3.5rem); align-items: center; min-height: 0; }
+.cols.even { grid-template-columns: 1fr 1fr; }
+.cols.wide-right { grid-template-columns: 0.9fr 1.3fr; }
+@media (max-width: 760px) and (orientation: portrait) {
+  .cols, .cols.even, .cols.wide-right { grid-template-columns: 1fr; }
+  .hide-narrow { display: none !important; }
+}
+.card {
+  background: var(--paper-2); border-radius: 14px;
+  padding: clamp(0.7rem, 1.8vw, 1.5rem);
+  border: 1px solid rgba(28,42,46,0.06);
+}
+.card.sand { background: #f6e6b8; }
+.card.ember { background: #f6d8cb; }
+.card.sea { background: #d5e7e6; }
+.card h3 { margin-bottom: 0.35em; }
+.tag {
+  display: inline-block; font-size: var(--small-size); font-weight: 600;
+  padding: 0.15em 0.65em; border-radius: 99px; background: var(--paper-3); color: var(--ink);
+}
+
+/* Math ---------------------------------------------- */
+.m { font-family: var(--font-math); font-style: italic; white-space: nowrap; }
+.m .up { font-style: normal; }
+.m sub, .m sup { font-size: 0.66em; line-height: 0; }
+/* chỉ số trên + dưới xếp chồng: X<span class="ss"><i>t+1</i><i>i</i></span> */
+.ss { display: inline-flex; flex-direction: column; vertical-align: 0.42em; font-size: 0.64em; line-height: 1.05; margin-left: 0.04em; }
+.ss i:first-child { margin-bottom: 0.05em; }
+.eq {
+  font-family: var(--font-math); font-size: var(--eq-size);
+  display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: center;
+  gap: 0.25em 0.3em; line-height: 1.3;
+}
+.eq .op { font-style: normal; padding-top: 0.05em; }
+.term { display: inline-flex; flex-direction: column; align-items: center; }
+.term .tm { font-style: italic; padding: 0.05em 0.25em; border-radius: 6px; white-space: nowrap; }
+.term .lbl {
+  font-family: var(--font-body); font-style: normal; font-weight: 600;
+  font-size: max(0.44em, 0.68rem); margin-top: 0.45em; letter-spacing: 0.02em;
+  border-top: 2px solid currentColor; padding-top: 0.25em; white-space: nowrap;
+}
+.t-in .tm { background: rgba(58,127,193,0.13); } .t-in .lbl { color: var(--sky); }
+.t-cog .tm { background: rgba(75,143,69,0.14); } .t-cog .lbl { color: var(--moss); }
+.t-soc .tm { background: rgba(217,86,47,0.13); } .t-soc .lbl { color: var(--ember); }
+.t-hi .tm { background: rgba(240,207,122,0.6); }
+.eq-box { background: var(--paper-2); border-radius: 14px; padding: clamp(0.6rem, 2vh, 1.4rem) clamp(0.8rem, 2vw, 1.6rem); }
+.eq-box.sand { background: #f6e6b8; }
+.eq-box.outline { background: transparent; border: 2px solid var(--ember); }
+
+/* Figures ------------------------------------------- */
+.fig { display: flex; flex-direction: column; gap: 0.4em; align-items: center; min-height: 0; }
+.fig figcaption { font-size: var(--small-size); color: var(--ink-soft); text-align: center; }
+.fig svg { width: 100%; height: auto; max-height: 58vh; }
+.chart-img { background: #fff; border-radius: 10px; padding: 0.4rem; box-shadow: 0 6px 24px rgba(28,42,46,0.08); }
+
+/* ===========================================
+   REVEAL ANIMATIONS (kích hoạt khi slide hiện)
+   =========================================== */
+.reveal { opacity: 0; transform: translateY(22px); transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.slide.visible .reveal { opacity: 1; transform: none; }
+.slide.visible .reveal.d1 { transition-delay: 0.08s; }
+.slide.visible .reveal.d2 { transition-delay: 0.18s; }
+.slide.visible .reveal.d3 { transition-delay: 0.28s; }
+.slide.visible .reveal.d4 { transition-delay: 0.38s; }
+.slide.visible .reveal.d5 { transition-delay: 0.48s; }
+.slide.visible .reveal.d6 { transition-delay: 0.58s; }
+/* vẽ nét SVG */
+.draw { stroke-dasharray: var(--len, 1000); stroke-dashoffset: var(--len, 1000); transition: stroke-dashoffset 1.4s var(--ease); }
+.slide.visible .draw { stroke-dashoffset: 0; }
+.slide.visible .draw.d2 { transition-delay: 0.3s; } .slide.visible .draw.d3 { transition-delay: 0.6s; }
+.slide.visible .draw.d4 { transition-delay: 0.9s; } .slide.visible .draw.d5 { transition-delay: 1.2s; }
+
+/* ===========================================
+   CHROME: progress, dots, page number
+   =========================================== */
+.progress { position: fixed; left: 0; bottom: 0; height: 3px; background: var(--sea); width: 0; z-index: 50; transition: width 0.4s var(--ease); }
+.nav-dots { position: fixed; right: clamp(0.4rem, 1.2vw, 1.2rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 7px; z-index: 50; }
+.nav-dots button { width: 7px; height: 7px; border-radius: 50%; border: 0; background: rgba(28,42,46,0.2); cursor: pointer; transition: transform 0.3s, background 0.3s; }
+.nav-dots button[aria-current="true"] { background: var(--sea); transform: scale(1.5); }
+.nav-dots button:focus-visible { outline: 2px solid var(--ember); outline-offset: 2px; }
+.page-num { position: fixed; right: clamp(0.8rem, 2.5vw, 2.2rem); bottom: clamp(0.5rem, 1.6vh, 1.2rem); font-size: var(--small-size); color: var(--ink-soft); font-variant-numeric: tabular-nums; z-index: 50; }
+.keyboard-hint { position: fixed; left: clamp(0.8rem, 2.5vw, 2.2rem); bottom: clamp(0.5rem, 1.6vh, 1.2rem); font-size: var(--small-size); color: var(--ink-soft); z-index: 50; opacity: 0.8; transition: opacity 1s; }
+.keyboard-hint.gone { opacity: 0; }
+@media (max-width: 600px) { .nav-dots { display: none; } }
+
+/* ===========================================
+   LANGUAGE SWITCH (VN | EN) — mỗi đoạn chữ có cặp .vi / .en
+   =========================================== */
+html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !important; }
+.lang-switch {
+  position: fixed; top: clamp(0.5rem, 1.6vh, 1.1rem); right: clamp(0.6rem, 2vw, 1.6rem); z-index: 60;
+  display: flex; align-items: center; gap: 0.15em; font-size: var(--small-size); font-weight: 600;
+  background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px;
+  padding: 0.2em 0.35em; color: var(--ink-soft); backdrop-filter: blur(4px);
+}
+.lang-switch button {
+  font: inherit; border: 0; background: transparent; color: var(--ink-soft); cursor: pointer;
+  padding: 0.25em 0.6em; border-radius: 99px; letter-spacing: 0.06em; transition: background 0.2s, color 0.2s;
+}
+.lang-switch button[aria-pressed="true"] { background: var(--sea); color: var(--paper); }
+.lang-switch button:focus-visible { outline: 2px solid var(--ember); outline-offset: 1px; }
+
+.home-link {
+  position: fixed; top: clamp(0.5rem, 1.6vh, 1.1rem); left: clamp(0.6rem, 2vw, 1.6rem); z-index: 60;
+  font-size: var(--small-size); font-weight: 600; color: var(--sea); text-decoration: none;
+  background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px;
+  padding: 0.38em 0.9em; backdrop-filter: blur(4px); transition: background 0.2s, color 0.2s;
+}
+.home-link:hover, .home-link:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+
+.mini-table { border-collapse: collapse; font-size: calc(var(--body-size) * 0.9); width: 100%; }
+.mini-table th, .mini-table td { text-align: left; padding: 0.4em 0.7em; border-bottom: 1px solid rgba(28,42,46,0.12); vertical-align: top; }
+.mini-table th { font-weight: 600; color: var(--sea); font-size: var(--small-size); letter-spacing: 0.06em; text-transform: uppercase; }
+
+/* ===========================================
+   SLIDE-SPECIFIC
+   =========================================== */
+/* Title & closing ---------------------------------- */
+.swarm-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+.title-slide .slide-content { position: relative; z-index: 1; justify-content: flex-end; padding-bottom: clamp(2rem, 10vh, 7rem); }
+.title-slide h1 { max-width: 12em; }
+.title-slide h1 .sub { display: block; font-size: 0.42em; font-weight: 500; font-style: italic; color: var(--sea); margin-top: 0.35em; letter-spacing: 0; }
+.credit { font-size: var(--small-size); color: var(--ink-soft); border-top: 1px solid rgba(28,42,46,0.15); padding-top: 0.8em; max-width: 34em; }
+
+/* Inspiration photos -------------------------------- */
+.photos { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.5rem, 1.2vw, 1rem); }
+.photos img { width: 100%; height: clamp(120px, 42vh, 420px); object-fit: cover; border-radius: 14px; display: block; }
+.photos figure:nth-child(2) { margin-top: clamp(1rem, 6vh, 4rem); }
+@media (max-width: 760px) and (orientation: portrait) { .photos img { height: clamp(90px, 20vh, 200px); } .photos figure:nth-child(2) { margin-top: 0; } }
+
+/* Big idea ------------------------------------------ */
+.big-quote { font-family: var(--font-display); font-size: clamp(1.25rem, 3.3vw, 2.7rem); line-height: 1.32; max-width: 22em; font-weight: 500; }
+.big-quote .hl { padding: 0 0.15em; border-radius: 4px; }
+.forces { display: flex; flex-wrap: wrap; gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.force { flex: 1 1 13em; border-left: 4px solid; padding: 0.4em 0 0.4em 0.9em; }
+.force b { display: block; font-family: var(--font-display); font-size: var(--h3-size); }
+.force > span { font-size: var(--small-size); color: var(--ink-soft); }
+
+/* Components ---------------------------------------- */
+.defs { display: flex; flex-direction: column; gap: clamp(0.4rem, 1.6vh, 1rem); }
+.def { display: grid; grid-template-columns: minmax(7.5em, auto) 1fr; gap: 0.2em 1em; align-items: baseline; }
+.def dt { font-weight: 600; }
+.def dd { color: var(--ink-soft); }
+.def dd .m { color: var(--ink); font-size: 1.12em; }
+.stack { display: flex; flex-direction: column; gap: clamp(0.5rem, 1.6vh, 1rem); }
+.mathcard .m { font-size: clamp(1rem, 2.1vw, 1.6rem); display: block; line-height: 1.6; }
+
+/* Steps --------------------------------------------- */
+.steps { list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: clamp(0.25rem, 1.1vh, 0.7rem); position: relative; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2.2em 1fr; align-items: baseline; gap: 0.6em; }
+.steps li::before {
+  content: counter(s); font-family: var(--font-display); font-weight: 700; font-size: 1.15em;
+  width: 1.9em; height: 1.9em; border-radius: 50%; display: grid; place-items: center;
+  background: var(--paper-2); color: var(--sea); align-self: center;
+}
+.steps li.loop-body::before { background: var(--sea); color: var(--paper); }
+.loop-note { display: flex; align-items: center; gap: 0.6em; font-size: var(--small-size); color: var(--sea); font-weight: 600; margin-top: 0.3em; }
+
+/* Interactive example ------------------------------- */
+.demo { display: grid; grid-template-columns: minmax(14em, 0.75fr) 1.6fr; gap: clamp(0.8rem, 2.5vw, 2.5rem); align-items: center; min-height: 0; }
+@media (max-width: 760px) and (orientation: portrait) { .demo { grid-template-columns: 1fr; } }
+.demo-text { display: flex; flex-direction: column; gap: 0.7em; }
+.demo-step-label { font-size: var(--small-size); font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--sea); }
+.demo-desc { min-height: 6.5em; }
+.demo-desc b { color: var(--ink); }
+.demo-ctrl { display: flex; align-items: center; gap: 0.6em; flex-wrap: wrap; }
+.btn {
+  font: inherit; font-size: var(--small-size); font-weight: 600; cursor: pointer;
+  border: 1.5px solid var(--sea); color: var(--sea); background: transparent;
+  padding: 0.45em 1em; border-radius: 99px; transition: background 0.2s, color 0.2s;
+}
+.btn:hover, .btn:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+.btn:disabled { opacity: 0.35; cursor: default; background: transparent; color: var(--sea); }
+.pips { display: flex; gap: 5px; }
+.pips span { width: 18px; height: 4px; border-radius: 2px; background: var(--paper-3); transition: background 0.3s; }
+.pips span.on { background: var(--sea); }
+.legend { display: flex; flex-wrap: wrap; gap: 0.3em 1em; font-size: var(--small-size); transition: opacity 0.4s; }
+.legend i { display: inline-block; width: 1.4em; height: 3px; vertical-align: middle; margin-right: 0.35em; border-radius: 2px; }
+#demo-svg { width: 100%; height: auto; max-height: 64vh; }
+#demo-svg text { font-family: var(--font-body); }
+
+/* Binary PSO annotations ---------------------------- */
+.annot { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6em; font-size: var(--small-size); }
+.annot div { background: #f6e6b8; border-radius: 10px; padding: 0.5em 0.7em; position: relative; }
+.annot div b { font-family: var(--font-math); font-style: italic; font-size: 1.25em; display: block; font-weight: 400; }
+@media (max-width: 760px) and (orientation: portrait) { .annot { grid-template-columns: 1fr 1fr; } }
+
+/* Variants grid ------------------------------------- */
+.variants { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.variants .card { display: flex; flex-direction: column; gap: 0.3em; }
+.variants .card .num { font-family: var(--font-display); font-size: var(--h2-size); color: var(--sea); line-height: 1; opacity: 0.55; }
+.variants .card p { color: var(--ink-soft); font-size: calc(var(--body-size) * 0.92); }
+@media (max-width: 600px) { .variants { grid-template-columns: 1fr; } .variants .card .num { display: none; } }
+
+/* GA-PSO selection diagram -------------------------- */
+.sel-row { display: flex; align-items: center; gap: 0.6em; }
+.sel-row .lab { width: 7.5em; font-size: var(--small-size); color: var(--ink-soft); }
+.dots { display: flex; gap: clamp(4px, 0.7vw, 9px); }
+.dots i { width: clamp(16px, 2.2vw, 28px); height: clamp(16px, 2.2vw, 28px); border-radius: 50%; display: block; }
+
+/* EPSO cycle ---------------------------------------- */
+.cycle { display: flex; flex-wrap: wrap; gap: 0.4em; align-items: center; font-size: var(--small-size); font-weight: 600; }
+.cycle > span { background: var(--paper-2); padding: 0.35em 0.8em; border-radius: 99px; }
+.cycle .arr { background: none; padding: 0; color: var(--sea); }
+
+/* Chart grids --------------------------------------- */
+.charts3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.4rem, 1vw, 0.9rem); align-items: center; }
+.charts3 img, .charts4 img { width: 100%; max-height: 34vh; }
+.charts4 { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.3rem, 0.8vw, 0.8rem); }
+.charts4 img { max-height: 30vh; }
+@media (max-width: 760px) and (orientation: portrait) { .charts3 { grid-template-columns: 1fr; } .charts3 img { max-height: 19vh; } .charts4 img { max-height: 22vh; } }
+
+/* DEPSO alternation ---------------------------------- */
+.alt { display: flex; gap: 5px; flex-wrap: wrap; }
+.alt span { font-size: var(--small-size); font-weight: 600; padding: 0.35em 0; width: 3.7em; text-align: center; border-radius: 8px; color: #fff; }
+.alt .p { background: var(--sea); } .alt .d { background: var(--moss); }
+.alt small { display: block; font-weight: 400; opacity: 0.85; font-size: 0.85em; }
+
+/* Applications bar chart ----------------------------- */
+.bars { display: grid; grid-template-columns: auto 1fr; gap: clamp(1px, 0.45vh, 5px) 0.7em; font-size: var(--small-size); font-variant-numeric: tabular-nums; align-items: center; }
+.bars .yr { color: var(--ink-soft); }
+.bars .bar { display: flex; align-items: center; gap: 0.5em; }
+.bars .bar i { display: block; height: clamp(8px, 1.6vh, 15px); background: var(--sea); border-radius: 0 4px 4px 0; width: 0; transition: width 1.2s var(--ease); min-width: 2px; }
+.bars .bar i.zero { min-width: 0; }
+
+/* Closing ------------------------------------------- */
+.recap { display: flex; flex-wrap: wrap; gap: 0.6em; }
+.recap > span { background: rgba(245,240,230,0.85); border: 1px solid rgba(28,42,46,0.12); border-radius: 99px; padding: 0.4em 1em; font-size: var(--small-size); }
+/* thêm cho slide thực nghiệm, mã nguồn, tài liệu tham khảo */
+.pros-cons { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(0.6rem, 2vw, 1.6rem); }
+@media (max-width: 760px) and (orientation: portrait) { .pros-cons { grid-template-columns: 1fr; } }
+.pros-cons h3 { display: flex; align-items: center; gap: 0.4em; }
+.codeblock { font-family: "JetBrains Mono", "SFMono-Regular", Menlo, Consolas, monospace; font-size: clamp(0.62rem, 1.05vw, 0.92rem); line-height: 1.5; background: #1c2a2e; color: #e9e4d8; border-radius: 12px; padding: clamp(0.6rem, 1.4vw, 1.1rem) clamp(0.7rem, 1.6vw, 1.3rem); white-space: pre; overflow: hidden; max-width: 100%; }
+.codeblock .c { color: #8fb3a8; } .codeblock .k { color: #f0cf7a; }
+.refs { list-style: none; counter-reset: rf; display: flex; flex-direction: column; gap: clamp(0.2rem, 0.8vh, 0.5rem); font-size: clamp(0.62rem, 0.95vw, 0.86rem); line-height: 1.4; }
+.refs li { counter-increment: rf; padding-left: 2.2em; position: relative; }
+.refs li::before { content: "[" counter(rf) "]"; position: absolute; left: 0; color: var(--sea); font-weight: 600; }
+.refs a { color: var(--sea); text-decoration: none; word-break: break-all; }
+.res-table td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.sg-plus { color: var(--moss); font-weight: 700; } .sg-minus { color: var(--ember); font-weight: 700; } .sg-eq { color: var(--ink-soft); }
+.conv-img { width: 100%; max-height: 52vh; background: #fff; border-radius: 10px; padding: 0.4rem; }
+@media (max-width: 600px) { .codeblock { font-size: 0.55rem; white-space: pre-wrap; } .refs { font-size: 0.6rem; } }
+@media (max-height: 500px) { .codeblock { font-size: 0.5rem; line-height: 1.3; padding: 0.4rem 0.6rem; } }
+
+/* ---------- Reviewer-strategy additions ---------- */
+.mini-table { font-size: calc(var(--body-size) * 0.86); }
+.mini-table.dense { font-size: calc(var(--body-size) * 0.78); }
+.mini-table th, .mini-table td { padding: 0.36em 0.6em; }
+.mini-table td:first-child { font-weight: 600; }
+.mini-table tr.fatal td:first-child, td.fatal { color: #a3311a; }
+.sev { display: inline-block; font-size: 0.78em; font-weight: 700; letter-spacing: 0.05em; padding: 0.08em 0.6em; border-radius: 99px; white-space: nowrap; }
+.sev.fat { background: #f3c9bd; color: #8c2a14; }
+.sev.maj { background: #f7dcb0; color: #7a4a06; }
+.sev.min { background: #d3e8cf; color: #2d5e28; }
+.sev.acc { background: #d5e7e6; color: #1f5a61; }
+.grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.grid2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(0.5rem, 1.5vw, 1.2rem); }
+.card p { color: var(--ink-soft); font-size: calc(var(--body-size) * 0.92); }
+.card .big { font-family: var(--font-display); font-size: var(--h3-size); color: var(--ink); }
+.anat { display: grid; grid-template-columns: max-content 1fr; gap: 0.35em 0.9em; font-size: calc(var(--body-size) * 0.92); }
+.anat b { color: var(--sea); white-space: nowrap; }
+.anat span.en, .anat span.vi { display: contents; }
+.report { columns: 2; column-gap: clamp(0.8rem, 2.5vw, 2rem); font-size: clamp(0.6rem, 0.95vw, 0.84rem); line-height: 1.42;
+  background: var(--paper-2); border-radius: 12px; padding: clamp(0.6rem, 1.5vw, 1.2rem); border-left: 4px solid var(--sea); }
+.report p { margin-bottom: 0.45em; break-inside: avoid-column; }
+.report h4 { font-family: var(--font-display); color: var(--sea); font-size: 1.05em; margin: 0.2em 0 0.3em; }
+.report.conf { border-left-color: var(--ember); columns: 1; background: #f6e6b8; }
+.tree { list-style: none; display: flex; flex-direction: column; gap: clamp(0.25rem, 0.9vh, 0.6rem); counter-reset: s; }
+.tree li { display: grid; grid-template-columns: 1fr auto; gap: 0.8em; align-items: center; background: var(--paper-2); border-radius: 10px; padding: 0.4em 0.8em; }
+.tree li .q::before { content: counter(s) ". "; counter-increment: s; color: var(--sea); font-weight: 700; }
+.dl { display: flex; flex-wrap: wrap; gap: 0.6em; }
+.dl a { font-size: var(--small-size); font-weight: 600; text-decoration: none; color: var(--paper); background: var(--sea); border-radius: 99px; padding: 0.45em 1.1em; }
+.dl a:hover, .dl a:focus-visible { background: var(--ember); outline: none; }
+.dl a.ghost { background: transparent; color: var(--sea); border: 1px solid var(--sea); }
+.checks { list-style: none; columns: 2; column-gap: 2rem; font-size: calc(var(--body-size) * 0.88); }
+.checks li { padding-left: 1.5em; position: relative; margin-bottom: 0.35em; break-inside: avoid; }
+.checks li::before { content: "☐"; position: absolute; left: 0; color: var(--sea); }
+@media (max-width: 760px) and (orientation: portrait) {
+  .grid3, .grid2 { grid-template-columns: 1fr; }
+  .report, .checks { columns: 1; }
+  .mini-table, .mini-table.dense { font-size: 0.66rem; }
+  .card p { font-size: 0.72rem; }
+  .card { padding: 0.45rem 0.6rem; }
+  .card h3 { margin-bottom: 0.1em; }
+  .lead { font-size: 0.78rem; }
+  .bullets, .steps { font-size: 0.78rem; }
+  .bullets { gap: 0.25rem; }
+  .report { font-size: 0.56rem; }
+  .anat { font-size: 0.72rem; grid-template-columns: 1fr; gap: 0.1em; }
+  .tree li { font-size: 0.72rem; padding: 0.25em 0.5em; }
+  .checks { font-size: 0.68rem; }
+}
+@media (max-height: 500px) {
+  .mini-table, .mini-table.dense { font-size: 0.6rem; }
+  .mini-table th, .mini-table td { padding: 0.15em 0.4em; }
+  .card p, .bullets, .steps, .lead { font-size: 0.68rem; }
+  .card { padding: 0.35rem 0.5rem; }
+  .report { font-size: 0.5rem; columns: 3; }
+  .report.conf { columns: 1; }
+  .anat, .tree li, .checks { font-size: 0.64rem; }
+  .tree li { padding: 0.12em 0.5em; }
+  .checks { columns: 3; }
+}
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link" href="/citivan/"><span class="vi">← Trang chủ</span><span class="en">← Home</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language">
+  <button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button>
+</div>
+<main>
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Kỹ thuật viết báo · Phản biện khoa học</span><span class="en">Scientific Writing · Peer Review</span></p>
+    <h1 class="reveal d1"><span class="vi">Chiến lược phản biện bài báo khoa học</span><span class="en">A Strategy for Peer Reviewing Scientific Papers</span><span class="sub"><span class="vi">Phương pháp, tiêu chí, quy tắc ra quyết định và một ví dụ phản biện hoàn chỉnh</span><span class="en">Methods, criteria, decision rules, and a complete worked review</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+<section class="slide " aria-label="Mục tiêu" data-label-en="Objectives">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p><h2 class="reveal d1"><span class="vi">Sau bài này, bạn có thể</span><span class="en">After this lesson you will be able to</span></h2></header>
+<ol class="steps"><li class="reveal d2"><span><span class="vi">Đọc một bản thảo theo <strong>quy trình ba lượt</strong> và ghi nhận vấn đề có vị trí cụ thể.</span><span class="en">Read a manuscript with the <strong>three-pass process</strong> and log issues with exact locations.</span></span></li><li class="reveal d3"><span><span class="vi">Đánh giá bài theo <strong>14 tiêu chí</strong> chung và <strong>10 điểm kiểm</strong> riêng cho học máy, metaheuristic.</span><span class="en">Assess a paper against <strong>14 general criteria</strong> and <strong>10 checks</strong> specific to ML and metaheuristics.</span></span></li><li class="reveal d4"><span><span class="vi">Phân loại vấn đề <strong>Fatal / Major / Minor</strong> và chọn <strong>Accept, Minor, Major, Reject</strong> có lập luận.</span><span class="en">Classify issues as <strong>Fatal / Major / Minor</strong> and justify <strong>Accept, Minor, Major, or Reject</strong>.</span></span></li><li class="reveal d5"><span><span class="vi">Viết một báo cáo phản biện <strong>cụ thể, xây dựng</strong> và dùng chính khung này để <strong>tự kiểm bài</strong> trước khi nộp.</span><span class="en">Write a <strong>specific, constructive</strong> report, and use the same framework to <strong>self-review</strong> before submitting.</span></span></li></ol>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Ba câu hỏi gốc" data-label-en="Three core questions">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Vai trò người phản biện</span><span class="en">The reviewer’s role</span></p><h2 class="reveal d1"><span class="vi">Mọi bài phản biện xoay quanh ba câu hỏi</span><span class="en">Every review turns on three questions</span></h2></header><p class="lead reveal d2"><span class="vi">Người phản biện <strong>không ra quyết định cuối cùng</strong>; họ đưa cho Editor một <strong>khuyến nghị có lập luận</strong>.</span><span class="en">The reviewer <strong>does not make the final decision</strong>; they give the editor a <strong>reasoned recommendation</strong>.</span></p>
+<div class="grid3">
+<div class="card sea reveal d2"><h3><span class="vi">1 · Đáng công bố?</span><span class="en">1 · Worth publishing?</span></h3><p><span class="vi">Tính mới, mức quan trọng, phù hợp phạm vi tạp chí.</span><span class="en">Novelty, significance, fit with the journal’s scope.</span></p><p><span class="vi">Nếu “Không” → thường <strong>Reject</strong>, kể cả khi phương pháp đúng.</span><span class="en">If “No” → usually <strong>Reject</strong>, even if the methods are sound.</span></p></div>
+<div class="card sand reveal d3"><h3><span class="vi">2 · Kết luận được chứng minh?</span><span class="en">2 · Conclusions supported?</span></h3><p><span class="vi">Thiết kế, dữ liệu, thống kê.</span><span class="en">Design, data, statistics.</span></p><p><span class="vi">Nếu “Không” → <strong>Major</strong> nếu sửa được; <strong>Reject</strong> nếu lỗi ở thiết kế cốt lõi.</span><span class="en">If “No” → <strong>Major</strong> if fixable; <strong>Reject</strong> if the flaw is in the core design.</span></p></div>
+<div class="card ember reveal d4"><h3><span class="vi">3 · Tái lập được?</span><span class="en">3 · Reproducible?</span></h3><p><span class="vi">Trình bày, mã nguồn, dữ liệu, siêu tham số.</span><span class="en">Presentation, code, data, hyperparameters.</span></p><p><span class="vi">Nếu “Không” → <strong>Minor</strong> hoặc <strong>Major</strong> tùy mức thiếu.</span><span class="en">If “No” → <strong>Minor</strong> or <strong>Major</strong>, depending on what is missing.</span></p></div>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Đạo đức" data-label-en="Ethics">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Đạo đức phản biện</span><span class="en">Reviewer ethics</span></p><h2 class="reveal d1"><span class="vi">Năm nguyên tắc theo COPE</span><span class="en">Five principles from COPE</span></h2></header>
+<ul class="bullets"><li class="reveal d2"><span class="vi"><strong>Bảo mật:</strong> không chia sẻ bản thảo, không dùng ý tưởng chưa công bố, không tải lên công cụ AI bên ngoài nếu tạp chí không cho phép.</span><span class="en"><strong>Confidentiality:</strong> do not share the manuscript or use unpublished ideas, and do not upload it to external AI tools unless the journal allows it.</span></li><li class="reveal d3"><span class="vi"><strong>Xung đột lợi ích:</strong> từ chối nếu là đồng nghiệp gần, đối thủ trực tiếp, hoặc đã phản biện bài này ở nơi khác.</span><span class="en"><strong>Conflicts of interest:</strong> decline if you are a close colleague or direct competitor, or already reviewed this paper elsewhere.</span></li><li class="reveal d4"><span class="vi"><strong>Năng lực:</strong> chỉ nhận khi đánh giá được phần cốt lõi; nếu chỉ một phần, báo Editor.</span><span class="en"><strong>Competence:</strong> accept only if you can judge the core; if only part of it, tell the editor.</span></li><li class="reveal d5"><span class="vi"><strong>Đúng hạn:</strong> thường 14–21 ngày; không kịp thì báo sớm.</span><span class="en"><strong>Timeliness:</strong> usually 14–21 days; if you cannot make it, say so early.</span></li><li class="reveal d6"><span class="vi"><strong>Tôn trọng:</strong> phê bình công trình, không phê bình con người; không ép trích dẫn bài của mình.</span><span class="en"><strong>Respect:</strong> critique the work, not the people; do not push authors to cite your papers.</span></li></ul>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Tư duy" data-label-en="Mindset">
+  <div class="slide-content">
+
+<p class="kicker reveal"><span class="vi">Tư duy đúng</span><span class="en">The right mindset</span></p>
+<p class="big-quote reveal d1"><span class="vi">Người phản biện vừa là <span class="hl c-soc">người gác cổng</span> không để kết luận sai lọt qua, vừa là <span class="hl c-cog">người cố vấn</span> giúp bài tốt hơn.</span><span class="en">A reviewer is both a <span class="hl c-soc">gatekeeper</span> who keeps unsupported conclusions out and a <span class="hl c-cog">mentor</span> who helps the paper improve.</span></p>
+<div class="recap reveal d3">
+  <span><span class="vi">Sai ở đâu?</span><span class="en">What is wrong?</span></span><span><span class="vi">Vì sao quan trọng?</span><span class="en">Why does it matter?</span></span><span><span class="vi">Sửa thế nào?</span><span class="en">How to fix it?</span></span>
+</div>
+<p class="note reveal d4"><span class="vi">Hai lỗi của người mới: <strong>quá dễ dãi</strong> (chỉ sửa chính tả, khen chung chung) và <strong>quá khắt khe</strong> (đòi một bài báo khác hẳn).</span><span class="en">Two beginner errors: <strong>too lenient</strong> (typos and generic praise) and <strong>too harsh</strong> (demanding a different paper).</span></p>
+  </div>
+</section>
+<section class="slide " aria-label="Quy trình ba lượt" data-label-en="Three-pass process">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Phương pháp</span><span class="en">Method</span></p><h2 class="reveal d1"><span class="vi">Quy trình ba lượt đọc</span><span class="en">The three-pass reading process</span></h2></header><p class="lead reveal d2"><span class="vi">Một bài 12–20 trang thường mất <strong>4–8 giờ</strong>. Ba lượt giúp không bị cuốn theo câu chữ của tác giả.</span><span class="en">A 12–20-page paper usually takes <strong>4–8 hours</strong>. Three passes keep you from being carried along by the authors’ framing.</span></p>
+<table class="mini-table  reveal d3"><thead><tr><th><span class="vi">Bước</span><span class="en">Step</span></th><th><span class="vi">Thời gian</span><span class="en">Time</span></th><th><span class="vi">Việc làm</span><span class="en">What to do</span></th><th class="hide-narrow"><span class="vi">Đầu ra</span><span class="en">Output</span></th></tr></thead><tbody><tr><td><span class="vi">0 · Nhận lời mời</span><span class="en">0 · Invitation</span></td><td><span class="vi">5–10 phút</span><span class="en">5–10 min</span></td><td><span class="vi">Đọc tiêu đề, tóm tắt; kiểm chuyên môn, xung đột lợi ích, hạn.</span><span class="en">Read title and abstract; check expertise, conflicts, deadline.</span></td><td class="hide-narrow"><span class="vi">Nhận hoặc từ chối</span><span class="en">Accept or decline</span></td></tr><tr><td><span class="vi">1 · Lượt tổng quan</span><span class="en">1 · Overview pass</span></td><td><span class="vi">20–30 phút</span><span class="en">20–30 min</span></td><td><span class="vi">Abstract, đoạn đóng góp, hình/bảng chính, Conclusion.</span><span class="en">Abstract, contribution paragraph, main figures/tables, Conclusion.</span></td><td class="hide-narrow"><span class="vi">Tóm tắt 3–5 câu; cảm nhận tính mới</span><span class="en">3–5 sentence summary; novelty impression</span></td></tr><tr><td><span class="vi">2 · Lượt phương pháp</span><span class="en">2 · Methods pass</span></td><td><span class="vi">2–3 giờ</span><span class="en">2–3 h</span></td><td><span class="vi">Đọc kỹ Method, Setup, Results; đối chiếu mỗi tuyên bố với bằng chứng.</span><span class="en">Close reading of Methods, Setup, Results; check each claim against evidence.</span></td><td class="hide-narrow"><span class="vi">Danh sách vấn đề có vị trí</span><span class="en">Issue list with locations</span></td></tr><tr><td><span class="vi">3 · Lượt kiểm chứng</span><span class="en">3 · Verification pass</span></td><td><span class="vi">1–2 giờ</span><span class="en">1–2 h</span></td><td><span class="vi">Kiểm số liệu bảng–hình–văn bản, thống kê, 3–5 tài liệu then chốt.</span><span class="en">Cross-check numbers, statistics, 3–5 key references.</span></td><td class="hide-narrow"><span class="vi">Phân loại Fatal / Major / Minor</span><span class="en">Classified Fatal / Major / Minor</span></td></tr><tr><td><span class="vi">4 · Viết báo cáo</span><span class="en">4 · Write the report</span></td><td><span class="vi">1–2 giờ</span><span class="en">1–2 h</span></td><td><span class="vi">Tóm tắt – Đánh giá chung – Major – Minor – Ý kiến mật.</span><span class="en">Summary – Assessment – Major – Minor – Confidential.</span></td><td class="hide-narrow"><span class="vi">Báo cáo + khuyến nghị</span><span class="en">Report + recommendation</span></td></tr><tr><td><span class="vi">5 · Đọc lại hôm sau</span><span class="en">5 · Reread next day</span></td><td><span class="vi">15 phút</span><span class="en">15 min</span></td><td><span class="vi">Bỏ câu cảm tính; khuyến nghị khớp với nhận xét.</span><span class="en">Remove emotional wording; recommendation matches comments.</span></td><td class="hide-narrow"><span class="vi">Bản nộp cuối</span><span class="en">Final version</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Mẹo từng lượt" data-label-en="Tips per pass">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Phương pháp</span><span class="en">Method</span></p><h2 class="reveal d1"><span class="vi">Mẹo cho từng lượt</span><span class="en">Tips for each pass</span></h2></header>
+<ul class="bullets"><li class="reveal d2"><span class="vi"><strong>Lượt 1:</strong> viết ra “bài này tuyên bố X, Y, Z” trước khi đọc Method. Phần còn lại là kiểm X, Y, Z có được chứng minh không.</span><span class="en"><strong>Pass 1:</strong> write “this paper claims X, Y, Z” before reading the Methods. The rest of the review checks whether X, Y, Z are supported.</span></li><li class="reveal d3"><span class="vi"><strong>Lượt 2:</strong> đọc như người sắp phải lặp lại thí nghiệm; thiếu thông tin ở đâu, ghi ngay.</span><span class="en"><strong>Pass 2:</strong> read as someone who must replicate the study; note missing information at once.</span></li><li class="reveal d4"><span class="vi"><strong>Lượt 3:</strong> tính lại vài con số; so Abstract với bảng; xem độ lệch chuẩn có hợp lý; cùng baseline có cho số khác nhau ở hai bảng?</span><span class="en"><strong>Pass 3:</strong> recompute a few numbers; compare Abstract with tables; check SDs; does one baseline give different numbers in two tables?</span></li><li class="reveal d5"><span class="vi"><strong>Viết:</strong> sắp Major theo <strong>mức ảnh hưởng đến kết luận</strong>, không theo thứ tự trang.</span><span class="en"><strong>Writing:</strong> order Major comments by <strong>impact on the conclusions</strong>, not by page.</span></li></ul>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Tiêu chí 1–5" data-label-en="Criteria 1–5">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Tiêu chí đánh giá · 14 tiêu chí</span><span class="en">Evaluation criteria · 14 criteria</span></p><h2 class="reveal d1"><span class="vi">Tiêu chí 1–5: câu hỏi kiểm tra và cờ đỏ</span><span class="en">Criteria 1–5: check questions and red flags</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Tiêu chí</span><span class="en">Criterion</span></th><th><span class="vi">Câu hỏi kiểm tra</span><span class="en">Check question</span></th><th><span class="vi">Cờ đỏ</span><span class="en">Red flag</span></th></tr></thead><tbody><tr><td><span class="vi">1. Phạm vi</span><span class="en">1. Scope</span></td><td><span class="vi">Nằm trong Aims & Scope? Độc giả có quan tâm?</span><span class="en">Within Aims & Scope? Will readers care?</span></td><td><span class="vi">Bài ứng dụng thuần gửi tạp chí lý thuyết</span><span class="en">Purely applied paper sent to a theory journal</span></td></tr><tr><td><span class="vi">2. Tính mới</span><span class="en">2. Novelty</span></td><td><span class="vi">Khác gì công trình gần nhất? Khác biệt có thực chất?</span><span class="en">How does it differ from the closest work? Substantively?</span></td><td><span class="vi">“Lần đầu áp dụng A cho dữ liệu B” không lý do khoa học</span><span class="en">“First use of A on dataset B” with no rationale</span></td></tr><tr><td><span class="vi">3. Ý nghĩa</span><span class="en">3. Significance</span></td><td><span class="vi">Kết quả thay đổi gì cho lĩnh vực, thực tiễn?</span><span class="en">What do the results change for the field or practice?</span></td><td><span class="vi">Tăng 0,1% không kiểm định</span><span class="en">A 0.1% gain with no significance test</span></td></tr><tr><td><span class="vi">4. Tổng quan</span><span class="en">4. Literature</span></td><td><span class="vi">Cập nhật, đầy đủ, có khoảng trống rõ?</span><span class="en">Current, complete, with a clear gap?</span></td><td><span class="vi">Liệt kê không phân tích; tự trích dẫn quá mức</span><span class="en">Lists without analysis; heavy self-citation</span></td></tr><tr><td><span class="vi">5. Thiết kế</span><span class="en">5. Design</span></td><td><span class="vi">Phương pháp có trả lời câu hỏi nghiên cứu?</span><span class="en">Does the method answer the research question?</span></td><td><span class="vi">Ghép nhiều kỹ thuật không giải thích vai trò</span><span class="en">Stacked techniques with no role explained</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Tiêu chí 6–10" data-label-en="Criteria 6–10">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Tiêu chí đánh giá</span><span class="en">Evaluation criteria</span></p><h2 class="reveal d1"><span class="vi">Tiêu chí 6–10: câu hỏi kiểm tra và cờ đỏ</span><span class="en">Criteria 6–10: check questions and red flags</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Tiêu chí</span><span class="en">Criterion</span></th><th><span class="vi">Câu hỏi kiểm tra</span><span class="en">Check question</span></th><th><span class="vi">Cờ đỏ</span><span class="en">Red flag</span></th></tr></thead><tbody><tr><td><span class="vi">6. Dữ liệu</span><span class="en">6. Data</span></td><td><span class="vi">Nguồn, chia tập minh bạch? Có rò rỉ?</span><span class="en">Transparent source and splits? Any leakage?</span></td><td><span class="vi">Chuẩn hóa, chọn đặc trưng trước khi chia tập</span><span class="en">Normalizing or selecting features before splitting</span></td></tr><tr><td><span class="vi">7. Baseline</span><span class="en">7. Baselines</span></td><td><span class="vi">Mạnh, mới, tinh chỉnh công bằng?</span><span class="en">Strong, recent, fairly tuned?</span></td><td><span class="vi">Baseline để mặc định; chép số từ bài khác</span><span class="en">Baselines left at defaults; numbers copied from other papers</span></td></tr><tr><td><span class="vi">8. Thống kê</span><span class="en">8. Statistics</span></td><td><span class="vi">Nhiều lần chạy, độ lệch, kiểm định?</span><span class="en">Repeated runs, variance, tests?</span></td><td><span class="vi">Một lần chạy; in đậm khác biệt không ý nghĩa</span><span class="en">Single run; bolding non-significant gaps</span></td></tr><tr><td><span class="vi">9. Tái lập</span><span class="en">9. Reproducibility</span></td><td><span class="vi">Siêu tham số, phiên bản, seed, mã nguồn?</span><span class="en">Hyperparameters, versions, seeds, code?</span></td><td><span class="vi">“Mã có sẵn khi yêu cầu” và thiếu tham số</span><span class="en">“Code on request” with missing parameters</span></td></tr><tr><td><span class="vi">10. Diễn giải</span><span class="en">10. Interpretation</span></td><td><span class="vi">Kết luận có vượt bằng chứng?</span><span class="en">Do conclusions exceed the evidence?</span></td><td><span class="vi">Khái quát từ một bộ dữ liệu; “vượt trội mọi phương pháp”</span><span class="en">Generalizing from one dataset; “beats all methods”</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Tiêu chí 11–14" data-label-en="Criteria 11–14">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Tiêu chí đánh giá</span><span class="en">Evaluation criteria</span></p><h2 class="reveal d1"><span class="vi">Tiêu chí 11–14: câu hỏi kiểm tra và cờ đỏ</span><span class="en">Criteria 11–14: check questions and red flags</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Tiêu chí</span><span class="en">Criterion</span></th><th><span class="vi">Câu hỏi kiểm tra</span><span class="en">Check question</span></th><th><span class="vi">Cờ đỏ</span><span class="en">Red flag</span></th></tr></thead><tbody><tr><td><span class="vi">11. Hạn chế</span><span class="en">11. Limitations</span></td><td><span class="vi">Tác giả có tự nhận hạn chế?</span><span class="en">Are limitations acknowledged?</span></td><td><span class="vi">Không nêu hạn chế nào</span><span class="en">No limitations stated</span></td></tr><tr><td><span class="vi">12. Trình bày</span><span class="en">12. Presentation</span></td><td><span class="vi">Cấu trúc, ký hiệu, hình/bảng rõ?</span><span class="en">Clear structure, notation, figures?</span></td><td><span class="vi">Hình mờ, ký hiệu đổi giữa các mục</span><span class="en">Blurry figures; notation changes between sections</span></td></tr><tr><td><span class="vi">13. Tham khảo</span><span class="en">13. References</span></td><td><span class="vi">Đúng định dạng, có thật, liên quan?</span><span class="en">Correct, real, relevant?</span></td><td><span class="vi">Tài liệu không tồn tại; nguồn săn mồi</span><span class="en">Nonexistent references; predatory venues</span></td></tr><tr><td><span class="vi">14. Liêm chính</span><span class="en">14. Integrity</span></td><td><span class="vi">Đạo văn, trùng lặp, số liệu bịa?</span><span class="en">Plagiarism, duplication, fabricated data?</span></td><td><span class="vi">Độ lệch chuẩn bằng 0; bảng trùng bài khác</span><span class="en">Zero SDs; tables identical to another paper</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Kiểm tra ML 1" data-label-en="ML checks 1">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Học máy và Metaheuristic</span><span class="en">Machine learning and metaheuristics</span></p><h2 class="reveal d1"><span class="vi">Mười “cờ đỏ” kiểm tra trong 30 phút đầu</span><span class="en">Ten red flags to check in the first 30 minutes</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Điểm kiểm</span><span class="en">Checkpoint</span></th><th><span class="vi">Cách kiểm nhanh</span><span class="en">Quick check</span></th></tr></thead><tbody><tr><td><span class="vi">M1 · Rò rỉ dữ liệu</span><span class="en">M1 · Data leakage</span></td><td><span class="vi">Chuẩn hóa, SMOTE, chọn đặc trưng, PCA làm trước hay sau khi chia tập? Hàm mục tiêu có dùng tập test?</span><span class="en">Normalization, SMOTE, feature selection, PCA before or after the split? Does the fitness use the test set?</span></td></tr><tr><td><span class="vi">M2 · Test dùng để chọn mô hình</span><span class="en">M2 · Test used for selection</span></td><td><span class="vi">Không có validation riêng hay CV lồng nhau → kết quả lạc quan.</span><span class="en">No separate validation or nested CV → optimistic results.</span></td></tr><tr><td><span class="vi">M3 · Ngân sách không bằng nhau</span><span class="en">M3 · Unequal budget</span></td><td><span class="vi">Số lần đánh giá hàm mục tiêu, quần thể, vòng lặp có bằng nhau?</span><span class="en">Same function evaluations, population, iterations?</span></td></tr><tr><td><span class="vi">M4 · Số lần chạy, kiểm định</span><span class="en">M4 · Runs and tests</span></td><td><span class="vi">≥ 30 lần chạy; Wilcoxon, Friedman + post-hoc; hiệu chỉnh Holm.</span><span class="en">≥ 30 runs; Wilcoxon, Friedman + post-hoc; Holm correction.</span></td></tr><tr><td><span class="vi">M5 · Benchmark chuẩn</span><span class="en">M5 · Standard benchmarks</span></td><td><span class="vi">Cần CEC2017/CEC2022, không chỉ 23 hàm cổ điển (thiên lệch gốc 0).</span><span class="en">Need CEC2017/CEC2022, not only the 23 classical functions (origin bias).</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Kiểm tra ML 2" data-label-en="ML checks 2">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Học máy và Metaheuristic</span><span class="en">Machine learning and metaheuristics</span></p><h2 class="reveal d1"><span class="vi">Mười “cờ đỏ”: phần tiếp theo</span><span class="en">Ten red flags, continued</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Điểm kiểm</span><span class="en">Checkpoint</span></th><th><span class="vi">Cách kiểm nhanh</span><span class="en">Quick check</span></th></tr></thead><tbody><tr><td><span class="vi">M6 · Tính mới “ẩn dụ”</span><span class="en">M6 · Metaphor novelty</span></td><td><span class="vi">Thuật toán “lấy cảm hứng từ con vật X” có khác PSO/DE/GWO về toán học? (Sörensen, 2015)</span><span class="en">Is the “animal X–inspired” algorithm mathematically different from PSO/DE/GWO? (Sörensen, 2015)</span></td></tr><tr><td><span class="vi">M7 · Ablation</span><span class="en">M7 · Ablation</span></td><td><span class="vi">Từng thành phần có được tách riêng để chứng minh đóng góp?</span><span class="en">Is each component isolated to show its contribution?</span></td></tr><tr><td><span class="vi">M8 · Chỉ số phù hợp</span><span class="en">M8 · Right metrics</span></td><td><span class="vi">Dữ liệu mất cân bằng chỉ báo Accuracy? Cần F1-macro, MCC, PR-AUC.</span><span class="en">Imbalanced data reported only with Accuracy? Need macro-F1, MCC, PR-AUC.</span></td></tr><tr><td><span class="vi">M9 · Chi phí tính toán</span><span class="en">M9 · Compute cost</span></td><td><span class="vi">Có thời gian chạy, phần cứng? Tăng nhỏ mà tốn gấp 50 lần?</span><span class="en">Runtime and hardware? A small gain at 50× cost?</span></td></tr><tr><td><span class="vi">M10 · Dữ liệu bão hòa</span><span class="en">M10 · Saturated data</span></td><td><span class="vi">NSL-KDD, MNIST, Iris > 99% khó chứng minh đóng góp.</span><span class="en">NSL-KDD, MNIST, Iris above 99% make contribution hard to show.</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Mức độ nghiêm trọng" data-label-en="Severity levels">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Phân loại vấn đề</span><span class="en">Classifying issues</span></p><h2 class="reveal d1"><span class="vi">Ba mức nghiêm trọng quyết định khuyến nghị</span><span class="en">Three severity levels drive the recommendation</span></h2></header>
+<div class="grid3">
+<div class="card ember reveal d2"><h3><span class="vi">FATAL · không sửa được</span><span class="en">FATAL · not fixable</span></h3><p><span class="vi">Làm sụp đổ kết luận chính; phải làm một nghiên cứu khác mới khắc phục.</span><span class="en">Collapses the main conclusion; fixing it needs a different study.</span></p><p><span class="vi"><em>Không mới, thiết kế sai từ gốc, số liệu bịa, đạo văn, ngoài phạm vi.</em></span><span class="en"><em>Not novel, flawed design, fabricated data, plagiarism, out of scope.</em></span></p><p><span class="vi">→ <strong>Reject</strong></span><span class="en">→ <strong>Reject</strong></span></p></div>
+<div class="card sand reveal d3"><h3><span class="vi">MAJOR · sửa được</span><span class="en">MAJOR · fixable</span></h3><p><span class="vi">Ảnh hưởng độ tin cậy; cần thí nghiệm hoặc phân tích mới.</span><span class="en">Affects reliability; needs new experiments or analyses.</span></p><p><span class="vi"><em>Rò rỉ chạy lại được, thiếu baseline, 1 lần chạy, thiếu kiểm định, thiếu ablation.</em></span><span class="en"><em>Rerunnable leakage, missing baselines, single run, no tests, no ablation.</em></span></p><p><span class="vi">→ <strong>Major Revision</strong></span><span class="en">→ <strong>Major Revision</strong></span></p></div>
+<div class="card sea reveal d4"><h3><span class="vi">MINOR · trình bày</span><span class="en">MINOR · presentation</span></h3><p><span class="vi">Không đổi kết luận, chỉ ảnh hưởng độ rõ ràng.</span><span class="en">Does not change conclusions, only clarity.</span></p><p><span class="vi"><em>Ký hiệu, hình mờ, ngữ pháp, vài tài liệu, định dạng.</em></span><span class="en"><em>Notation, blurry figures, grammar, a few references, formatting.</em></span></p><p><span class="vi">→ <strong>Minor</strong> hoặc <strong>Accept</strong></span><span class="en">→ <strong>Minor</strong> or <strong>Accept</strong></span></p></div>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Câu hỏi then chốt" data-label-en="The key question">
+  <div class="slide-content">
+
+<p class="kicker reveal"><span class="vi">Phân biệt Fatal và Major</span><span class="en">Telling Fatal from Major</span></p>
+<p class="big-quote reveal d1"><span class="vi">“Nếu tác giả làm <span class="hl c-cog">đúng mọi điều</span> tôi yêu cầu, bài có trở thành <span class="hl c-soc">một bài tốt cho tạp chí này</span> không?”</span><span class="en">“If the authors did <span class="hl c-cog">everything I ask</span>, would this become <span class="hl c-soc">a good paper for this journal</span>?”</span></p>
+<div class="grid2">
+<div class="card sea reveal d2"><h3><span class="vi">Có → Major Revision</span><span class="en">Yes → Major Revision</span></h3><p><span class="vi">Đóng góp cốt lõi có giá trị; lỗi khắc phục được trong một vòng sửa (2–3 tháng).</span><span class="en">The core contribution has value; the issues can be fixed in one round (2–3 months).</span></p></div>
+<div class="card ember reveal d3"><h3><span class="vi">Không → Reject</span><span class="en">No → Reject</span></h3><p><span class="vi">Đóng góp vẫn quá nhỏ, hoặc phải đổi câu hỏi nghiên cứu.</span><span class="en">The contribution would still be too small, or the research question would have to change.</span></p></div>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Quy tắc quyết định" data-label-en="Decision rules">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Ra quyết định</span><span class="en">Making the decision</span></p><h2 class="reveal d1"><span class="vi">Khi nào Accept, Minor, Major, Reject?</span><span class="en">When to Accept, Minor, Major, or Reject?</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Khuyến nghị</span><span class="en">Recommendation</span></th><th><span class="vi">Khi nào</span><span class="en">When</span></th><th><span class="vi">Kinh nghiệm</span><span class="en">Practical note</span></th></tr></thead><tbody><tr><td><span class="vi">Accept</span><span class="en">Accept</span></td><td><span class="vi">Không có Major; Minor không đáng kể.</span><span class="en">No Major issues; negligible Minor ones.</span></td><td><span class="vi">Rất hiếm ở vòng 1; thường ở vòng 2–3.</span><span class="en">Very rare in round 1; usually round 2–3.</span></td></tr><tr><td><span class="vi">Minor Revision</span><span class="en">Minor Revision</span></td><td><span class="vi">Kết luận đã được chứng minh; chỉ cần làm rõ, sửa hình, thêm tài liệu.</span><span class="en">Conclusions already supported; clarify, fix figures, add references.</span></td><td><span class="vi">Nếu phải chạy lại thí nghiệm thì không còn là Minor.</span><span class="en">If experiments must be rerun, it is no longer Minor.</span></td></tr><tr><td><span class="vi">Major Revision</span><span class="en">Major Revision</span></td><td><span class="vi">≥ 1 Major, đóng góp có giá trị, lỗi sửa được.</span><span class="en">≥ 1 Major issue; valuable contribution; fixable.</span></td><td><span class="vi">Phổ biến nhất ở vòng 1 với bài tiềm năng; nêu rõ điều kiện chấp nhận.</span><span class="en">Most common round-1 outcome for promising papers; state acceptance conditions.</span></td></tr><tr><td><span class="vi">Reject & Resubmit</span><span class="en">Reject & Resubmit</span></td><td><span class="vi">Ý tưởng tốt nhưng phần sửa quá lớn cho một vòng.</span><span class="en">Good idea, but changes too large for one round.</span></td><td><span class="vi">Cho tác giả nộp lại như bài mới.</span><span class="en">Lets authors resubmit as a new paper.</span></td></tr><tr class="fatal"><td><span class="vi">Reject</span><span class="en">Reject</span></td><td><span class="vi">Có Fatal; hoặc nhiều Major cơ bản cộng đóng góp yếu.</span><span class="en">A Fatal issue; or many fundamental Majors plus a weak contribution.</span></td><td><span class="vi">Giải thích cụ thể; vẫn góp ý xây dựng cho lần nộp sau.</span><span class="en">Explain specifically; still give constructive feedback.</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Cây quyết định" data-label-en="Decision tree">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<div class="stack"><header class="slide-head"><p class="kicker reveal"><span class="vi">Ra quyết định</span><span class="en">Making the decision</span></p><h2 class="reveal d1"><span class="vi">Cây quyết định sáu bước</span><span class="en">A six-step decision tree</span></h2></header><p class="lead reveal d2"><span class="vi">Đi từ trên xuống; dừng ở câu đầu tiên trả lời được.</span><span class="en">Go top-down; stop at the first question that decides.</span></p></div>
+<ol class="tree"><li class="reveal d2"><span class="q"><span class="vi">Bài nằm trong phạm vi tạp chí?</span><span class="en">Within the journal’s scope?</span></span><span class="sev fat"><span class="vi">Không → Reject</span><span class="en">No → Reject</span></span></li><li class="reveal d3"><span class="q"><span class="vi">Có đóng góp mới đủ tầm?</span><span class="en">A new contribution of sufficient weight?</span></span><span class="sev fat"><span class="vi">Không → Reject</span><span class="en">No → Reject</span></span></li><li class="reveal d4"><span class="q"><span class="vi">Có vấn đề liêm chính?</span><span class="en">Any integrity problem?</span></span><span class="sev fat"><span class="vi">Có → Reject + báo Editor</span><span class="en">Yes → Reject + tell the editor</span></span></li><li class="reveal d5"><span class="q"><span class="vi">Có lỗi Fatal về thiết kế?</span><span class="en">A Fatal design flaw?</span></span><span class="sev fat"><span class="vi">Có → Reject</span><span class="en">Yes → Reject</span></span></li><li class="reveal d6"><span class="q"><span class="vi">Có lỗi Major?</span><span class="en">Any Major issues?</span></span><span class="sev maj"><span class="vi">Sửa được → Major · Quá lớn → R&R/Reject</span><span class="en">Fixable → Major · Too large → R&R/Reject</span></span></li><li class="reveal d6"><span class="q"><span class="vi">Chỉ còn Minor?</span><span class="en">Only Minor issues left?</span></span><span class="sev min"><span class="vi">Đáng kể → Minor · Không → Accept</span><span class="en">Substantial → Minor · Negligible → Accept</span></span></li></ol>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Kinh nghiệm 1" data-label-en="Lessons 1">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Kinh nghiệm thực tế</span><span class="en">Lessons from practice</span></p><h2 class="reveal d1"><span class="vi">Tám bài học khi cân nhắc quyết định</span><span class="en">Eight lessons for weighing a decision</span></h2></header>
+<ul class="bullets"><li class="reveal d2"><span class="vi"><strong>Khuyến nghị phải khớp nhận xét.</strong> Sáu lỗi Major mà đề nghị Minor là mâu thuẫn; Editor sẽ xem nhẹ báo cáo.</span><span class="en"><strong>The recommendation must match the comments.</strong> Six Majors with a Minor recommendation is contradictory; the editor will discount it.</span></li><li class="reveal d3"><span class="vi"><strong>“Bài tôi muốn đọc” khác “bài tác giả đã viết”.</strong> Đánh giá theo câu hỏi nghiên cứu của tác giả.</span><span class="en"><strong>“The paper I want” is not “the paper they wrote.”</strong> Judge by the authors’ research question.</span></li><li class="reveal d4"><span class="vi"><strong>Không đòi hỏi vô hạn.</strong> Mỗi yêu cầu thí nghiệm gắn với một tuyên bố; tác giả hạ tuyên bố thì có thể không cần.</span><span class="en"><strong>No open-ended demands.</strong> Tie each experiment to a claim; if the claim is softened, it may not be needed.</span></li><li class="reveal d5"><span class="vi"><strong>Rò rỉ dữ liệu, tinh chỉnh trên test</strong> tối thiểu là Major; không chạy lại được thì là Fatal.</span><span class="en"><strong>Leakage or tuning on the test set</strong> is at least Major; Fatal if it cannot be rerun.</span></li></ul>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Kinh nghiệm 2" data-label-en="Lessons 2">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Kinh nghiệm thực tế</span><span class="en">Lessons from practice</span></p><h2 class="reveal d1"><span class="vi">Tám bài học: phần tiếp theo</span><span class="en">Eight lessons, continued</span></h2></header>
+<ul class="bullets"><li class="reveal d2"><span class="vi"><strong>“Thuật toán mới từ con vật”</strong> chỉ mới ở ẩn dụ, toán giống PSO/GWO, chỉ thử 23 hàm cổ điển: thường Reject ở Q1.</span><span class="en"><strong>“New animal-inspired algorithms”</strong> new only in metaphor, PSO/GWO math, 23 classical functions only: usually Reject at Q1.</span></li><li class="reveal d3"><span class="vi"><strong>Tiêu chuẩn theo hạng tạp chí:</strong> cùng bài có thể Major ở Q1, Minor ở Q3. Đọc vài bài gần đây để hiệu chỉnh.</span><span class="en"><strong>Standards depend on tier:</strong> Major at Q1 may be Minor at Q3. Read recent papers to calibrate.</span></li><li class="reveal d4"><span class="vi"><strong>Vòng 2:</strong> chỉ kiểm những gì đã yêu cầu và phần mới sửa; không thêm yêu cầu lớn mới.</span><span class="en"><strong>Round 2:</strong> check only what you asked for plus new changes; no major new requests.</span></li><li class="reveal d5"><span class="vi"><strong>Khi phản biện bất đồng:</strong> Editor cân lập luận, không đếm phiếu. Lập luận càng cụ thể càng có trọng lượng.</span><span class="en"><strong>When reviewers disagree:</strong> the editor weighs arguments, not votes. Specific arguments carry more weight.</span></li></ul>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Cấu trúc báo cáo" data-label-en="Report structure">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Viết báo cáo</span><span class="en">Writing the report</span></p><h2 class="reveal d1"><span class="vi">Cấu trúc chuẩn của một báo cáo phản biện</span><span class="en">The standard structure of a review report</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Phần</span><span class="en">Section</span></th><th><span class="vi">Nội dung</span><span class="en">Content</span></th><th class="hide-narrow"><span class="vi">Độ dài</span><span class="en">Length</span></th></tr></thead><tbody><tr><td><span class="vi">1. Tóm tắt bài</span><span class="en">1. Summary</span></td><td><span class="vi">Vấn đề, phương pháp, dữ liệu, kết quả, đóng góp, bằng lời của mình.</span><span class="en">Problem, method, data, results, contribution, in your own words.</span></td><td class="hide-narrow"><span class="vi">80–150 từ</span><span class="en">80–150 words</span></td></tr><tr><td><span class="vi">2. Đánh giá chung</span><span class="en">2. General assessment</span></td><td><span class="vi">Điểm mạnh thật sự và vấn đề lớn nhất; hướng khuyến nghị.</span><span class="en">Real strengths and the biggest problem; direction of the recommendation.</span></td><td class="hide-narrow"><span class="vi">1–2 đoạn</span><span class="en">1–2 paragraphs</span></td></tr><tr><td><span class="vi">3. Major comments</span><span class="en">3. Major comments</span></td><td><span class="vi">Vị trí – vấn đề – vì sao ảnh hưởng – đề nghị sửa.</span><span class="en">Location – problem – why it matters – fix.</span></td><td class="hide-narrow"><span class="vi">3–8 ý</span><span class="en">3–8 items</span></td></tr><tr><td><span class="vi">4. Minor comments</span><span class="en">4. Minor comments</span></td><td><span class="vi">Ngắn, theo thứ tự trang.</span><span class="en">Brief, in page order.</span></td><td class="hide-narrow"><span class="vi">Tùy bài</span><span class="en">As needed</span></td></tr><tr><td><span class="vi">5. Ý kiến mật</span><span class="en">5. Confidential</span></td><td><span class="vi">Nghi vấn liêm chính, mức tự tin, lý do khuyến nghị.</span><span class="en">Integrity concerns, confidence, reasoning.</span></td><td class="hide-narrow"><span class="vi">2–5 câu</span><span class="en">2–5 sentences</span></td></tr><tr><td><span class="vi">6. Khuyến nghị</span><span class="en">6. Recommendation</span></td><td><span class="vi">Chọn trong hệ thống của tạp chí.</span><span class="en">Select in the journal’s system.</span></td><td class="hide-narrow"><span class="vi">—</span><span class="en">—</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Văn phong" data-label-en="Writing style">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Văn phong</span><span class="en">Style</span></p><h2 class="reveal d1"><span class="vi">Tránh viết và nên viết</span><span class="en">Avoid this, write that</span></h2></header><p class="lead reveal d2"><span class="vi">Báo cáo thường viết bằng tiếng Anh: chỉ rõ vị trí, cơ chế lỗi và cách sửa; phê bình công trình, không phê bình người.</span><span class="en">Reports are usually in English: give the location, the mechanism, and the fix; critique the work, not the people.</span></p>
+<table class="mini-table  reveal d3"><thead><tr><th><span class="vi">✗ Tránh viết</span><span class="en">✗ Avoid</span></th><th><span class="vi">✓ Nên viết</span><span class="en">✓ Write instead</span></th></tr></thead><tbody><tr><td><span class="vi">The methodology is weak.</span><span class="en">The methodology is weak.</span></td><td><span class="vi">In Section 3.2, min–max normalization is fitted on the full dataset before the split. Please fit the scaler on the training fold only and rerun Table 4.</span><span class="en">In Section 3.2, min–max normalization is fitted on the full dataset before the split. Please fit the scaler on the training fold only and rerun Table 4.</span></td></tr><tr><td><span class="vi">The authors should compare with more methods.</span><span class="en">The authors should compare with more methods.</span></td><td><span class="vi">The superiority claim rests on GA and PSO only. Please add two recent strong baselines under the same evaluation budget.</span><span class="en">The superiority claim rests on GA and PSO only. Please add two recent strong baselines under the same evaluation budget.</span></td></tr><tr><td><span class="vi">The English is terrible.</span><span class="en">The English is terrible.</span></td><td><span class="vi">The manuscript would benefit from language editing; e.g., p. 4, ll. 12–20 contain incomplete sentences.</span><span class="en">The manuscript would benefit from language editing; e.g., p. 4, ll. 12–20 contain incomplete sentences.</span></td></tr><tr><td><span class="vi">This paper is useless.</span><span class="en">This paper is useless.</span></td><td><span class="vi">The contribution over [12] is not yet clear. A side-by-side comparison of the update rules would help.</span><span class="en">The contribution over [12] is not yet clear. A side-by-side comparison of the update rules would help.</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Một nhận xét Major" data-label-en="Anatomy of a Major comment">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Viết báo cáo</span><span class="en">Writing the report</span></p><h2 class="reveal d1"><span class="vi">Công thức một nhận xét Major hoàn chỉnh</span><span class="en">Anatomy of a complete Major comment</span></h2></header>
+<div class="card reveal d2"><div class="anat"><b><span class="vi">Vị trí</span><span class="en">Location</span></b><span>Section 4.1, Table 3, p. 9.</span><b><span class="vi">Quan sát</span><span class="en">Observation</span></b><span>All results are reported from a single run with no standard deviation.</span><b><span class="vi">Hệ quả</span><span class="en">Consequence</span></b><span>Because HHO and the baselines are stochastic, the 0.4% gap may be within run-to-run variance, so the superiority claim is not supported.</span><b><span class="vi">Yêu cầu</span><span class="en">Request</span></b><span>Please report mean ± SD over at least 30 independent runs and apply a Wilcoxon signed-rank test with Holm correction.</span><b><span class="vi">Điều kiện</span><span class="en">Condition</span></b><span>If the difference is not significant, please soften the claim in the Abstract and Conclusion.</span></div></div>
+<p class="note reveal d3"><span class="vi">Năm phần này giúp tác giả biết chính xác phải làm gì và Editor thấy yêu cầu có cơ sở.</span><span class="en">These five parts tell the authors exactly what to do and show the editor the request is grounded.</span></p>
+  </div>
+</section>
+<section class="slide " aria-label="Ví dụ: bản thảo" data-label-en="Example: manuscript">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Ví dụ cụ thể</span><span class="en">Worked example</span></p><h2 class="reveal d1"><span class="vi">Một bản thảo giả định cần phản biện</span><span class="en">A hypothetical manuscript to review</span></h2></header><p class="lead reveal d2"><span class="vi">Không phải bài thật; dựng lên để minh họa các lỗi thường gặp nhất của bài metaheuristic + học máy.</span><span class="en">Not a real paper; built to illustrate the most common flaws in metaheuristic + ML papers.</span></p>
+<table class="mini-table  reveal d3"><thead><tr><th><span class="vi">Mục</span><span class="en">Item</span></th><th><span class="vi">Nội dung</span><span class="en">Content</span></th></tr></thead><tbody><tr><td><span class="vi">Tiêu đề</span><span class="en">Title</span></td><td>HHO-XGB: A Harris Hawks Optimization-Tuned XGBoost Framework for Network Intrusion Detection</td></tr><tr><td><span class="vi">Tạp chí</span><span class="en">Journal</span></td><td><span class="vi">Tạp chí Q1 về hệ chuyên gia và ứng dụng AI; 18 trang</span><span class="en">Q1 journal on expert systems and applied AI; 18 pages</span></td></tr><tr><td><span class="vi">Tuyên bố</span><span class="en">Claims</span></td><td><span class="vi">HHO tinh chỉnh 6 siêu tham số + chọn đặc trưng; <strong>99,62%</strong> trên NSL-KDD, <strong>98,91%</strong> trên UNSW-NB15; vượt GA, PSO, GWO.</span><span class="en">HHO tunes 6 hyperparameters + selects features; <strong>99.62%</strong> on NSL-KDD, <strong>98.91%</strong> on UNSW-NB15; beats GA, PSO, GWO.</span></td></tr><tr><td><span class="vi">Thực nghiệm</span><span class="en">Setup</span></td><td><span class="vi">Chuẩn hóa + SMOTE trên toàn bộ dữ liệu rồi chia 80/20; hàm mục tiêu = accuracy trên phần 20%; 1 lần chạy; HHO 100 vòng, baseline 20 vòng.</span><span class="en">Normalization + SMOTE on all data, then an 80/20 split; fitness = accuracy on the 20%; 1 run; HHO 100 iterations, baselines 20.</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Danh sách vấn đề 1" data-label-en="Issue list 1">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Lượt đọc 2 và 3</span><span class="en">Passes 2 and 3</span></p><h2 class="reveal d1"><span class="vi">Mười hai vấn đề đã phân loại (1–6)</span><span class="en">Twelve classified issues (1–6)</span></h2></header><p class="lead reveal d2"><span class="vi">Lượt 1 đã gợi nghi vấn: <strong>99,62% trên NSL-KDD cao bất thường</strong> so với giao thức KDDTest+ chuẩn.</span><span class="en">Pass 1 already raised a flag: <strong>99.62% on NSL-KDD is unusually high</strong> for the standard KDDTest+ protocol.</span></p>
+<table class="mini-table dense reveal d3"><thead><tr><th><span class="vi">#</span><span class="en">#</span></th><th class="hide-narrow"><span class="vi">Vị trí</span><span class="en">Where</span></th><th><span class="vi">Vấn đề</span><span class="en">Issue</span></th><th><span class="vi">Mức</span><span class="en">Level</span></th><th><span class="vi">Đề nghị</span><span class="en">Fix</span></th></tr></thead><tbody><tr><td>1</td><td class="hide-narrow"><span class="vi">Mục 3.2</span><span class="en">Sec. 3.2</span></td><td><span class="vi">Chuẩn hóa và SMOTE trước khi chia tập → rò rỉ</span><span class="en">Normalization and SMOTE before splitting → leakage</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">Chia trước; fit trên train; chạy lại</span><span class="en">Split first; fit on train; rerun</span></td></tr><tr><td>2</td><td class="hide-narrow"><span class="vi">Mục 3.4</span><span class="en">Sec. 3.4</span></td><td><span class="vi">Hàm mục tiêu tính trên chính tập test</span><span class="en">Fitness computed on the test set itself</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">CV trong tập train; test chỉ một lần</span><span class="en">CV inside train; test once</span></td></tr><tr><td>3</td><td class="hide-narrow"><span class="vi">Mục 4.1</span><span class="en">Sec. 4.1</span></td><td><span class="vi">Không dùng KDDTest+ và test chính thức UNSW-NB15</span><span class="en">No KDDTest+ or official UNSW-NB15 test set</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">Báo cáo trên tập test chính thức</span><span class="en">Report on official test sets</span></td></tr><tr><td>4</td><td class="hide-narrow"><span class="vi">Bảng 5</span><span class="en">Table 5</span></td><td><span class="vi">Baseline 20 vòng, HHO 100 vòng</span><span class="en">Baselines 20 iterations, HHO 100</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">Cùng số lần đánh giá, cùng công tinh chỉnh</span><span class="en">Same evaluations, same tuning effort</span></td></tr><tr><td>5</td><td class="hide-narrow"><span class="vi">Bảng 4–5</span><span class="en">Tables 4–5</span></td><td><span class="vi">Một lần chạy, không độ lệch, không kiểm định</span><span class="en">Single run, no SD, no tests</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">≥ 30 lần, mean ± SD, Wilcoxon + Holm</span><span class="en">≥ 30 runs, mean ± SD, Wilcoxon + Holm</span></td></tr><tr><td>6</td><td class="hide-narrow"><span class="vi">Bảng 7</span><span class="en">Table 7</span></td><td><span class="vi">So với số chép từ bài khác giao thức</span><span class="en">Compared with numbers copied from other protocols</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">Chạy lại baseline hoặc ghi rõ</span><span class="en">Rerun baselines or label clearly</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Danh sách vấn đề 2" data-label-en="Issue list 2">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Lượt đọc 2 và 3</span><span class="en">Passes 2 and 3</span></p><h2 class="reveal d1"><span class="vi">Mười hai vấn đề đã phân loại (7–12)</span><span class="en">Twelve classified issues (7–12)</span></h2></header>
+<table class="mini-table dense reveal d3"><thead><tr><th><span class="vi">#</span><span class="en">#</span></th><th class="hide-narrow"><span class="vi">Vị trí</span><span class="en">Where</span></th><th><span class="vi">Vấn đề</span><span class="en">Issue</span></th><th><span class="vi">Mức</span><span class="en">Level</span></th><th><span class="vi">Đề nghị</span><span class="en">Fix</span></th></tr></thead><tbody><tr><td>7</td><td class="hide-narrow"><span class="vi">Mục 3</span><span class="en">Sec. 3</span></td><td><span class="vi">Không có ablation</span><span class="en">No ablation</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">Mặc định / chỉ tinh chỉnh / chỉ chọn đặc trưng / đầy đủ</span><span class="en">Default / tuning only / FS only / full</span></td></tr><tr><td>8</td><td class="hide-narrow"><span class="vi">Toàn bài</span><span class="en">Whole paper</span></td><td><span class="vi">Chỉ báo accuracy dù dữ liệu mất cân bằng</span><span class="en">Accuracy only on imbalanced data</span></td><td><span class="sev maj">MAJOR</span></td><td><span class="vi">F1-macro, MCC, recall từng lớp</span><span class="en">Macro-F1, MCC, per-class recall</span></td></tr><tr><td>9</td><td class="hide-narrow"><span class="vi">Mục 2</span><span class="en">Sec. 2</span></td><td><span class="vi">Thiếu công trình 2023–2026</span><span class="en">Missing 2023–2026 work</span></td><td><span class="sev min">MINOR</span></td><td><span class="vi">Bổ sung, có bảng so sánh</span><span class="en">Add, with a comparison table</span></td></tr><tr><td>10</td><td class="hide-narrow"><span class="vi">Hình 3</span><span class="en">Fig. 3</span></td><td><span class="vi">Đường hội tụ không có dải lệch</span><span class="en">Convergence curves without variance band</span></td><td><span class="sev min">MINOR</span></td><td><span class="vi">Vẽ mean ± SD, trục log</span><span class="en">Plot mean ± SD, log axis</span></td></tr><tr><td>11</td><td class="hide-narrow"><span class="vi">Mục 5</span><span class="en">Sec. 5</span></td><td><span class="vi">Không có chi phí tính toán</span><span class="en">No computational cost</span></td><td><span class="sev min">MINOR</span></td><td><span class="vi">Thời gian chạy, phần cứng</span><span class="en">Runtime, hardware</span></td></tr><tr><td>12</td><td class="hide-narrow"><span class="vi">Toàn bài</span><span class="en">Whole paper</span></td><td><span class="vi">Không mã nguồn, thiếu tham số HHO</span><span class="en">No code; HHO parameters missing</span></td><td><span class="sev min">MINOR</span></td><td><span class="vi">Công bố mã, seed, phiên bản</span><span class="en">Release code, seeds, versions</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Lập luận quyết định" data-label-en="Decision reasoning">
+  <div class="slide-content">
+
+<div class="cols">
+<div class="stack">
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Ra quyết định</span><span class="en">Making the decision</span></p><h2 class="reveal d1"><span class="vi">Vì sao là Major Revision?</span><span class="en">Why Major Revision?</span></h2></header>
+<ul class="bullets"><li class="reveal d2"><span class="vi">Có <strong>8 vấn đề Major</strong>; vấn đề 1 và 2 làm mọi con số chính hiện tại không đáng tin.</span><span class="en">There are <strong>8 Major issues</strong>; issues 1 and 2 make every headline number unreliable.</span></li><li class="reveal d3"><span class="vi">Nhưng chúng <strong>sửa được</strong>: dữ liệu công khai, chạy lại được trong 2–3 tháng.</span><span class="en">But they are <strong>fixable</strong>: public data, rerunnable within 2–3 months.</span></li><li class="reveal d4"><span class="vi">Sau khi sửa, bài vẫn có giá trị <strong>nếu</strong> HHO-XGB còn tốt hơn có ý nghĩa, hoặc bài được định vị lại thành nghiên cứu so sánh trung thực.</span><span class="en">After fixing, the paper still has value <strong>if</strong> HHO-XGB stays significantly better, or it is reframed as an honest comparative study.</span></li><li class="reveal d5"><span class="vi">Tạp chí đặt nặng tính mới có thể chọn <strong>Reject & Resubmit</strong>; nêu điều này trong ý kiến mật.</span><span class="en">A novelty-focused journal might choose <strong>Reject & Resubmit</strong>; say so in the confidential comments.</span></li></ul>
+</div>
+<div class="card sand reveal d4"><h3><span class="vi">Khuyến nghị</span><span class="en">Recommendation</span></h3><p class="big">Major Revision</p><p><span class="vi">8 Major · 4 Minor · 0 Fatal</span><span class="en">8 Major · 4 Minor · 0 Fatal</span></p></div>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Biến thể quyết định" data-label-en="Decision variants">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Ví dụ cụ thể</span><span class="en">Worked example</span></p><h2 class="reveal d1"><span class="vi">Điều gì làm thay đổi quyết định?</span><span class="en">What would change the decision?</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Tình huống</span><span class="en">Scenario</span></th><th><span class="vi">Quyết định</span><span class="en">Decision</span></th><th><span class="vi">Lý do</span><span class="en">Reason</span></th></tr></thead><tbody><tr><td><span class="vi">Tác giả không còn dữ liệu, mã để chạy lại</span><span class="en">Authors can no longer rerun (no data or code)</span></td><td><span class="sev fat">Reject</span></td><td><span class="vi">Major thành Fatal vì không khắc phục được</span><span class="en">Majors become Fatal: unfixable</span></td></tr><tr><td><span class="vi">“Thuật toán mới” chỉ đổi tên HHO, thử 23 hàm cổ điển</span><span class="en">“New algorithm” just renames HHO; 23 classical functions</span></td><td><span class="sev fat">Reject</span></td><td><span class="vi">Không có đóng góp mới thực chất</span><span class="en">No substantive contribution</span></td></tr><tr><td><span class="vi">Độ lệch chuẩn bằng 0, số trùng bài khác</span><span class="en">Zero SDs; numbers match another paper</span></td><td><span class="sev fat">Reject + Editor</span></td><td><span class="vi">Nghi vấn liêm chính</span><span class="en">Integrity concern</span></td></tr><tr><td><span class="vi">Giao thức đúng, 30 lần chạy, kiểm định, ablation; chỉ thiếu tài liệu, hình</span><span class="en">Correct protocol, 30 runs, tests, ablation; only refs and figures lacking</span></td><td><span class="sev min">Minor</span></td><td><span class="vi">Kết luận đã được chứng minh</span><span class="en">Conclusions already supported</span></td></tr><tr><td><span class="vi">Vòng 2: sửa trung thực, HHO chỉ hòa vài baseline, tác giả hạ tuyên bố</span><span class="en">Round 2: honest fixes, HHO only ties some baselines, claims softened</span></td><td><span class="sev acc">Accept / Minor</span></td><td><span class="vi">Trung thực quan trọng hơn “thắng”</span><span class="en">Honesty matters more than “winning”</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Báo cáo gửi tạp chí 1" data-label-en="Submitted report 1">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Báo cáo hoàn chỉnh (tiếng Anh)</span><span class="en">The complete report</span></p><h2 class="reveal d1"><span class="vi">Báo cáo gửi tạp chí · phần 1</span><span class="en">Report sent to the journal · part 1</span></h2></header>
+<div class="report reveal d2"><h4>Comments to the Authors</h4>
+<p><strong>Summary.</strong> The manuscript proposes HHO-XGB, in which Harris Hawks Optimization jointly tunes six XGBoost hyperparameters and selects features for network intrusion detection. Experiments on NSL-KDD and UNSW-NB15 report 99.62% and 98.91% accuracy, and the authors claim superiority over GA-, PSO-, and GWO-tuned XGBoost and over eight published studies.</p>
+<p><strong>General assessment.</strong> The topic is relevant to the journal, and the manuscript is clearly organized. However, two protocol issues make the headline results unreliable in their current form, and the baseline comparison is not budget-matched. I believe these issues can be fixed, and I would be glad to see a revised version.</p>
+<h4>Major comments</h4>
+<p>1. <em>Data leakage (Sec. 3.2).</em> Min–max scaling and SMOTE are applied to the full dataset before the 80/20 split, so SMOTE creates training samples from test instances. Please split first, fit both on the training portion only, and rerun all experiments.</p>
+<p>2. <em>Test set used for model selection (Sec. 3.4).</em> HHO’s fitness is accuracy on the same 20% hold-out that is reported as the test result. Please use k-fold CV inside the training data as the fitness and evaluate on the test set once.</p>
+<p>3. <em>Official test splits (Sec. 4.1).</em> Please report results on KDDTest+ and on the official UNSW-NB15 testing set so they are comparable with published work.</p>
+<p>4. <em>Unequal budget (Table 5).</em> HHO runs 100 iterations while GA, PSO, and GWO run 20 with defaults. Please match fitness evaluations and population size, and tune all optimizers with comparable effort.</p></div>
+  </div>
+</section>
+<section class="slide " aria-label="Báo cáo gửi tạp chí 2" data-label-en="Submitted report 2">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Báo cáo hoàn chỉnh (tiếng Anh)</span><span class="en">The complete report</span></p><h2 class="reveal d1"><span class="vi">Báo cáo gửi tạp chí · phần 2</span><span class="en">Report sent to the journal · part 2</span></h2></header>
+<div class="report reveal d2"><p>5. <em>Single run (Tables 4–5).</em> Please report mean ± SD over at least 30 independent runs and test differences with the Wilcoxon signed-rank test (Holm-corrected) or Friedman with post-hoc analysis.</p>
+<p>6. <em>Literature comparison (Table 7).</em> The cited studies use different splits; please reimplement key baselines under your protocol or label the table as indicative only.</p>
+<p>7. <em>Ablation.</em> Please separate the effects of tuning, feature selection, and SMOTE: default XGBoost; tuning only; feature selection only; full model.</p>
+<p>8. <em>Imbalanced metrics.</em> Please add macro-F1, MCC, and per-class recall, especially for U2R and R2L.</p>
+<h4>Minor comments</h4>
+<p>1. Add recent (2023–2026) work on hyperparameter optimization for IDS and on fair metaheuristic benchmarking. 2. Fig. 3: plot mean convergence with a ± SD band and a log y-axis. 3. Report wall-clock time and hardware. 4. Provide HHO settings, seeds, library versions, and code. 5. Several sentences on p. 6, ll. 10–25 are incomplete; language editing is recommended.</p></div>
+<div class="report conf reveal d3"><h4>Confidential comments to the Editor</h4>
+<p>The two leakage issues mean the current headline numbers are likely inflated, but they are fixable because both datasets are public. I recommend <strong>Major Revision</strong>; Reject &amp; Resubmit would also be reasonable if the journal prefers not to handle a full rerun within one round. I found no sign of plagiarism or fabrication. Confidence: high on methodology, medium on the IDS literature.</p></div>
+  </div>
+</section>
+<section class="slide " aria-label="Chiến lược theo thời gian" data-label-en="Strategy over time">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Chiến lược người phản biện</span><span class="en">Reviewer strategy</span></p><h2 class="reveal d1"><span class="vi">Chiến lược theo từng thời điểm</span><span class="en">Strategy at each stage</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Thời điểm</span><span class="en">When</span></th><th><span class="vi">Chiến lược</span><span class="en">Strategy</span></th></tr></thead><tbody><tr><td><span class="vi">Nhận lời mời</span><span class="en">Invitation</span></td><td><span class="vi">Chỉ nhận khi đánh giá được phần cốt lõi và có thời gian; số lượng vừa phải mỗi tháng.</span><span class="en">Accept only if you can judge the core and have time; a moderate number per month.</span></td></tr><tr><td><span class="vi">30 phút đầu</span><span class="en">First 30 min</span></td><td><span class="vi">Xác định tuyên bố chính, chạy bảng cờ đỏ M1–M10; thấy Fatal thì xác nhận kỹ trước.</span><span class="en">Find the main claims, run the M1–M10 red flags; confirm any Fatal issue first.</span></td></tr><tr><td><span class="vi">Đọc kỹ</span><span class="en">Close reading</span></td><td><span class="vi">Đọc như người phải lặp lại; tách “lỗi ảnh hưởng kết luận” và “lỗi trình bày”.</span><span class="en">Read as a replicator; separate “affects conclusions” from “presentation”.</span></td></tr><tr><td><span class="vi">Khi viết</span><span class="en">Writing</span></td><td><span class="vi">Major trước, theo mức ảnh hưởng; Minor gom gọn.</span><span class="en">Major first, by impact; Minor kept compact.</span></td></tr><tr><td><span class="vi">Trước khi nộp</span><span class="en">Before submitting</span></td><td><span class="vi">Khuyến nghị khớp nhận xét; bỏ câu cảm tính; kiểm số trích từ bài.</span><span class="en">Recommendation matches comments; no emotional wording; recheck quoted numbers.</span></td></tr><tr><td><span class="vi">Vòng 2</span><span class="en">Round 2</span></td><td><span class="vi">Lập bảng truy vết ý kiến → trả lời → thay đổi thật → kết luận.</span><span class="en">Build a trace table: comment → response → actual change → verdict.</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Vòng 2: truy vết" data-label-en="Round 2: traceability">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Phản biện vòng 2</span><span class="en">Second-round review</span></p><h2 class="reveal d1"><span class="vi">Đối chiếu bản thảo, không tin lời thư trả lời</span><span class="en">Check the manuscript, not the response letter</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Ý kiến vòng 1</span><span class="en">Round-1 comment</span></th><th class="hide-narrow"><span class="vi">Tác giả trả lời</span><span class="en">Authors’ reply</span></th><th><span class="vi">Kiểm trong bản sửa</span><span class="en">Check in revision</span></th><th><span class="vi">Kết luận</span><span class="en">Verdict</span></th></tr></thead><tbody><tr><td><span class="vi">Major 1: rò rỉ SMOTE</span><span class="en">Major 1: SMOTE leakage</span></td><td class="hide-narrow"><span class="vi">“Đã chia tập trước SMOTE”</span><span class="en">“We now split before SMOTE”</span></td><td><span class="vi">SMOTE nằm trong pipeline theo fold; accuracy 99,62% → 88,4% trên KDDTest+</span><span class="en">SMOTE inside the per-fold pipeline; accuracy 99.62% → 88.4% on KDDTest+</span></td><td><span class="sev min"><span class="vi">Đã giải quyết</span><span class="en">Resolved</span></span></td></tr><tr><td><span class="vi">Major 4: ngân sách</span><span class="en">Major 4: budget</span></td><td class="hide-narrow"><span class="vi">“Đã tăng vòng lặp”</span><span class="en">“Iterations increased”</span></td><td><span class="vi">100 vòng nhưng quần thể 20 so với 50 của HHO</span><span class="en">100 iterations but population 20 vs. HHO’s 50</span></td><td><span class="sev maj"><span class="vi">Một phần</span><span class="en">Partly</span></span></td></tr><tr><td><span class="vi">Major 7: ablation</span><span class="en">Major 7: ablation</span></td><td class="hide-narrow"><span class="vi">“Đã thêm”</span><span class="en">“Added”</span></td><td><span class="vi">Bảng 8 có 4 cấu hình nhưng chỉ 1 lần chạy</span><span class="en">Table 8 has 4 configurations but 1 run each</span></td><td><span class="sev maj"><span class="vi">Một phần</span><span class="en">Partly</span></span></td></tr></tbody></table>
+<p class="note reveal d3"><span class="vi">Số liệu giả định. Kết quả giảm sau khi sửa rò rỉ là bình thường; hãy ghi nhận sự trung thực thay vì phạt tác giả vì con số thấp hơn.</span><span class="en">Hypothetical numbers. A drop after fixing leakage is normal; reward that honesty instead of penalizing a lower number.</span></p>
+  </div>
+</section>
+<section class="slide " aria-label="Các bẫy" data-label-en="Common traps">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Chiến lược người phản biện</span><span class="en">Reviewer strategy</span></p><h2 class="reveal d1"><span class="vi">Sáu cái bẫy thường gặp</span><span class="en">Six common traps</span></h2></header>
+<table class="mini-table  reveal d2"><thead><tr><th><span class="vi">Bẫy</span><span class="en">Trap</span></th><th><span class="vi">Biểu hiện</span><span class="en">Looks like</span></th><th><span class="vi">Cách tránh</span><span class="en">How to avoid</span></th></tr></thead><tbody><tr><td><span class="vi">Thiên lệch xác nhận</span><span class="en">Confirmation bias</span></td><td><span class="vi">Thích ý tưởng nên bỏ qua lỗi</span><span class="en">Liking the idea, overlooking flaws</span></td><td><span class="vi">Kiểm bằng chứng trước khi đánh giá tính mới</span><span class="en">Check evidence before judging novelty</span></td></tr><tr><td><span class="vi">Hiệu ứng hào quang</span><span class="en">Halo effect</span></td><td><span class="vi">Tin tác giả, trường danh tiếng</span><span class="en">Trusting famous authors or institutions</span></td><td><span class="vi">Đánh giá như bài ẩn danh</span><span class="en">Review as if anonymous</span></td></tr><tr><td><span class="vi">Đòi bài khác</span><span class="en">Asking for another paper</span></td><td><span class="vi">Yêu cầu đổi câu hỏi nghiên cứu</span><span class="en">Requesting a new research question</span></td><td><span class="vi">Đánh giá theo mục tiêu tác giả</span><span class="en">Judge against the authors’ goals</span></td></tr><tr><td><span class="vi">Nhận xét chung chung</span><span class="en">Vague comments</span></td><td><span class="vi">“Cần cải thiện phương pháp”</span><span class="en">“Improve the methodology”</span></td><td><span class="vi">Luôn nêu vị trí và cách sửa</span><span class="en">Always give location and fix</span></td></tr><tr><td><span class="vi">Sa đà lỗi nhỏ</span><span class="en">Fixating on small errors</span></td><td><span class="vi">Hai trang ngữ pháp, không có phương pháp</span><span class="en">Two pages of grammar, nothing on methods</span></td><td><span class="vi">Major trước, gom Minor</span><span class="en">Major first; group Minor</span></td></tr><tr><td><span class="vi">Ép trích dẫn</span><span class="en">Coercive citation</span></td><td><span class="vi">Yêu cầu trích bài của mình</span><span class="en">Asking to cite your own work</span></td><td><span class="vi">Chỉ gợi ý khi thật cần</span><span class="en">Suggest only when truly needed</span></td></tr></tbody></table>
+  </div>
+</section>
+<section class="slide " aria-label="Tự phản biện" data-label-en="Self-review">
+  <div class="slide-content">
+
+<div class="cols wide-right">
+<div class="stack"><header class="slide-head"><p class="kicker reveal"><span class="vi">Dành cho tác giả</span><span class="en">For authors</span></p><h2 class="reveal d1"><span class="vi">Tự phản biện bài mình trước khi nộp</span><span class="en">Self-review before you submit</span></h2></header><p class="lead reveal d2"><span class="vi">Cách hiệu quả nhất để giảm Major Revision.</span><span class="en">The most effective way to avoid a Major Revision.</span></p></div>
+<ol class="steps"><li class="reveal d2"><span><span class="vi">Viết 3 tuyên bố chính; bảng hoặc hình nào chứng minh từng tuyên bố?</span><span class="en">Write the 3 main claims; which table or figure supports each?</span></span></li><li class="reveal d3"><span><span class="vi">Chạy bảng kiểm M1–M10, nhất là rò rỉ dữ liệu và ngân sách so sánh.</span><span class="en">Run checks M1–M10, especially leakage and comparison budget.</span></span></li><li class="reveal d4"><span><span class="vi">≥ 30 lần chạy, mean ± SD, kiểm định có hiệu chỉnh; ablation cho từng thành phần.</span><span class="en">≥ 30 runs, mean ± SD, corrected tests; ablation for each component.</span></span></li><li class="reveal d5"><span><span class="vi">Mục Limitations trung thực, kể cả khi phương pháp đề xuất thua.</span><span class="en">An honest Limitations section, including where the method loses.</span></span></li><li class="reveal d6"><span><span class="vi">Số trong Abstract khớp bảng; mọi tài liệu có thật, có DOI.</span><span class="en">Abstract numbers match tables; every reference is real, with a DOI.</span></span></li><li class="reveal d6"><span><span class="vi">Nhờ đồng nghiệp ngoài nhóm đọc như một “phản biện khó tính”.</span><span class="en">Ask a colleague outside the team to read as a “tough reviewer.”</span></span></li></ol>
+</div>
+  </div>
+</section>
+<section class="slide " aria-label="Bảng kiểm" data-label-en="Checklist">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Phụ lục A</span><span class="en">Appendix A</span></p><h2 class="reveal d1"><span class="vi">Bảng kiểm phản biện một trang</span><span class="en">One-page review checklist</span></h2></header>
+<ul class="checks reveal d2"><li><span class="vi">Đúng phạm vi tạp chí</span><span class="en">Within journal scope</span></li><li><span class="vi">Đóng góp khác biệt rõ</span><span class="en">Clearly distinct contribution</span></li><li><span class="vi">Có bảng so sánh công trình liên quan</span><span class="en">Related-work comparison table</span></li><li><span class="vi">Tài liệu 3–5 năm gần đây</span><span class="en">References from the last 3–5 years</span></li><li><span class="vi">Nguồn, chia tập mô tả đầy đủ</span><span class="en">Source and splits fully described</span></li><li><span class="vi">Không rò rỉ dữ liệu</span><span class="en">No data leakage</span></li><li><span class="vi">Test không dùng để tinh chỉnh</span><span class="en">Test set kept out of tuning</span></li><li><span class="vi">Baseline mạnh, cùng ngân sách</span><span class="en">Strong baselines, same budget</span></li><li><span class="vi">Nhiều lần chạy, kiểm định</span><span class="en">Multiple runs, significance tests</span></li><li><span class="vi">Có ablation</span><span class="en">Ablation included</span></li><li><span class="vi">Chỉ số phù hợp dữ liệu</span><span class="en">Metrics suit the data</span></li><li><span class="vi">Siêu tham số, seed, mã nguồn</span><span class="en">Hyperparameters, seeds, code</span></li><li><span class="vi">Kết luận trong phạm vi bằng chứng</span><span class="en">Conclusions within evidence</span></li><li><span class="vi">Có mục Limitations</span><span class="en">Limitations stated</span></li><li><span class="vi">Hình, bảng, ký hiệu rõ</span><span class="en">Clear figures, tables, notation</span></li><li><span class="vi">Tài liệu có thật, đúng định dạng</span><span class="en">References real and formatted</span></li><li><span class="vi">Không dấu hiệu bất thường liêm chính</span><span class="en">No integrity anomalies</span></li><li><span class="vi">Khuyến nghị khớp nhận xét</span><span class="en">Recommendation matches comments</span></li></ul>
+  </div>
+</section>
+<section class="slide " aria-label="Tài liệu" data-label-en="References and downloads">
+  <div class="slide-content">
+
+<header class="slide-head"><p class="kicker reveal"><span class="vi">Tài liệu tham khảo</span><span class="en">References</span></p><h2 class="reveal d1"><span class="vi">Đọc thêm và tải tài liệu</span><span class="en">Further reading and downloads</span></h2></header>
+<ol class="refs reveal d2">
+<li>COPE Council, <em>COPE Ethical Guidelines for Peer Reviewers</em>, Committee on Publication Ethics, 2017. <a href="https://doi.org/10.24318/cope.2019.1.9">doi:10.24318/cope.2019.1.9</a></li>
+<li>K. Sörensen, “Metaheuristics—the metaphor exposed,” <em>Int. Trans. Oper. Res.</em>, vol. 22, no. 1, pp. 3–18, 2015. <a href="https://doi.org/10.1111/itor.12001">doi:10.1111/itor.12001</a></li>
+<li>J. Derrac, S. García, D. Molina, F. Herrera, “A practical tutorial on the use of nonparametric statistical tests…,” <em>Swarm Evol. Comput.</em>, vol. 1, no. 1, pp. 3–18, 2011. <a href="https://doi.org/10.1016/j.swevo.2011.02.002">doi:10.1016/j.swevo.2011.02.002</a></li>
+<li>S. Kapoor, A. Narayanan, “Leakage and the reproducibility crisis in machine-learning-based science,” <em>Patterns</em>, vol. 4, no. 9, Art. no. 100804, 2023. <a href="https://doi.org/10.1016/j.patter.2023.100804">doi:10.1016/j.patter.2023.100804</a></li>
+<li>J. Demšar, “Statistical comparisons of classifiers over multiple data sets,” <em>J. Mach. Learn. Res.</em>, vol. 7, pp. 1–30, 2006.</li>
+</ol>
+<div class="dl reveal d3">
+  <a href="Reviewer_Strategy_VN.docx" download><span class="vi">⬇ Tài liệu Word (Tiếng Việt)</span><span class="en">⬇ Word document (Vietnamese)</span></a>
+  <a href="Reviewer_Strategy_EN.docx" download><span class="vi">⬇ Tài liệu Word (Tiếng Anh)</span><span class="en">⬇ Word document (English)</span></a>
+  <a class="ghost" href="/citivan/swarm-intelligence/"><span class="vi">Giáo trình Trí tuệ bầy đàn →</span><span class="en">Swarm Intelligence Textbook →</span></a>
+</div>
+  </div>
+</section>
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Ba lượt đọc</span><span class="en">Three passes</span></span><span><span class="vi">14 tiêu chí + 10 cờ đỏ ML</span><span class="en">14 criteria + 10 ML red flags</span></span>
+      <span>Fatal · Major · Minor</span><span><span class="vi">Vị trí – vấn đề – hệ quả – cách sửa</span><span class="en">Location – problem – consequence – fix</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Phản biện tốt là giúp khoa học đúng hơn</span><span class="en">Good reviewing makes science more reliable</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+</main>
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   Phím ← → ↑ ↓ PageUp PageDown Space Home End, cuộn chuột, vuốt.
+   Slide nào có `stepper` (ví dụ minh họa) sẽ được hỏi trước khi chuyển trang.
+   =========================================== */
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+class SlidePresentation {
+  constructor() {
+    this.slides = Array.from(document.querySelectorAll('.slide'));
+    this.current = 0;
+    this.locked = false;
+    this.progress = document.querySelector('.progress');
+    this.pageNum = document.querySelector('.page-num');
+    this.hint = document.querySelector('.keyboard-hint');
+    this.setupNavDots();
+    this.setupIntersectionObserver();
+    this.setupKeyboardNav();
+    this.setupWheelNav();
+    this.setupTouchNav();
+    window.addEventListener('resize', () => this.go(this.current, true));
+    const start = parseInt(location.hash.slice(1), 10);
+    if (start > 0 && start <= this.slides.length) this.go(start - 1, true);
+    this.update();
+  }
+
+  setupIntersectionObserver() {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting && e.intersectionRatio > 0.55) {
+          e.target.classList.add('visible');
+          this.current = this.slides.indexOf(e.target);
+          this.update();
+          e.target.dispatchEvent(new CustomEvent('slideenter'));
+        } else if (!e.isIntersecting) {
+          e.target.dispatchEvent(new CustomEvent('slideleave'));
+        }
+      });
+    }, { threshold: [0, 0.6] });
+    this.slides.forEach((s) => io.observe(s));
+  }
+
+  setupNavDots() {
+    const nav = document.querySelector('.nav-dots');
+    nav.innerHTML = '';
+    this.navDots = nav;
+    this.dots = this.slides.map((s, i) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('aria-label', `${i + 1}: ${s.getAttribute('aria-label') || ''}`);
+      b.addEventListener('click', () => this.go(i));
+      nav.appendChild(b);
+      return b;
+    });
+  }
+
+  update() {
+    const n = this.slides.length;
+    this.progress.style.width = `${((this.current + 1) / n) * 100}%`;
+    this.pageNum.textContent = `${String(this.current + 1).padStart(2, '0')} / ${n}`;
+    this.dots.forEach((d, i) => d.setAttribute('aria-current', i === this.current ? 'true' : 'false'));
+    history.replaceState(null, '', `#${this.current + 1}`);
+    if (this.current > 0) this.hint.classList.add('gone');
+  }
+
+  go(i, instant = false) {
+    i = Math.max(0, Math.min(this.slides.length - 1, i));
+    this.slides[i].scrollIntoView({ behavior: instant || reduceMotion ? 'auto' : 'smooth' });
+    this.current = i;
+    this.update();
+  }
+
+  next() {
+    const s = this.slides[this.current].stepper;
+    if (s && s.next()) return;
+    this.go(this.current + 1);
+  }
+
+  prev() {
+    const s = this.slides[this.current].stepper;
+    if (s && s.prev()) return;
+    this.go(this.current - 1);
+  }
+
+  setupKeyboardNav() {
+    document.addEventListener('keydown', (e) => {
+      if (e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+      if (['ArrowRight', 'ArrowDown', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); this.next(); }
+      else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) { e.preventDefault(); this.prev(); }
+      else if (e.key === 'Home') { e.preventDefault(); this.go(0); }
+      else if (e.key === 'End') { e.preventDefault(); this.go(this.slides.length - 1); }
+    });
+  }
+
+  setupWheelNav() {
+    window.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      if (this.locked || Math.abs(e.deltaY) < 12) return;
+      this.locked = true;
+      e.deltaY > 0 ? this.next() : this.prev();
+      setTimeout(() => (this.locked = false), 750);
+    }, { passive: false });
+  }
+
+  setupTouchNav() {
+    let x0 = 0, y0 = 0;
+    window.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+      const d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
+      if (Math.abs(d) < 45) return;
+      d < 0 ? this.next() : this.prev();
+    }, { passive: true });
+  }
+}
+
+
+class SwarmCanvas {
+  constructor(canvas) {
+    this.c = canvas; this.ctx = canvas.getContext('2d');
+    this.slide = canvas.closest('.slide');
+    this.running = false; this.t = Math.random() * 100;
+    this.resize(); window.addEventListener('resize', () => this.resize());
+    this.slide.addEventListener('slideenter', () => this.start());
+    this.slide.addEventListener('slideleave', () => this.stop());
+    this.init();
+    this.draw(true);
+  }
+  resize() {
+    const r = this.c.getBoundingClientRect(), dpr = Math.min(2, window.devicePixelRatio || 1);
+    this.w = r.width; this.h = r.height;
+    this.c.width = this.w * dpr; this.c.height = this.h * dpr;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  target() {
+    // mục tiêu trôi theo đường Lissajous ở nửa trên khung hình
+    return { x: this.w * (0.55 + 0.33 * Math.sin(this.t * 0.31)), y: this.h * (0.36 + 0.2 * Math.sin(this.t * 0.47 + 1)) };
+  }
+  fit(p, g) { const dx = p.x - g.x, dy = p.y - g.y; return dx * dx + dy * dy; }
+  init() {
+    const n = this.w < 600 ? 40 : 70;
+    // khởi tạo thành một đám lỏng, bay cùng hướng, như đàn chim vừa cất cánh
+    const cx = this.w * 0.25, cy = this.h * 0.3, R = Math.min(this.w, this.h) * 0.25;
+    this.ps = Array.from({ length: n }, () => {
+      const a = Math.random() * Math.PI * 2, r = R * Math.sqrt(Math.random());
+      const x = cx + r * Math.cos(a), y = cy + r * Math.sin(a) * 0.6;
+      return { x, y, vx: 1.6 + Math.random(), vy: (Math.random() - 0.5), bx: x, by: y };
+    });
+  }
+  step() {
+    this.t += 0.012;
+    const g0 = this.target();
+    let best = null, bf = Infinity;
+    for (const p of this.ps) {
+      const f = this.fit({ x: p.bx, y: p.by }, g0);
+      // mục tiêu thay đổi → quên dần pbest cũ
+      if (this.fit(p, g0) < f) { p.bx = p.x; p.by = p.y; }
+      const fb = this.fit({ x: p.bx, y: p.by }, g0);
+      if (fb < bf) { bf = fb; best = p; }
+    }
+    const w = 0.93, c1 = 0.5, c2 = 0.32, vmax = 3.2;
+    for (const p of this.ps) {
+      const r1 = Math.random(), r2 = Math.random();
+      p.vx = w * p.vx + c1 * r1 * (p.bx - p.x) * 0.006 + c2 * r2 * (best.bx - p.x) * 0.006 + (Math.random() - 0.5) * 0.6;
+      p.vy = w * p.vy + c1 * r1 * (p.by - p.y) * 0.006 + c2 * r2 * (best.by - p.y) * 0.006 + (Math.random() - 0.5) * 0.6;
+      const sp = Math.hypot(p.vx, p.vy);
+      if (sp > vmax) { p.vx *= vmax / sp; p.vy *= vmax / sp; }
+      // lực tách (kiểu boids): giữ khoảng cách để bầy trông như đàn chim, không co thành một chấm
+      for (const q of this.ps) {
+        if (q === p) continue;
+        const dx = p.x - q.x, dy = p.y - q.y, d2 = dx * dx + dy * dy;
+        if (d2 < 520 && d2 > 0.01) { const k = (520 - d2) / 520 * 0.22 / Math.sqrt(d2); p.vx += dx * k; p.vy += dy * k; }
+      }
+      // căn hướng nhẹ theo cá thể dẫn đầu
+      p.vx += (best.vx - p.vx) * 0.02; p.vy += (best.vy - p.vy) * 0.02;
+      p.x += p.vx; p.y += p.vy;
+      // pbest tự "phai" để bầy không đông cứng
+      p.bx += (p.x - p.bx) * 0.01; p.by += (p.y - p.by) * 0.01;
+    }
+    this.best = best;
+  }
+  draw(clear) {
+    const ctx = this.ctx;
+    if (clear) { ctx.clearRect(0, 0, this.w, this.h); }
+    else { ctx.fillStyle = 'rgba(245,240,230,0.42)'; ctx.fillRect(0, 0, this.w, this.h); }
+    for (const p of this.ps) {
+      const a = Math.atan2(p.vy, p.vx);
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(a);
+      ctx.fillStyle = 'rgba(28,42,46,0.75)';
+      ctx.beginPath(); ctx.moveTo(6, 0); ctx.lineTo(-4, 3.2); ctx.lineTo(-2, 0); ctx.lineTo(-4, -3.2); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    if (this.best) {
+      ctx.fillStyle = '#d9562f';
+      ctx.fillRect(this.best.bx - 4, this.best.by - 4, 8, 8);
+    }
+  }
+  loop() {
+    if (!this.running) return;
+    this.step(); this.draw(false);
+    requestAnimationFrame(() => this.loop());
+  }
+  start() {
+    if (reduceMotion) { for (let i = 0; i < 200; i++) this.step(); this.draw(true); return; }
+    if (this.running) return;
+    this.running = true; this.loop();
+  }
+  stop() { this.running = false; }
+}
+
+
+document.querySelectorAll('canvas[data-swarm]').forEach((c) => new SwarmCanvas(c));
+window.deck = new SlidePresentation();
+(function setupLang() {
+  const root = document.documentElement;
+  const TITLES = { vi: 'Chiến lược phản biện bài báo', en: 'Reviewer Strategy' };
+  document.querySelectorAll('.slide').forEach((s) => { s.dataset.labelVi = s.getAttribute('aria-label') || ''; });
+  function setLang(L, save = true) {
+    L = L === 'en' ? 'en' : 'vi';
+    root.dataset.lang = L; root.lang = L;
+    document.title = TITLES[L];
+    document.querySelectorAll('[data-set-lang]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.setLang === L)));
+    document.querySelectorAll('.slide').forEach((s, i) => {
+      const lab = L === 'en' ? (s.dataset.labelEn || s.dataset.labelVi) : s.dataset.labelVi;
+      s.setAttribute('aria-label', lab);
+      if (deck.dots[i]) deck.dots[i].setAttribute('aria-label', `${i + 1}: ${lab}`);
+    });
+        document.querySelectorAll('a.lang-link').forEach((a) => { const u = a.getAttribute('href').split('?')[0]; a.setAttribute('href', `${u}?lang=${L}`); });
+    if (save) { try { localStorage.setItem('si-lang', L); } catch (e) { /* bộ nhớ bị chặn: bỏ qua */ } }
+  }
+  document.querySelectorAll('[data-set-lang]').forEach((b) => b.addEventListener('click', (e) => { setLang(b.dataset.setLang); e.currentTarget.blur(); }));
+  document.addEventListener('keydown', (e) => { if (e.key === 'l' || e.key === 'L') setLang(root.dataset.lang === 'en' ? 'vi' : 'en'); });
+  let L = new URLSearchParams(location.search).get('lang');
+  if (!L) { try { L = localStorage.getItem('si-lang'); } catch (e) { L = null; } }
+  setLang(L || 'vi', false);
+})();
+
+</script>
+</body>
+</html>

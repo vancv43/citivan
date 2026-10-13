@@ -23,6 +23,7 @@ const siteData = {
       { label: 'GitHub', href: 'https://github.com/vancv43' },
       { label: 'LinkedIn', href: 'https://www.linkedin.com/in/citi-van-2a7251353/' },
       { label: 'Swarm Intelligence Textbook', href: '/citivan/swarm-intelligence/' },
+      { label: 'Reviewer Strategy', href: '/citivan/reviewer-strategy/' },
     ],
     cvLink: '#',
     heroImage: '/images/profile-photo.jpg',
@@ -148,6 +149,15 @@ const siteData = {
     ],
   },
   projects: [
+    {
+      id: 'P08',
+      year: 2026,
+      title: 'Reviewer Strategy: bilingual slides on peer-review methods, criteria, decision rules and a worked journal review',
+      funding: 'Teaching material, PTITHCM',
+      role: 'Author',
+      period: '2026',
+      link: '/citivan/reviewer-strategy/',
+    },
     {
       id: 'P07',
       year: 2026,
