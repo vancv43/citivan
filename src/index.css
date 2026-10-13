@@ -588,3 +588,12 @@ select {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+.list-text a.author-link {
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px dotted #9ca3af;
+}
+
+.list-text a.author-link:hover { color: #2563eb; border-bottom-color: #2563eb; }
+.list-text a.author-link.me { font-weight: 700; }
