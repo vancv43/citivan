@@ -513,3 +513,27 @@ select {
     padding: 24px;
   }
 }
+.index-badge {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 0.72em;
+  font-style: normal;
+  font-weight: 600;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.index-badge.muted {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.index-note {
+  margin-top: 32px;
+  color: #6b7280;
+  font-size: 0.85em;
+}

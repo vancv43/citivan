@@ -85,6 +85,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan",
       title: "A Hybrid AI Framework for Automated Test Generation and Fault Prediction in Software Engineering",
       venue: "2025 Real-Time Intelligent Systems, Lecture Notes in Networks and Systems, pp. 239-247, 2026.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-3-032-23396-7_21",
     },
     {
@@ -94,6 +95,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Anderes Gui, Hailong Sun, Nicholaus Hendrik Jeremy, Kenny Jingga",
       title: "A Hybrid Deep Learning and PSO-Based Framework for Occupancy-Based Energy Management in Smart Buildings",
       venue: "2026 11th International Conference on Applying New Technology in Green Buildings (ATiGB), pp. 1677-1682, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/atigb70203.2026.11628460",
     },
     {
@@ -103,6 +105,7 @@ const siteData = {
       authors: "Van Van Chau, Tuan Minh Nguyen, Phayung Meesad",
       title: "A Lightweight Transformer–Enhanced Image Processing Framework for Efficient Visual Feature Representation",
       venue: "Proceedings of the 22nd International Conference on Computing and Information Technology (IC2IT2026), Lecture Notes in Networks and Systems, pp. 46-55, 2026.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-3-032-28048-0_5",
     },
     {
@@ -112,6 +115,7 @@ const siteData = {
       authors: "Nguyen Minh Tuan, Nguyen Hong Son, Chau Van Van",
       title: "An Offline Semantic Plagiarism Detection System Using Sentence-Bert and Duckduckgo-Based Web Search: *Note: Sub-Titles Are Not Captured in Xplore and Should Not Be Used",
       venue: "2026 40th International Conference on Information Networking (ICOIN), pp. 706-710, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icoin68469.2026.11480560",
     },
     {
@@ -121,6 +125,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Anderes Gui, Hailong Sun, Nicholaus Hendrik Jeremy, Kenny Jingga",
       title: "An iHHO-Driven Hyperparameter Optimization Framework for Hybrid CNN–RNN Architectures in Fine-Grained Image Classification",
       venue: "2026 11th International Conference on Applying New Technology in Green Buildings (ATiGB), pp. 1643-1648, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/atigb70203.2026.11628286",
     },
     {
@@ -130,6 +135,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan",
       title: "BERT-Driven Deep Learning for Enhanced Spam Email Classification with Browser Extension Integration",
       venue: "2025 Real-Time Intelligent Systems, Lecture Notes in Networks and Systems, pp. 167-177, 2026.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-3-032-23396-7_15",
     },
     {
@@ -139,6 +145,7 @@ const siteData = {
       authors: "Van Van Chau, Tuan Minh Nguyen, Phayung Meesad",
       title: "Hybrid Transformer-Based Multimodal Fusion for Chest X-ray Report Generation",
       venue: "Proceedings of the 22nd International Conference on Computing and Information Technology (IC2IT2026), Lecture Notes in Networks and Systems, pp. 144-153, 2026.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-3-032-28048-0_14",
     },
     {
@@ -148,6 +155,7 @@ const siteData = {
       authors: "Chau Van Van, Anderes Gui, Roggers Gang, Nesti Sianipar, Riki, Idris Gautama So",
       title: "KGEDO: A Knowledge-Guided Explainable Decision Optimisation Framework for Intelligent Accounting Information Systems",
       venue: "2026 IEEE 1st International Conference on Artificial Intelligence Implementation & Applications (ICAIIA), pp. 37-42, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icaiia70172.2026.11691716",
     },
     {
@@ -157,6 +165,7 @@ const siteData = {
       authors: "Van Van Chau, Nguyen Minh Tuan, Nguyen Hong Son",
       title: "Mô Hình Học Sâu Cho Phát Hiện Tấn Công Và Ngăn Chặn Hệ Thống Mạng",
       venue: "REV-ECIT 2026 (National Conference on Electronics, Communications and Information Technology), 2026.",
+      index: "National",
       link: "https://orcid.org/0009-0008-0325-6809",
     },
     {
@@ -166,6 +175,7 @@ const siteData = {
       authors: "Van Van Chau, Nguyen Minh Tuan, Nguyen Trong Hien, Nguyen Hong Son",
       title: "New Data for Educational Consulting and Advanced Classification Models",
       venue: "RTIS 2026, 2026.",
+      index: "In press",
       link: "https://orcid.org/0009-0008-0325-6809",
     },
     {
@@ -175,6 +185,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Phayung Meesad, Anderes Gui, Erwin Halim, Hailong Sun",
       title: "Real-Time Detection of Violence in Video Content using YOLO and HHO Algorithm",
       venue: "2026 International Conference on Intelligent and Sustainable AI Systems (ICOSAAS), pp. 128-134, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icosaas68663.2026.11649360",
     },
     {
@@ -184,6 +195,7 @@ const siteData = {
       authors: "Erwin Halim, Chau Van Van, Shara Toibayeva, Jefferson Cristoval, Laura Dorothy Thomason, Ai Ping Teoh",
       title: "Trust and Perceived Risk in Artificial Intelligence Use for Forex and Cryptocurrency Trading",
       venue: "2026 International Seminar on Intelligent Business and Edge-Computing Research (ISIBER), pp. 308-313, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/isiber68248.2026.11469785",
     },
     {
@@ -193,6 +205,7 @@ const siteData = {
       authors: "Ricky Kosasih, Anderes Gui, Evaristus Didik Madyatmadja, Yuvaraj Ganesan, Chau Van Van, I Gusti Made Karmawan",
       title: "Unveiling the Intention to Embrace Smart Wearables in Healthcare",
       venue: "2026 IEEE Region 10 Symposium (TENSYMP), pp. 1-5, 2026.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/tensymp68909.2026.11704032",
     },
     {
@@ -202,6 +215,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan",
       title: "ViT–RBTFIR: A Deployed Vision Transformer on Fast Image Retrieval",
       venue: "2025 Real-Time Intelligent Systems, Lecture Notes in Networks and Systems, pp. 202-214, 2026.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-3-032-23396-7_18",
     },
     {
@@ -211,6 +225,7 @@ const siteData = {
       authors: "Van Van Chau, Nguyen Minh Tuan, Nguyen Hong Son",
       title: "Ứng Dụng Trí Tuệ Nhân Tạo Trong Chẩn Đoán Y Tế Sử Dụng Dữ liệu Lớn",
       venue: "REV-ECIT 2026 (National Conference on Electronics, Communications and Information Technology), 2026.",
+      index: "National",
       link: "https://orcid.org/0009-0008-0325-6809",
     },
     {
@@ -220,6 +235,7 @@ const siteData = {
       authors: "Nguyen Minh Tuan, Chau Van Van, Nguyen Hong Son, Huynh Trong Thua, Le Ha Thanh",
       title: "On Deploying Bilinear Neural Network Method to Various Solutions of (3+1)-dimensional Potential Yu-Toda-Sasa-Fukuyama Equation",
       venue: "WSEAS TRANSACTIONS ON SYSTEMS AND CONTROL, vol. 21, p. 95, 2026.",
+      index: "Scopus",
       link: "https://doi.org/10.37394/23203.2026.21.10",
     },
     {
@@ -229,6 +245,7 @@ const siteData = {
       authors: "Nguyen Minh Tuan, Tran Trung Duy, Phayung Meesad, Nguyen Hong Son, Nguyen Trong Hien, Huynh Trong Thua, Vo Van Tinh, Chau Van Van, Nguyen Le Nha Trang",
       title: "Optimizing predictive accuracy in general medical exams using hybrid machine learning and metaheuristic optimization methods",
       venue: "An International Journal of Optimization and Control: Theories & Applications (IJOCTA), vol. 16, no. 3, p. 888, 2026.",
+      index: "Scopus · ISI (WoS-ESCI)",
       link: "https://doi.org/10.36922/ijocta026020008",
     },
     {
@@ -238,6 +255,7 @@ const siteData = {
       authors: "Nguyen Minh Tuan, Chau Van Van, Nguyen Hong Son",
       title: "A Practical Evaluation of Paging Algorithm Smoothness: Trade-offs Between Competitiveness and Stability",
       venue: "Proceedings of the 2025 10th International Conference on Cloud Computing and Internet of Things, pp. 53-60, 2025.",
+      index: "Scopus (ACM ICPS)",
       link: "https://doi.org/10.1145/3785520.3785528",
     },
     {
@@ -247,6 +265,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Nguyen Hong Son, Nguyen Trung Hieu",
       title: "D-ViT: Bộ biến đổi thị giác hiệu quả dữ liệu cho tác vụ tóm tắt ảnh X-quang ngực sang văn bản",
       venue: "REV-ECIT 2025 (National Conference on Electronics, Communications and Information Technology), pp. 426-430, 2025.",
+      index: "National",
       link: "https://rev-ecit.vn/vi/content/ky-yeu-hoi-nghi-0",
     },
     {
@@ -256,6 +275,7 @@ const siteData = {
       authors: "Nguyen Minh Tuan, Chau Van Van",
       title: "Data-Intensive Finance: Leveraging AI for Market Insights and Risk Forecasting",
       venue: "2025 International Conference on Intelligent Computing and Next Generation Networks (ICNGN), pp. 1-6, 2025.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icngn67480.2025.11413748",
     },
     {
@@ -265,6 +285,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Luong Trong Khoa, Nguyen Trong Hien, Erwin Halim, Anderes Gui",
       title: "Deep Herbal Vision: A Computer Vision Approach for Genuine versus Counterfeit Identification of Ngoc Linh Ginseng (Panax vietnamensis Ha et Grushv.)",
       venue: "2025 International Conference on Intelligent Computing and Next Generation Networks (ICNGN), pp. 1-5, 2025.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icngn67480.2025.11413697",
     },
     {
@@ -274,6 +295,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan, Huynh Trung Tru, Nguyen Trong Hien, Erwin Halim, Anderes Gui",
       title: "Hybrid Neural Network Models for Time-Series Biomedical Signal Forecasting",
       venue: "2025 International Conference on Intelligent Computing and Next Generation Networks (ICNGN), pp. 1-5, 2025.",
+      index: "Scopus (IEEE Xplore)",
       link: "https://doi.org/10.1109/icngn67480.2025.11413781",
     },
     {
@@ -283,6 +305,7 @@ const siteData = {
       authors: "Chau Van Van, Nguyen Minh Tuan",
       title: "Optimizing Detection Tasks with PySwarms: Applications of Paging Algorithms",
       venue: "Proceedings of the 2025 10th International Conference on Cloud Computing and Internet of Things, pp. 70-74, 2025.",
+      index: "Scopus (ACM ICPS)",
       link: "https://doi.org/10.1145/3785520.3785530",
     },
     {
@@ -292,6 +315,7 @@ const siteData = {
       authors: "Van Van Chau",
       title: "Thuật toán Piecemeal-DFS Cho Việc Tìm Kiếm Duyệt Sâu Với Mức Năng Lượng Ràng Buộc Trên Bài Toán Hợp Hai Cây Cho Trước",
       venue: "National conference paper (Vietnamese), 2024.",
+      index: "National",
       link: "https://www.researchgate.net/publication/392512584_Thuat_toan_Piecemeal-DFS_Cho_Viec_Tim_Kiem_Duyet_Sau_Voi_Muc_Nang_Luong_Rang_Buoc_Tren_Bai_Toan_Hop_Hai_Cay_Cho_Truoc",
     },
     {
@@ -301,6 +325,7 @@ const siteData = {
       authors: "Lam Duc Vu Nguyen, Van Van Chau, Sinh Van Nguyen",
       title: "Face Recognition Based on Deep Learning and Data Augmentation",
       venue: "Future Data and Security Engineering. Big Data, Security and Privacy, Smart City and Industry 4.0 Applications, Communications in Computer and Information Science, pp. 560-573, 2022.",
+      index: "Scopus (Springer)",
       link: "https://doi.org/10.1007/978-981-19-8069-5_38",
     },
   ],
@@ -627,11 +652,20 @@ export default function App() {
                           <div className="list-id">[{item.id}]</div>
                           <div className="list-text">
                             {item.authors}. <a href={item.link}>“{item.title}”</a>. <i>{item.venue}</i>
+                            {item.index && (
+                              <span className={item.index.startsWith('Scopus') ? 'index-badge' : 'index-badge muted'}>
+                                {item.index}
+                              </span>
+                            )}
                           </div>
                         </div>
                       ))}
                   </div>
                 ))}
+              <p className="index-note">
+                Indexing labels refer to the publication venue or proceedings series (Scopus; ISI = Web of Science).
+                Recently published papers may take several weeks to appear in the databases.
+              </p>
             </div>
           </section>
         )}
