@@ -513,19 +513,6 @@ select {
     padding: 24px;
   }
 }
-.index-badge {
-  display: inline-block;
-  margin-left: 10px;
-  padding: 2px 10px;
-  border-radius: 999px;
-  background: #e0f2fe;
-  color: #075985;
-  font-size: 0.72em;
-  font-style: normal;
-  font-weight: 600;
-  vertical-align: middle;
-  white-space: nowrap;
-}
 
 .index-badge.muted {
   background: #f3f4f6;
@@ -536,4 +523,68 @@ select {
   margin-top: 32px;
   color: #6b7280;
   font-size: 0.85em;
+}
+
+.pub-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  font-style: normal;
+}
+
+.pub-badge,
+.index-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.index-badge { border-radius: 999px; background: #e0f2fe; color: #075985; font-weight: 600; }
+.pub-ieee { background: #00629b; color: #fff; }
+.pub-springer { background: #fcd34d; color: #111827; }
+.pub-acm { background: #0085ca; color: #fff; }
+.pub-wseas { background: #4b5563; color: #fff; }
+.pub-accscience { background: #15803d; color: #fff; }
+
+.pub-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.6;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.pub-btn:hover { border-color: #2563eb; color: #2563eb; }
+.pub-btn.pdf { color: #b91c1c; border-color: #fca5a5; }
+.pub-btn.pdf:hover { background: #fef2f2; }
+
+.cite-box {
+  flex-basis: 100%;
+  margin-top: 6px;
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.cite-box pre {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
