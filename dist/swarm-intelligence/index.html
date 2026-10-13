@@ -37,6 +37,10 @@ section.block { padding: clamp(2.5rem, 7vh, 5rem) 0; scroll-margin-top: 3.5rem; 
 .topbar { position: fixed; top: 0; left: 0; right: 0; z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.6rem clamp(0.6rem, 2vw, 1.6rem); pointer-events: none; }
 .topbar > * { pointer-events: auto; }
 .parts-mini { display: flex; gap: 0.25rem; background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px; padding: 0.2em 0.35em; backdrop-filter: blur(4px); opacity: 0; transform: translateY(-8px); transition: opacity 0.3s, transform 0.3s; }
+.top-right { display: flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.top-link { text-decoration: none; font-size: 0.8rem; font-weight: 600; color: var(--sea); background: rgba(245,240,230,0.88); border: 1px solid rgba(28,42,46,0.14); border-radius: 99px; padding: 0.38em 0.9em; backdrop-filter: blur(4px); white-space: nowrap; transition: background 0.2s, color 0.2s; }
+.top-link:hover, .top-link:focus-visible { background: var(--sea); color: var(--paper); outline: none; }
+@media (max-width: 420px) { .top-link { font-size: 0.7rem; padding: 0.32em 0.7em; } }
 .parts-mini.show { opacity: 1; transform: none; }
 .parts-mini a { text-decoration: none; font-size: 0.78rem; font-weight: 600; color: var(--ink-soft); padding: 0.25em 0.65em; border-radius: 99px; }
 .parts-mini a:hover, .parts-mini a:focus-visible, .parts-mini a.cur { background: var(--sea); color: var(--paper); outline: none; }
@@ -149,7 +153,10 @@ footer { padding: 2rem 0 3rem; color: var(--ink-soft); font-size: 0.85rem; borde
   <nav class="parts-mini" aria-label="Các phần / Parts">
     <a href="#part-I">I</a><a href="#part-II">II</a><a href="#part-III">III</a><a href="#part-IV">IV</a><a href="#part-V">V</a>
   </nav>
+  <div class="top-right">
+    <a class="top-link" href="/citivan/reviewer-strategy/">Reviewer Strategy →</a>
   <div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+  </div>
 </div>
 
 <header class="hero slide" aria-label="Giáo trình Trí tuệ bầy đàn" data-label-en="Swarm Intelligence Textbook">
