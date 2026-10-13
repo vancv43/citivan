@@ -26,10 +26,10 @@ const siteData = {
       { label: 'Reviewer Strategy', href: '/citivan/reviewer-strategy/' },
     ],
     cvLink: '#',
-    heroImage: '/images/profile-photo.jpg',
+    heroImage: `${import.meta.env.BASE_URL}images/profile-photo.jpg`,
   },
   profile: {
-    bannerImage: '/images/profile-baner.jpg',
+    bannerImage: `${import.meta.env.BASE_URL}images/profile-baner.jpg`,
     summary:
       'Chau Van Van is a lecturer and researcher in information technology, with academic interests spanning artificial intelligence, machine learning, computer vision, image retrieval, software engineering, software testing, and data science education. This page is structured so that education, academic positions, honors, and future milestones can be expanded easily over time without changing the overall layout of the website.',
     education: [
@@ -116,7 +116,7 @@ const siteData = {
     },
   ],
   supervision: {
-    bannerImage: '/images/profile-baner.jpg',
+    bannerImage: `${import.meta.env.BASE_URL}images/profile-baner.jpg`,
     doctoral: [
       {
         id: 'P01',
@@ -406,7 +406,7 @@ export default function App() {
 
         {activePage === 'publications' && (
           <section className="page-card">
-            <Banner src="/images/publication-banner.png" />
+            <Banner src={`${import.meta.env.BASE_URL}images/publication-banner.jpg`} />
 
             <div className="content-box">
               <SectionTitle
@@ -487,7 +487,7 @@ export default function App() {
 
         {activePage === 'projects' && (
           <section className="page-card">
-            <Banner src="/images/projects-banner.png" />
+            <Banner src={`${import.meta.env.BASE_URL}images/projects-banner.jpg`} />
 
             <div className="content-box">
               <SectionTitle
