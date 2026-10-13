@@ -1,0 +1,62 @@
+name: Sync publications from ORCID
+
+on:
+  schedule:
+    - cron: '0 1 * * *' # daily, 08:00 Vietnam time
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: sync-orcid
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Pull ORCID record
+        run: node scripts/sync-orcid.mjs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          if git diff --quiet -- src/data/publications.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build site
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          npm install
+          npm run build
+          rsync -a --delete dist/ docs/
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898900+github-actions[bot]@users.noreply.github.com"
+          git add src/data/publications.json docs dist
+          git commit -m "Sync publications from ORCID"
+          git push
+
+      # Pushes made with GITHUB_TOKEN do not trigger other workflows,
+      # so start the Pages deployment explicitly.
+      - name: Deploy
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run deploy.yml --ref main
