@@ -579,8 +579,9 @@ function Banner({ src }) {
 function PubLinks({ item }) {
   const [showCite, setShowCite] = useState(false);
   const [copied, setCopied] = useState(false);
+  const bibtex = item.bibtex.replace(/^(@\w+\{[^,]+,)\s*/, '$1\n  ').replace(/,\s+(?=[\w-]+\s*=)/g, ',\n  ').replace(/,?\s*\}\s*$/, '\n}');
   const copy = () => {
-    navigator.clipboard?.writeText(item.bibtex).then(() => {
+    navigator.clipboard?.writeText(bibtex).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 1500);
     });
@@ -611,7 +612,7 @@ function PubLinks({ item }) {
       </button>
       {showCite && (
         <div className="cite-box">
-          <pre>{item.bibtex}</pre>
+          <pre>{bibtex}</pre>
           <button type="button" className="pub-btn" onClick={copy}>{copied ? 'Copied' : 'Copy BibTeX'}</button>
         </div>
       )}
