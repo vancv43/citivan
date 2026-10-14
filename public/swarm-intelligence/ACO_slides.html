@@ -50,7 +50,7 @@
 <!-- 2. INSPIRATION -->
 <section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
   <div class="slide-content">
-    <div class="cols">
+    <div class="cols wide-right">
       <div class="stack">
         <header class="slide-head">
           <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
@@ -64,18 +64,9 @@
         </ul>
       </div>
       <figure class="fig reveal d3">
-        <svg viewBox="0 0 380 260" role="img" aria-label="Thí nghiệm cầu đôi: nhánh ngắn đậm pheromone hơn">
-          <path d="M40,130 C120,20 260,20 340,130" fill="none" stroke="#1f6f78" stroke-width="3" opacity="0.35"/>
-          <path class="draw" style="--len:320" d="M40,130 C120,190 260,190 340,130" fill="none" stroke="#1f6f78" stroke-width="10" stroke-linecap="round"/>
-          <circle cx="40" cy="130" r="20" fill="#f0cf7a" stroke="#1c2a2e"/><circle cx="340" cy="130" r="20" fill="#f6d8cb" stroke="#1c2a2e"/>
-          <g font-family="Be Vietnam Pro, sans-serif" font-size="13" text-anchor="middle" fill="#1c2a2e">
-            <text x="40" y="170"><tspan class="vi">tổ</tspan><tspan class="en">nest</tspan></text><text x="340" y="170"><tspan class="vi">thức ăn</tspan><tspan class="en">food</tspan></text>
-            <text x="190" y="40" fill="#56676a"><tspan class="vi">nhánh dài: vệt mờ dần</tspan><tspan class="en">long branch: trail fades</tspan></text>
-            <text x="190" y="215" fill="#1f6f78" font-weight="600"><tspan class="vi">nhánh ngắn: vệt đậm dần</tspan><tspan class="en">short branch: trail builds up</tspan></text>
-          </g>
-          <g fill="#1c2a2e"><circle cx="110" cy="164" r="3.5"/><circle cx="160" cy="176" r="3.5"/><circle cx="215" cy="178" r="3.5"/><circle cx="270" cy="168" r="3.5"/><circle cx="150" cy="58" r="3.5"/></g>
-        </svg>
-        <figcaption><span class="vi">Thí nghiệm cầu đôi (Deneubourg và cs., 1990)</span><span class="en">The double-bridge experiment (Deneubourg et al., 1990)</span></figcaption>
+        <img class="vi" src="assets/aco_idea_vi.svg" style="width:100%;height:auto;max-height:58vh" alt="Kiến thật tìm đường ngắn nhất từ tổ tới thức ăn; thuật toán ACO củng cố đường tốt nhất trên đồ thị bằng pheromone" />
+        <img class="en" src="assets/aco_idea_en.svg" style="width:100%;height:auto;max-height:58vh" alt="Real ants find the shortest nest-to-food path; ACO reinforces the best path on a graph with pheromone" />
+        <figcaption><span class="vi">Từ kiến thật tới thuật toán. Độ đậm cạnh ở hình phải là pheromone sau một lần chạy Ant System minh họa (12 kiến, 30 vòng) hội tụ về đường ngắn nhất. Vẽ lại theo GeeksforGeeks, <em>Introduction to Ant Colony Optimization</em></span><span class="en">From real ants to the algorithm. Edge strength on the right is the pheromone after one illustrative Ant System run (12 ants, 30 iterations) that converged on the shortest path. Redrawn after GeeksforGeeks, <em>Introduction to Ant Colony Optimization</em></span></figcaption>
       </figure>
     </div>
   </div>
