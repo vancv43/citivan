@@ -655,34 +655,40 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
           <h2 class="reveal d1"><span class="vi">Cập nhật vị trí: bước theo vận tốc mới</span><span class="en">Position update: step along the new velocity</span></h2>
         </header>
         <div class="eq-box reveal d2"><div class="eq"><span class="m">X<span class="ss"><i>t+1</i><i>i</i></span> = X<span class="ss"><i>t</i><i>i</i></span> + V<span class="ss"><i>t+1</i><i>i</i></span></span></div></div>
-        <p class="lead reveal d3"><span class="vi">Vận tốc mới là tổng của ba vector nối đuôi nhau. Cá thể đi theo vector tổng, tức một hướng dung hòa giữa đà cũ, kinh nghiệm riêng và kinh nghiệm của bầy.</span><span class="en">The new velocity is the sum of three vectors placed head to tail. The particle follows the resultant, a compromise between its momentum, its own experience and the swarm's experience.</span></p>
+        <p class="lead reveal d3"><span class="vi">Từ vị trí hiện tại, ba thành phần cùng kéo cá thể: đà cũ, hướng về Pbest của chính nó và hướng về Gbest của bầy. Vector tổng là vận tốc mới, đưa cá thể tới vị trí kế tiếp, một điểm dung hòa giữa ba lực kéo.</span><span class="en">From the current position, three components pull the particle: its momentum, the pull towards its own Pbest and the pull towards the swarm's Gbest. Their sum is the new velocity, which carries the particle to its next position, a compromise between the three pulls.</span></p>
       </div>
       <figure class="fig reveal d3">
-        <svg viewBox="0 0 520 340" role="img" aria-label="Vector diagram">
+        <svg viewBox="0 0 560 350" role="img" aria-label="PSO velocity vector diagram">
           <defs>
-            <marker id="v-in" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a7fc1"/></marker>
-            <marker id="v-cog" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4b8f45"/></marker>
-            <marker id="v-soc" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
-            <marker id="v-tot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d9562f"/></marker>
+            <marker id="vv-mag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b4428c"/></marker>
+            <marker id="vv-blu" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a7fc1"/></marker>
+            <marker id="vv-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
           </defs>
-          <g font-family="STIX Two Text, serif" font-style="italic" font-size="22">
-            <line x1="100" y1="280" x2="220" y2="120" stroke="#4b8f45" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>
-            <line x1="100" y1="280" x2="430" y2="85" stroke="#d9562f" stroke-width="1.2" stroke-dasharray="4 5" opacity="0.6"/>
-            <circle cx="220" cy="120" r="8" fill="none" stroke="#4b8f45" stroke-width="2.5"/><text x="196" y="108" fill="#4b8f45">P<tspan font-size="14" dy="5">i</tspan></text>
-            <rect x="422" y="77" width="16" height="16" fill="#d9562f"/><text x="446" y="80" fill="#d9562f">P<tspan font-size="14" dy="5">g</tspan></text>
-            <path class="draw" style="--len:140" d="M100,280 L228,270" stroke="#3a7fc1" stroke-width="3.5" fill="none" marker-end="url(#v-in)"/>
-            <path class="draw d2" style="--len:110" d="M230,270 L288,193" stroke="#4b8f45" stroke-width="3.5" fill="none" marker-end="url(#v-cog)"/>
-            <path class="draw d3" style="--len:160" d="M290,190 L416,116" stroke="#1c2a2e" stroke-width="3.5" fill="none" marker-end="url(#v-soc)"/>
-            <path class="draw d4" style="--len:380" d="M100,280 L414,116" stroke="#d9562f" stroke-width="3" fill="none" marker-end="url(#v-tot)"/>
-            <circle cx="100" cy="280" r="9" fill="#1c2a2e"/><text x="62" y="312">X<tspan font-size="14" dy="-11">t</tspan><tspan font-size="14" dx="-5" dy="17">i</tspan></text>
-            <circle cx="418" cy="114" r="7" fill="#1c2a2e" opacity="0.85"/>
-            <text x="368" y="152" fill="#1c2a2e" font-size="19">X<tspan font-size="13" dy="-10">t+1</tspan><tspan font-size="13" dx="-19" dy="16">i</tspan></text>
+          <g stroke="#1c2a2e" stroke-width="2" marker-end="url(#vv-ink)">
+            <line x1="30" y1="330" x2="30" y2="12"/>
+            <line x1="14" y1="318" x2="540" y2="318"/>
           </g>
-          <g font-family="Be Vietnam Pro, sans-serif" font-size="14" font-weight="600">
-            <text x="132" y="300" fill="#3a7fc1"><tspan class="vi">quán tính</tspan><tspan class="en">inertia</tspan></text>
-            <text x="268" y="250" fill="#4b8f45"><tspan class="vi">nhận thức</tspan><tspan class="en">cognitive</tspan></text>
-            <text x="352" y="188" fill="#1c2a2e"><tspan class="vi">xã hội</tspan><tspan class="en">social</tspan></text>
-            <text x="196" y="182" fill="#d9562f" transform="rotate(-27 196 182)"><tspan class="vi">vận tốc mới</tspan><tspan class="en">new velocity</tspan></text>
+          <line class="reveal d3" x1="110" y1="244" x2="80" y2="122" stroke="#b4428c" stroke-width="2.2" stroke-dasharray="11 4 2 4" marker-end="url(#vv-mag)"/>
+          <line class="reveal d3" x1="120" y1="253" x2="368" y2="277" stroke="#b4428c" stroke-width="2.2" stroke-dasharray="11 4 2 4" marker-end="url(#vv-mag)"/>
+          <line class="reveal d3" x1="120" y1="251" x2="436" y2="198" stroke="#b4428c" stroke-width="2.2" stroke-dasharray="11 4 2 4" marker-end="url(#vv-mag)"/>
+          <line class="reveal d4" x1="86" y1="111" x2="436" y2="59" stroke="#3a7fc1" stroke-width="2.2" stroke-dasharray="11 4 2 4" marker-end="url(#vv-blu)"/>
+          <line class="reveal d4" x1="380" y1="270" x2="443" y2="68" stroke="#3a7fc1" stroke-width="2.2" stroke-dasharray="11 4 2 4" marker-end="url(#vv-blu)"/>
+          <line class="reveal d4" x1="446" y1="188" x2="446" y2="68" stroke="#3a7fc1" stroke-width="2.2" stroke-dasharray="8 5" marker-end="url(#vv-blu)"/>
+          <path class="draw d5" style="--len:386" d="M120,247 L436,64" stroke="#1c2a2e" stroke-width="3" fill="none" marker-end="url(#vv-ink)"/>
+          <circle cx="112" cy="252" r="8" fill="#b4428c"/>
+          <circle cx="78" cy="112" r="6.5" fill="#3a7fc1"/>
+          <circle cx="378" cy="278" r="6.5" fill="#3a7fc1"/>
+          <circle cx="446" cy="196" r="6.5" fill="#3a7fc1"/>
+          <circle cx="446" cy="58" r="7.5" fill="#3a7fc1"/>
+          <g font-family="STIX Two Text, serif" font-style="italic">
+            <text x="72" y="290" fill="#1c2a2e" text-anchor="start" font-size="22">X<tspan font-size="14" dy="-10">t</tspan><tspan font-size="14" dx="-8" dy="16">i</tspan></text>
+            <text x="80" y="84" fill="#1c2a2e" text-anchor="start" font-size="22">V<tspan font-size="14" dy="-10">t</tspan><tspan font-size="14" dx="-8" dy="16">i</tspan></text>
+            <text x="466" y="60" fill="#1c2a2e" text-anchor="start" font-size="22">X<tspan font-size="14" dy="-10">t+1</tspan><tspan font-size="14" dx="-23" dy="16">i</tspan></text>
+            <text x="208" y="150" fill="#1c2a2e" text-anchor="start" font-size="21">V<tspan font-size="13" dy="-9">t+1</tspan><tspan font-size="13" dx="-21" dy="16">i</tspan></text>
+            <text x="296" y="196" fill="#1c2a2e" text-anchor="start" font-size="19">V<tspan font-size="12" dy="-9">Gbest</tspan><tspan font-size="12" dx="-32" dy="14">i</tspan></text>
+            <text x="196" y="300" fill="#1c2a2e" text-anchor="start" font-size="19">V<tspan font-size="12" dy="-9">Pbest</tspan><tspan font-size="12" dx="-32" dy="14">i</tspan></text>
+            <text x="466" y="203" font-size="21">Gbest</text>
+            <text x="398" y="292" font-size="21">Pbest<tspan font-size="13" dy="5">i</tspan></text>
           </g>
         </svg>
       </figure>
