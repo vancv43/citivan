@@ -398,6 +398,11 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
 .conv-img { width: 100%; max-height: 52vh; background: #fff; border-radius: 10px; padding: 0.4rem; }
 @media (max-width: 600px) { .codeblock { font-size: 0.55rem; white-space: pre-wrap; } .refs { font-size: 0.6rem; } }
 @media (max-height: 500px) { .codeblock { font-size: 0.5rem; line-height: 1.3; padding: 0.4rem 0.6rem; } }
+
+/* PSO flowchart, vertical layout (slide 7) */
+.fc-cols { grid-template-columns: 0.55fr 1.45fr; }
+.fig.fc-vert svg { max-height: calc(100dvh - 2 * var(--slide-padding)); width: auto; max-width: 100%; }
+@media (max-width: 760px) and (orientation: portrait) { .fc-cols { grid-template-columns: 1fr; } .fig.fc-vert svg { max-height: 72dvh; } }
 </style>
 </head>
 <body>
@@ -533,54 +538,58 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
 <!-- ============ 6. FLOWCHART ============ -->
 <section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
   <div class="slide-content">
-    <header class="slide-head">
-      <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
-      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
-    </header>
-    <figure class="fig reveal d2">
-      <svg viewBox="0 0 1000 410" role="img" aria-label="PSO flowchart">
+    <div class="cols fc-cols">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+        <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
+      </header>
+    <figure class="fig fc-vert reveal d2">
+      <svg viewBox="0 0 720 906" role="img" aria-label="PSO flowchart">
         <defs>
-          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
           <marker id="ah-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
         </defs>
-        <g font-family="Be Vietnam Pro, sans-serif" font-size="17" text-anchor="middle" fill="#1c2a2e">
-          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
-          <g class="vi"><text x="125" y="67">Thiết lập</text><text x="125" y="89">tham số PSO</text></g>
-          <g class="en"><text x="125" y="67">Set PSO</text><text x="125" y="89">parameters</text></g>
-          <rect x="270" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
-          <g class="vi"><text x="375" y="67">Khởi tạo vị trí và</text><text x="375" y="89">vận tốc của bầy</text></g>
-          <g class="en"><text x="375" y="67">Initialize positions</text><text x="375" y="89">and velocities</text></g>
-          <rect x="520" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
-          <g class="vi"><text x="625" y="67">Đánh giá ban đầu,</text><text x="625" y="89">chọn pbest và gbest</text></g>
-          <g class="en"><text x="625" y="67">Evaluate fitness,</text><text x="625" y="89">select pbest and gbest</text></g>
-          <rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/>
-          <text x="875" y="78" font-family="STIX Two Text, serif" font-style="italic" font-size="21">k = 1</text>
-          <rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/>
-          <g class="vi"><text x="875" y="237">Cập nhật vận tốc</text><text x="875" y="259">và vị trí</text></g>
-          <g class="en"><text x="875" y="237">Update velocity</text><text x="875" y="259">and position</text></g>
-          <rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/>
-          <g class="vi"><text x="625" y="237">Đánh giá, cập nhật</text><text x="625" y="259">pbest và gbest</text></g>
-          <g class="en"><text x="625" y="237">Evaluate, update</text><text x="625" y="259">pbest and gbest</text></g>
-          <path d="M375,192 L470,242 L375,292 L280,242 z" fill="#f6e6b8"/>
-          <text x="375" y="249" font-family="STIX Two Text, serif" font-style="italic" font-size="20">k &lt; max_iter ?</text>
-          <rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/>
-          <g class="vi"><text x="125" y="237">Trả về gbest</text><text x="125" y="259">làm lời giải tốt nhất</text></g>
-          <g class="en"><text x="125" y="237">Return gbest as</text><text x="125" y="259">the best solution</text></g>
-          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#ah)">
-            <path class="draw" style="--len:40" d="M230,72 H268"/>
-            <path class="draw d2" style="--len:40" d="M480,72 H518"/>
-            <path class="draw d3" style="--len:40" d="M730,72 H768"/>
-            <path class="draw d4" style="--len:90" d="M875,114 V198"/>
-            <path class="draw d5" style="--len:40" d="M770,242 H732"/>
-            <path class="draw d5" style="--len:50" d="M520,242 H472"/>
-            <path class="draw d5" style="--len:50" d="M280,242 H232"/>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="18" text-anchor="middle" fill="#1c2a2e">
+          <rect x="200" y="14" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="42">BẮT ĐẦU</text></g><g class="en"><text x="420" y="42">START</text></g>
+          <rect x="200" y="84" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="115">Thiết lập tham số PSO (<tspan font-family="STIX Two Text, serif" font-style="italic">w, c₁, c₂</tspan>)</text></g><g class="en"><text x="420" y="115">Set PSO parameters (<tspan font-family="STIX Two Text, serif" font-style="italic">w, c₁, c₂</tspan>)</text></g>
+          <rect x="200" y="160" width="440" height="66" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="188">Khởi tạo quần thể với vị trí</text><text x="420" y="210">và vận tốc ngẫu nhiên</text></g><g class="en"><text x="420" y="188">Initialize population with random</text><text x="420" y="210">positions and velocities</text></g>
+          <rect x="200" y="252" width="440" height="66" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="280">Đánh giá độ thích nghi ban đầu,</text><text x="420" y="302">chọn pbest và gbest</text></g><g class="en"><text x="420" y="280">Evaluate initial fitness,</text><text x="420" y="302">select pbest and gbest</text></g>
+          <rect x="200" y="344" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="375">Đặt bộ đếm vòng lặp <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1</tspan></text></g><g class="en"><text x="420" y="375">Set iteration count <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1</tspan></text></g>
+          <rect x="200" y="420" width="440" height="112" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g font-weight="600"><g class="vi"><text x="420" y="450">Cập nhật vận tốc và vị trí mọi cá thể</text></g><g class="en"><text x="420" y="450">Update velocity and position of all particles</text></g></g>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="16.5"><text x="420" y="480">v<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1) = w·v<tspan baseline-shift="sub" font-size="13">i</tspan>(t) + c<tspan baseline-shift="sub" font-size="13">1</tspan>r<tspan baseline-shift="sub" font-size="13">1</tspan>(pbest<tspan baseline-shift="sub" font-size="13">i</tspan> − x<tspan baseline-shift="sub" font-size="13">i</tspan>(t)) + c<tspan baseline-shift="sub" font-size="13">2</tspan>r<tspan baseline-shift="sub" font-size="13">2</tspan>(gbest − x<tspan baseline-shift="sub" font-size="13">i</tspan>(t))</text><text x="420" y="508">x<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1) = x<tspan baseline-shift="sub" font-size="13">i</tspan>(t) + v<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1)</text></g>
+          <rect x="200" y="558" width="440" height="66" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="586">Đánh giá độ thích nghi,</text><text x="420" y="608">cập nhật pbest và gbest</text></g><g class="en"><text x="420" y="586">Evaluate fitness,</text><text x="420" y="608">update pbest and gbest</text></g>
+          <path d="M420,650 L590,698 L420,746 L250,698 z" fill="#f6e6b8" stroke="#1f6f78" stroke-width="2"/>
+          <text x="420" y="704"><tspan font-family="STIX Two Text, serif" font-style="italic">k &lt; Max_Iterations ?</tspan></text>
+          <rect x="200" y="772" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="803">In ra giá trị gbest tối ưu</text></g><g class="en"><text x="420" y="803">Print optimal gbest values</text></g>
+          <rect x="200" y="848" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="420" y="876">KẾT THÚC</text></g><g class="en"><text x="420" y="876">END</text></g>
+          <rect x="18" y="676" width="150" height="44" rx="6" fill="#f6d8cb" stroke="#1f6f78" stroke-width="2"/><text x="93" y="704" font-family="STIX Two Text, serif" font-style="italic" font-size="19">k = k + 1</text>
+          <g stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-sea)">
+            <path class="draw d2" style="--len:36" d="M420,58 V82"/>
+            <path class="draw d2" style="--len:36" d="M420,134 V158"/>
+            <path class="draw d2" style="--len:36" d="M420,226 V250"/>
+            <path class="draw d3" style="--len:36" d="M420,318 V342"/>
+            <path class="draw d3" style="--len:36" d="M420,394 V418"/>
+            <path class="draw d3" style="--len:36" d="M420,532 V556"/>
+            <path class="draw d4" style="--len:36" d="M420,624 V648"/>
+            <path class="draw d4" style="--len:36" d="M420,746 V770"/>
+            <path class="draw d4" style="--len:36" d="M420,822 V846"/>
+            <path class="draw d5" style="--len:92" d="M250,698 H170"/>
+            <path class="draw d5" style="--len:900" d="M93,676 V476 H198"/>
           </g>
-          <text x="256" y="230" font-size="15" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
-          <path class="draw d5" style="--len:700" d="M375,292 V360 H955 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-sea)"/>
-          <text x="665" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có</tspan><tspan class="en">Yes</tspan> · <tspan font-family="STIX Two Text, serif" font-style="italic" font-weight="400">k ← k + 1</tspan></text>
+          <text x="209" y="688" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có</tspan><tspan class="en">Yes</tspan></text>
+          <text x="434" y="764" text-anchor="start" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
         </g>
       </svg>
     </figure>
+    </div>
   </div>
 </section>
 
