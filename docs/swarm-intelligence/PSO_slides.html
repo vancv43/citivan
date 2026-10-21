@@ -399,10 +399,27 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
 @media (max-width: 600px) { .codeblock { font-size: 0.55rem; white-space: pre-wrap; } .refs { font-size: 0.6rem; } }
 @media (max-height: 500px) { .codeblock { font-size: 0.5rem; line-height: 1.3; padding: 0.4rem 0.6rem; } }
 
-/* PSO flowchart, vertical layout (slide 7) */
-.fc-cols { grid-template-columns: 0.55fr 1.45fr; }
+/* PSO-FC-BEGIN flowchart + pseudocode (slide 7) */
+.fc-cols { grid-template-columns: 1fr 1fr; align-items: center; }
 .fig.fc-vert svg { max-height: calc(100dvh - 2 * var(--slide-padding)); width: auto; max-width: 100%; }
-@media (max-width: 760px) and (orientation: portrait) { .fc-cols { grid-template-columns: 1fr; } .fig.fc-vert svg { max-height: 72dvh; } }
+.fc-badge { fill: #1f6f78; } .fc-badge-t { fill: #fff; font-size: 15px; font-weight: 700; }
+.fc-node rect, .fc-node path, .pc-g { transition: filter .2s, background-color .2s, outline-color .2s; }
+.pc-fig { display: flex; flex-direction: column; gap: 0.5em; }
+.pc-fig figcaption { font-size: var(--small-size); color: var(--ink-soft); }
+.pc-box { background: #fff; border: 1px solid #1c2a2e; box-shadow: -7px 7px 0 #c9c9c9; padding: 0.7em 0.9em 0.7em 0.5em;
+  font-family: var(--font-math); font-style: italic; font-size: clamp(0.72rem, 1.05vw, 1.05rem); line-height: 1.5; color: var(--ink); }
+.pc-g { position: relative; padding-left: 2.1em; border-radius: 6px; outline: 2px solid transparent; }
+.pc-badge { position: absolute; left: 0.25em; top: 0.18em; width: 1.45em; height: 1.45em; border-radius: 50%; background: #1f6f78; color: #fff;
+  font: 700 0.78em/1.45em var(--font-body); font-style: normal; text-align: center; }
+.pc-l { padding-left: calc(var(--ind) * 1.3em); text-indent: -1em; margin-left: 1em; }
+.pc-l * { text-indent: 0; } .pc-l .m { font-size: 1.02em; }
+.pc-fig { max-width: 46em; }
+.fc-map:has([data-s="1"]:hover) [data-s="1"], .fc-map:has([data-s="2"]:hover) [data-s="2"], .fc-map:has([data-s="3"]:hover) [data-s="3"], .fc-map:has([data-s="4"]:hover) [data-s="4"], .fc-map:has([data-s="5"]:hover) [data-s="5"], .fc-map:has([data-s="6"]:hover) [data-s="6"] { background: #d5e7e6; outline-color: #1f6f78; filter: drop-shadow(0 0 4px rgba(31,111,120,.55)); }
+@media (max-width: 760px) and (orientation: portrait) {
+  .fc-cols { grid-template-columns: 1fr; gap: 0.5rem; } .fc-map > .stack { order: -1; }
+  .fig.fc-vert svg { max-height: 40dvh; } .pc-box { font-size: 0.6rem; line-height: 1.3; } .pc-fig figcaption { display: none; }
+}
+/* PSO-FC-END */
 </style>
 </head>
 <body>
@@ -538,39 +555,62 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
 <!-- ============ 6. FLOWCHART ============ -->
 <section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
   <div class="slide-content">
-    <div class="cols fc-cols">
-      <header class="slide-head">
-        <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
-        <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
-      </header>
+    <div class="cols fc-cols fc-map">
     <figure class="fig fc-vert reveal d2">
-      <svg viewBox="0 0 720 906" role="img" aria-label="PSO flowchart">
+      <svg viewBox="0 0 740 906" role="img" aria-label="PSO flowchart">
         <defs>
           <marker id="ah-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
         </defs>
         <g font-family="Be Vietnam Pro, sans-serif" font-size="18" text-anchor="middle" fill="#1c2a2e">
+          <g>
           <rect x="200" y="14" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="42">BẮT ĐẦU</text></g><g class="en"><text x="420" y="42">START</text></g>
+          </g>
+          <g class="fc-node" data-s="1">
           <rect x="200" y="84" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="115">Thiết lập tham số PSO (<tspan font-family="STIX Two Text, serif" font-style="italic">w, c₁, c₂</tspan>)</text></g><g class="en"><text x="420" y="115">Set PSO parameters (<tspan font-family="STIX Two Text, serif" font-style="italic">w, c₁, c₂</tspan>)</text></g>
+          <circle class="fc-badge" cx="668" cy="109" r="14"/><text class="fc-badge-t" x="668" y="115">1</text>
+          </g>
+          <g class="fc-node" data-s="2">
           <rect x="200" y="160" width="440" height="66" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="188">Khởi tạo quần thể với vị trí</text><text x="420" y="210">và vận tốc ngẫu nhiên</text></g><g class="en"><text x="420" y="188">Initialize population with random</text><text x="420" y="210">positions and velocities</text></g>
+          <circle class="fc-badge" cx="668" cy="193" r="14"/><text class="fc-badge-t" x="668" y="199">2</text>
+          </g>
+          <g class="fc-node" data-s="4">
           <rect x="200" y="252" width="440" height="66" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="280">Đánh giá độ thích nghi ban đầu,</text><text x="420" y="302">chọn pbest và gbest</text></g><g class="en"><text x="420" y="280">Evaluate initial fitness,</text><text x="420" y="302">select pbest and gbest</text></g>
+          <circle class="fc-badge" cx="668" cy="285" r="14"/><text class="fc-badge-t" x="668" y="291">4</text>
+          </g>
+          <g class="fc-node" data-s="3">
           <rect x="200" y="344" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="375">Đặt bộ đếm vòng lặp <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1</tspan></text></g><g class="en"><text x="420" y="375">Set iteration count <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1</tspan></text></g>
+          <circle class="fc-badge" cx="668" cy="369" r="14"/><text class="fc-badge-t" x="668" y="375">3</text>
+          </g>
+          <g class="fc-node" data-s="5">
           <rect x="200" y="420" width="440" height="112" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
           <g font-weight="600"><g class="vi"><text x="420" y="450">Cập nhật vận tốc và vị trí mọi cá thể</text></g><g class="en"><text x="420" y="450">Update velocity and position of all particles</text></g></g>
           <g font-family="STIX Two Text, serif" font-style="italic" font-size="16.5"><text x="420" y="480">v<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1) = w·v<tspan baseline-shift="sub" font-size="13">i</tspan>(t) + c<tspan baseline-shift="sub" font-size="13">1</tspan>r<tspan baseline-shift="sub" font-size="13">1</tspan>(pbest<tspan baseline-shift="sub" font-size="13">i</tspan> − x<tspan baseline-shift="sub" font-size="13">i</tspan>(t)) + c<tspan baseline-shift="sub" font-size="13">2</tspan>r<tspan baseline-shift="sub" font-size="13">2</tspan>(gbest − x<tspan baseline-shift="sub" font-size="13">i</tspan>(t))</text><text x="420" y="508">x<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1) = x<tspan baseline-shift="sub" font-size="13">i</tspan>(t) + v<tspan baseline-shift="sub" font-size="13">i</tspan>(t+1)</text></g>
+          <circle class="fc-badge" cx="668" cy="476" r="14"/><text class="fc-badge-t" x="668" y="482">5</text>
+          </g>
+          <g class="fc-node" data-s="4">
           <rect x="200" y="558" width="440" height="66" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="586">Đánh giá độ thích nghi,</text><text x="420" y="608">cập nhật pbest và gbest</text></g><g class="en"><text x="420" y="586">Evaluate fitness,</text><text x="420" y="608">update pbest and gbest</text></g>
+          <circle class="fc-badge" cx="668" cy="591" r="14"/><text class="fc-badge-t" x="668" y="597">4</text>
+          </g>
+          <g class="fc-node" data-s="3">
           <path d="M420,650 L590,698 L420,746 L250,698 z" fill="#f6e6b8" stroke="#1f6f78" stroke-width="2"/>
           <text x="420" y="704"><tspan font-family="STIX Two Text, serif" font-style="italic">k &lt; Max_Iterations ?</tspan></text>
+          <circle class="fc-badge" cx="628" cy="698" r="14"/><text class="fc-badge-t" x="628" y="704">3</text>
+          </g>
+          <g>
           <rect x="200" y="772" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="803">In ra giá trị gbest tối ưu</text></g><g class="en"><text x="420" y="803">Print optimal gbest values</text></g>
+          </g>
+          <g>
           <rect x="200" y="848" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
           <g class="vi"><text x="420" y="876">KẾT THÚC</text></g><g class="en"><text x="420" y="876">END</text></g>
-          <rect x="18" y="676" width="150" height="44" rx="6" fill="#f6d8cb" stroke="#1f6f78" stroke-width="2"/><text x="93" y="704" font-family="STIX Two Text, serif" font-style="italic" font-size="19">k = k + 1</text>
+          </g>
+          <g class="fc-node" data-s="6"><rect x="18" y="676" width="150" height="44" rx="6" fill="#f6d8cb" stroke="#1f6f78" stroke-width="2"/><text x="93" y="704" font-family="STIX Two Text, serif" font-style="italic" font-size="19">k = k + 1</text><circle class="fc-badge" cx="30" cy="662" r="14"/><text class="fc-badge-t" x="30" y="668">6</text></g>
           <g stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-sea)">
             <path class="draw d2" style="--len:36" d="M420,58 V82"/>
             <path class="draw d2" style="--len:36" d="M420,134 V158"/>
@@ -589,6 +629,51 @@ html[data-lang="en"] .vi, html:not([data-lang="en"]) .en { display: none !import
         </g>
       </svg>
     </figure>
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Thuật toán PSO</span><span class="en">The PSO algorithm</span></p>
+          <h2 class="reveal d1"><span class="vi">Lưu đồ và mã giả</span><span class="en">Flowchart and pseudocode</span></h2>
+        </header>
+        <figure class="pc-fig reveal d3">
+          <div class="pc-box">
+          <div class="pc-g" data-s="1">
+          <span class="pc-badge">1</span>
+          <div class="pc-l" style="--ind:0"><span class="en">Initialize parameters</span><span class="vi">Khởi tạo tham số</span></div>
+          </div>
+          <div class="pc-g" data-s="2">
+          <span class="pc-badge">2</span>
+          <div class="pc-l" style="--ind:0"><span class="en">Initialize population</span><span class="vi">Khởi tạo quần thể</span></div>
+          </div>
+          <div class="pc-g" data-s="3">
+          <span class="pc-badge">3</span>
+          <div class="pc-l" style="--ind:0"><span class="en">while (number of generations, or the stopping criterion is not met) {</span><span class="vi">while (chưa đạt số thế hệ hoặc tiêu chí dừng) {</span></div>
+          </div>
+          <div class="pc-g" data-s="4">
+          <span class="pc-badge">4</span>
+          <div class="pc-l" style="--ind:1"><span class="en">for (i = 1 to number of particles N) {</span><span class="vi">for (i = 1 đến số cá thể N) {</span></div>
+          <div class="pc-l" style="--ind:2"><span class="en">if the fitness of <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span> is greater than the fitness of <span class="m">p<sub>i_best</sub></span></span><span class="vi">nếu độ thích nghi của <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span> lớn hơn của <span class="m">p<sub>i_best</sub></span></span></div>
+          <div class="pc-l" style="--ind:3"><span class="en">then update <span class="m">p<sub>i_best</sub></span> = <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span></span><span class="vi">thì cập nhật <span class="m">p<sub>i_best</sub></span> = <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span></span></div>
+          <div class="pc-l" style="--ind:2"><span class="en">if the fitness of <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span> is greater than that of <span class="m">g<sub>best</sub></span></span><span class="vi">nếu độ thích nghi của <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span> lớn hơn của <span class="m">g<sub>best</sub></span></span></div>
+          <div class="pc-l" style="--ind:3"><span class="en">then update <span class="m">g<sub>best</sub></span> = <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span></span><span class="vi">thì cập nhật <span class="m">g<sub>best</sub></span> = <span class="m">X<span class="ss"><i>t</i><i>i</i></span></span></span></div>
+          </div>
+          <div class="pc-g" data-s="5">
+          <span class="pc-badge">5</span>
+          <div class="pc-l" style="--ind:2"><span class="en">Update velocity vector</span><span class="vi">Cập nhật vector vận tốc</span></div>
+          <div class="pc-l" style="--ind:2"><span class="en">Update particle position</span><span class="vi">Cập nhật vị trí cá thể</span></div>
+          </div>
+          <div class="pc-g" data-s="6">
+          <span class="pc-badge">6</span>
+          <div class="pc-l" style="--ind:2"><span class="en">Next particle</span><span class="vi">Cá thể kế tiếp</span></div>
+          <div class="pc-l" style="--ind:1"><span class="en">}</span><span class="vi">}</span></div>
+          <div class="pc-l" style="--ind:1"><span class="en">Next generation</span><span class="vi">Thế hệ kế tiếp</span></div>
+          </div>
+          <div class="pc-g">
+          <div class="pc-l" style="--ind:0"><span class="en">}</span><span class="vi">}</span></div>
+          </div>
+          </div>
+          <figcaption><span class="vi">Mã giả PSO theo Ramadan và Abdel-Kader [9]. Số trên mỗi khối lưu đồ ứng với nhóm dòng cùng số.</span><span class="en">PSO pseudocode after Ramadan and Abdel-Kader [9]. Each number on a flowchart block marks the pseudocode lines with the same number.</span></figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 </section>
