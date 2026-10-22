@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="vi" data-lang="vi" data-title-vi="Giải thuật di truyền (GA)" data-title-en="Genetic Algorithm (GA)">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Giải thuật di truyền (GA)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/si-deck.css" />
+<style>
+/* GA-FC-BEGIN flowchart + pseudocode (GA deck) */
+.fc-cols { grid-template-columns: 1fr 1fr; align-items: center; }
+.fig.fc-vert svg { max-height: calc(100dvh - 2 * var(--slide-padding)); width: auto; max-width: 100%; }
+.fc-badge { fill: #1f6f78; } .fc-badge-t { fill: #fff; font-size: 15px; font-weight: 700; }
+.fc-node rect, .fc-node path, .pc-g { transition: filter .2s, background-color .2s, outline-color .2s; }
+.pc-fig { display: flex; flex-direction: column; gap: 0.5em; max-width: 46em; }
+.pc-fig figcaption { font-size: var(--small-size); color: var(--ink-soft); }
+.pc-box { background: #fff; border: 1px solid #1c2a2e; box-shadow: -7px 7px 0 #c9c9c9; padding: 0.6em 0.9em 0.7em 0.5em;
+  font-family: var(--font-math); font-size: clamp(0.7rem, 1.0vw, 1.02rem); line-height: 1.45; color: var(--ink); }
+.pc-title { border-bottom: 1px solid #1c2a2e; margin: 0 0 0.35em 0.5em; padding-bottom: 0.2em; }
+.pc-g { position: relative; padding-left: 2.1em; border-radius: 6px; outline: 2px solid transparent; }
+.pc-badge { position: absolute; left: 0.25em; top: 0.16em; width: 1.45em; height: 1.45em; border-radius: 50%; background: #1f6f78; color: #fff;
+  font: 700 0.78em/1.45em var(--font-body); font-style: normal; text-align: center; }
+.pc-l { padding-left: calc(var(--ind) * 1.3em); text-indent: -1em; margin-left: 1em; }
+.pc-l * { text-indent: 0; } .pc-l .m { font-style: italic; }
+.fc-map:has([data-s="1"]:hover) [data-s="1"], .fc-map:has([data-s="2"]:hover) [data-s="2"], .fc-map:has([data-s="3"]:hover) [data-s="3"], .fc-map:has([data-s="4"]:hover) [data-s="4"], .fc-map:has([data-s="5"]:hover) [data-s="5"], .fc-map:has([data-s="6"]:hover) [data-s="6"], .fc-map:has([data-s="7"]:hover) [data-s="7"], .fc-map:has([data-s="8"]:hover) [data-s="8"], .fc-map:has([data-s="9"]:hover) [data-s="9"], .fc-map:has([data-s="10"]:hover) [data-s="10"], .fc-map:has([data-s="11"]:hover) [data-s="11"] { background: #d5e7e6; outline-color: #1f6f78; filter: drop-shadow(0 0 4px rgba(31,111,120,.55)); }
+@media (max-width: 760px) and (orientation: portrait) {
+  .fc-cols { grid-template-columns: 1fr; gap: 0.5rem; } .fc-map > .stack { order: -1; }
+  .fig.fc-vert svg { max-height: 40dvh; } .pc-box { font-size: 0.58rem; line-height: 1.3; } .pc-fig figcaption { display: none; }
+}
+/* GA-FC-END */
+</style>
+</head>
+<body>
+<div class="progress" aria-hidden="true"></div>
+<nav class="nav-dots" aria-label="Chuyển nhanh tới trang"></nav>
+<div class="page-num" aria-live="polite"></div>
+<div class="keyboard-hint"><span class="vi">← → hoặc cuộn chuột để chuyển trang</span><span class="en">← → or scroll to change slides</span></div>
+<a class="home-link lang-link" href="Swarm Intelligence Textbook.html"><span class="vi">☰ Mục lục</span><span class="en">☰ Contents</span></a>
+<div class="lang-switch" role="group" aria-label="Ngôn ngữ / Language"><button type="button" data-set-lang="vi" aria-pressed="true" title="Tiếng Việt">VN</button><span aria-hidden="true">|</span><button type="button" data-set-lang="en" aria-pressed="false" title="English">EN</button></div>
+
+<main>
+
+<section class="slide title-slide" aria-label="Trang bìa" data-label-en="Title">
+  <canvas class="swarm-canvas" data-swarm="title" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Chương 16 · Mục 16.1</span><span class="en">Chapter 16 · Section 16.1</span></p>
+    <h1 class="reveal d1"><span class="vi">Giải thuật di truyền</span><span class="en">Genetic Algorithm</span><span class="sub"><span class="vi">Genetic Algorithm — GA</span><span class="en">GA — evolution by selection, crossover and mutation</span></span></h1>
+    <p class="credit reveal d2">Châu Văn Vân · PTITHCM</p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mục tiêu bài học" data-label-en="Learning objectives">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Mục tiêu bài học</span><span class="en">Learning objectives</span></p>
+        <h2 class="reveal d1"><span class="vi">Sau chương này, bạn có thể</span><span class="en">After this chapter you will be able to</span></h2>
+      </header>
+      <ol class="steps">
+        <li class="reveal d2"><span class="vi">Giải thích GA bằng các khái niệm gen, nhiễm sắc thể, quần thể và độ thích nghi.</span><span class="en">Explain GA through genes, chromosomes, populations and fitness.</span></li>
+        <li class="reveal d3"><span class="vi">Chọn cách mã hóa lời giải phù hợp: nhị phân, số thực, hoán vị, cây.</span><span class="en">Choose a suitable encoding: binary, real-valued, permutation, tree.</span></li>
+        <li class="reveal d4"><span class="vi">Thực hiện tay chọn lọc roulette, lai ghép và đột biến trên một quần thể nhỏ.</span><span class="en">Carry out roulette selection, crossover and mutation by hand on a small population.</span></li>
+        <li class="reveal d5"><span class="vi">Đọc lưu đồ và mã giả GA, rồi so sánh GA với PSO trên bộ hàm chuẩn.</span><span class="en">Read the GA flowchart and pseudocode, then compare GA with PSO on the benchmark suite.</span></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Nguồn cảm hứng" data-label-en="Inspiration">
+  <div class="slide-content">
+    <div class="cols">
+      <div class="stack">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tổng quan</span><span class="en">Overview</span></p>
+      <h2 class="reveal d1"><span class="vi">Tiến hóa tự nhiên làm thuật toán tìm kiếm</span><span class="en">Natural evolution as a search algorithm</span></h2>
+    </header>
+        <ul class="bullets">
+          <li class="reveal d2"><span class="vi">Được <strong>J. Holland</strong>, K. De Jong và D. Goldberg nghiên cứu từ những năm 1970, dựa trên chọn lọc tự nhiên của Darwin.</span><span class="en">Studied from the 1970s by <strong>J. Holland</strong>, K. De Jong and D. Goldberg, after Darwin's natural selection.</span></li>
+          <li class="reveal d3"><span class="vi">Cá thể thích nghi tốt có nhiều cơ hội sinh sản hơn; con cái thừa hưởng gen của cha mẹ và đôi khi bị đột biến.</span><span class="en">Fitter individuals reproduce more often; children inherit their parents' genes and are sometimes mutated.</span></li>
+          <li class="reveal d4"><span class="vi">GA là thuật toán dựa trên quần thể, tìm kiếm theo xác suất và không cần đạo hàm, nên hợp với bài toán phi tuyến, nhiều cực trị.</span><span class="en">GA is population-based, searches probabilistically and needs no gradient, so it suits non-linear, multimodal problems.</span></li>
+          <li class="reveal d5"><span class="vi">Thường dùng cho tối ưu rời rạc; các phiên bản GA khác nhau chủ yếu ở cách mã hóa và các toán tử.</span><span class="en">Often used for discrete optimization; GA variants differ mainly in encoding and operators.</span></li>
+        </ul>
+      </div>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 420 270" role="img" aria-label="population, chromosome, gene">
+          <g font-family="Be Vietnam Pro, sans-serif" text-anchor="middle" fill="#1c2a2e">
+            <rect x="16" y="36" width="204" height="160" rx="10" fill="none" stroke="#1f6f78" stroke-width="2" stroke-dasharray="5 4"/>
+            <text x="118" y="24" font-size="14" font-weight="600" fill="#1f6f78"><tspan class="vi">Quần thể</tspan><tspan class="en">Population</tspan></text>
+            <rect x="30" y="50" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="68" font-size="13" fill="#fff">1</text><rect x="52" y="50" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="68" font-size="13" fill="#1c2a2e">0</text><rect x="74" y="50" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="68" font-size="13" fill="#fff">1</text><rect x="96" y="50" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="68" font-size="13" fill="#fff">1</text><rect x="118" y="50" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="68" font-size="13" fill="#1c2a2e">0</text><rect x="140" y="50" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="68" font-size="13" fill="#1c2a2e">0</text><rect x="162" y="50" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="68" font-size="13" fill="#fff">1</text><rect x="184" y="50" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="195" y="68" font-size="13" fill="#1c2a2e">0</text><rect x="30" y="86" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="104" font-size="13" fill="#1c2a2e">0</text><rect x="52" y="86" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="104" font-size="13" fill="#fff">1</text><rect x="74" y="86" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="104" font-size="13" fill="#fff">1</text><rect x="96" y="86" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="104" font-size="13" fill="#1c2a2e">0</text><rect x="118" y="86" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="104" font-size="13" fill="#fff">1</text><rect x="140" y="86" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="104" font-size="13" fill="#fff">1</text><rect x="162" y="86" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="104" font-size="13" fill="#1c2a2e">0</text><rect x="184" y="86" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="195" y="104" font-size="13" fill="#1c2a2e">0</text><rect x="30" y="122" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="140" font-size="13" fill="#fff">1</text><rect x="52" y="122" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="140" font-size="13" fill="#fff">1</text><rect x="74" y="122" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="140" font-size="13" fill="#fff">1</text><rect x="96" y="122" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="140" font-size="13" fill="#1c2a2e">0</text><rect x="118" y="122" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="140" font-size="13" fill="#1c2a2e">0</text><rect x="140" y="122" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="140" font-size="13" fill="#fff">1</text><rect x="162" y="122" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="140" font-size="13" fill="#1c2a2e">0</text><rect x="184" y="122" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="195" y="140" font-size="13" fill="#fff">1</text><rect x="30" y="158" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="176" font-size="13" fill="#1c2a2e">0</text><rect x="52" y="158" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="176" font-size="13" fill="#1c2a2e">0</text><rect x="74" y="158" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="176" font-size="13" fill="#1c2a2e">0</text><rect x="96" y="158" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="176" font-size="13" fill="#fff">1</text><rect x="118" y="158" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="176" font-size="13" fill="#fff">1</text><rect x="140" y="158" width="22" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="176" font-size="13" fill="#1c2a2e">0</text><rect x="162" y="158" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="176" font-size="13" fill="#fff">1</text><rect x="184" y="158" width="22" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="195" y="176" font-size="13" fill="#fff">1</text>
+            <rect x="26" y="83" width="184" height="34" rx="6" fill="none" stroke="#d9562f" stroke-width="2"/>
+            <path d="M210,100 C250,100 250,100 262,100" stroke="#d9562f" stroke-width="2" fill="none" marker-end="url(#ga-ah)"/>
+            <text x="336" y="70" font-size="14" font-weight="600" fill="#d9562f"><tspan class="vi">Nhiễm sắc thể</tspan><tspan class="en">Chromosome</tspan></text>
+            <text x="336" y="88" font-size="12" fill="#56676a"><tspan class="vi">một lời giải</tspan><tspan class="en">one solution</tspan></text>
+            <rect x="268" y="96" width="17" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="276" y="113" font-size="12" fill="#1c2a2e">0</text><rect x="285" y="96" width="17" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="294" y="113" font-size="12" fill="#fff">1</text><rect x="302" y="96" width="17" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="310" y="113" font-size="12" fill="#fff">1</text><rect x="319" y="96" width="17" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="328" y="113" font-size="12" fill="#1c2a2e">0</text><rect x="336" y="96" width="17" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="344" y="113" font-size="12" fill="#fff">1</text><rect x="353" y="96" width="17" height="26" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="362" y="113" font-size="12" fill="#fff">1</text><rect x="370" y="96" width="17" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="378" y="113" font-size="12" fill="#1c2a2e">0</text><rect x="387" y="96" width="17" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="396" y="113" font-size="12" fill="#1c2a2e">0</text>
+            <rect x="319" y="92" width="19" height="34" rx="4" fill="none" stroke="#3a7fc1" stroke-width="2.2"/>
+            <path d="M328,126 V160" stroke="#3a7fc1" stroke-width="2" fill="none" marker-end="url(#ga-ah2)"/>
+            <text x="328" y="180" font-size="14" font-weight="600" fill="#3a7fc1"><tspan class="vi">Gen</tspan><tspan class="en">Gene</tspan></text>
+            <text x="328" y="198" font-size="12" fill="#56676a"><tspan class="vi">một biến quyết định</tspan><tspan class="en">one decision variable</tspan></text>
+            <text x="118" y="222" font-size="12" fill="#56676a"><tspan class="vi">mỗi hàng là một cá thể</tspan><tspan class="en">each row is one individual</tspan></text>
+            <text x="210" y="256" font-size="12.5" fill="#1c2a2e"><tspan class="vi">độ thích nghi f(x) chấm điểm từng nhiễm sắc thể</tspan><tspan class="en">fitness f(x) scores every chromosome</tspan></text>
+          </g>
+          <defs>
+            <marker id="ga-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#d9562f"/></marker>
+            <marker id="ga-ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3a7fc1"/></marker>
+          </defs>
+        </svg>
+        <figcaption><span class="vi">Quần thể gồm nhiều nhiễm sắc thể; mỗi nhiễm sắc thể gồm các gen. Vẽ lại theo GeeksforGeeks</span><span class="en">A population holds chromosomes; each chromosome is a string of genes. Redrawn after GeeksforGeeks</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ý tưởng cốt lõi" data-label-en="Core idea">
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Ý tưởng cốt lõi</span><span class="en">Core idea</span></p>
+    <p class="big-quote reveal d1"><span class="vi">Mỗi thế hệ, quần thể <span class="hl c-soc">chọn lọc</span> cha mẹ tốt, <span class="hl c-cog">lai ghép</span> để ghép các khối gen tốt lại với nhau, rồi <span class="hl c-in">đột biến</span> để giữ đa dạng. Lặp lại, quần thể dần dồn về vùng có độ thích nghi cao.</span><span class="en">Each generation the population <span class="hl c-soc">selects</span> good parents, <span class="hl c-cog">crosses</span> them to combine good gene blocks, then <span class="hl c-in">mutates</span> to keep diversity. Repeated, the population drifts toward high-fitness regions.</span></p>
+    <div class="forces">
+      <div class="force reveal d3" style="border-color: #1f6f78"><b style="color:#1f6f78"><span class="vi">Chọn lọc</span><span class="en">Selection</span></b><span><span class="vi">ưu tiên cá thể có độ thích nghi cao</span><span class="en">favours individuals with high fitness</span></span></div>
+      <div class="force reveal d4" style="border-color: #4b8f45"><b style="color:#4b8f45"><span class="vi">Lai ghép</span><span class="en">Crossover</span></b><span><span class="vi">tái sử dụng khối gen tốt của cha mẹ</span><span class="en">reuses good gene blocks of the parents</span></span></div>
+      <div class="force reveal d5" style="border-color: #3a7fc1"><b style="color:#3a7fc1"><span class="vi">Đột biến</span><span class="en">Mutation</span></b><span><span class="vi">thay đổi ngẫu nhiên, chống hội tụ sớm</span><span class="en">random changes against premature convergence</span></span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các thành phần" data-label-en="Components">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các thành phần</span><span class="en">Components</span></p>
+      <h2 class="reveal d1"><span class="vi">Các khái niệm cơ bản</span><span class="en">Basic concepts</span></h2>
+    </header>
+    <div class="cols">
+      <dl class="defs">
+        <div class="def reveal d2"><dt><span class="vi">Gen</span><span class="en">Gene</span></dt><dd><span class="vi">Đơn vị thông tin nhỏ nhất, biểu diễn một biến hay một tham số.</span><span class="en">The smallest unit of information: one variable or parameter.</span></dd></div>
+        <div class="def reveal d3"><dt><span class="vi">Nhiễm sắc thể</span><span class="en">Chromosome</span></dt><dd><span class="vi">Một lời giải ứng viên đầy đủ, gồm các gen của mọi biến quyết định.</span><span class="en">A complete candidate solution made of the genes of all decision variables.</span></dd></div>
+        <div class="def reveal d4"><dt><span class="vi">Quần thể</span><span class="en">Population</span></dt><dd><span class="vi">Tập các nhiễm sắc thể ở một thế hệ; lớn thì khám phá rộng nhưng tốn chi phí.</span><span class="en">The set of chromosomes in one generation; larger explores more but costs more.</span></dd></div>
+        <div class="def reveal d5"><dt><span class="vi">Độ thích nghi</span><span class="en">Fitness</span></dt><dd><span class="vi">Hàm chấm điểm mỗi nhiễm sắc thể; quyết định ai được sinh sản.</span><span class="en">Scores each chromosome and decides who reproduces.</span></dd></div>
+      </dl>
+      <div class="stack">
+        <div class="card sea mathcard reveal d3"><h3><span class="vi">Năm thành phần của GA</span><span class="en">Five parts of a GA</span></h3><ol class="bullets" style="font-size:0.85em"><li><span class="vi">Mã hóa lời giải</span><span class="en">Solution encoding</span></li><li><span class="vi">Lai ghép</span><span class="en">Crossover</span></li><li><span class="vi">Đột biến</span><span class="en">Mutation</span></li><li><span class="vi">Chọn lọc cha mẹ</span><span class="en">Parent selection</span></li><li><span class="vi">Đấu tranh sinh tồn</span><span class="en">Survivor selection</span></li></ol></div>
+        <div class="card sand mathcard reveal d4"><h3><span class="vi">Điều kiện dừng</span><span class="en">Stopping criteria</span></h3><p style="font-size:0.85em"><span class="vi">Đủ số thế hệ, đạt ngưỡng độ thích nghi, không cải thiện sau nhiều thế hệ, hoặc hết thời gian.</span><span class="en">Maximum generations, a fitness threshold, no improvement for several generations, or a time limit.</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã hóa lời giải" data-label-en="Solution encoding">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thành phần 1</span><span class="en">Part 1</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã hóa: từ lời giải sang nhiễm sắc thể</span><span class="en">Encoding: from a solution to a chromosome</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d2"><span class="vi"><strong>Nhị phân</strong>: chuỗi <span class="m">{0, 1}<sup>L</sup></span>; giải mã ngược để tính độ thích nghi.</span><span class="en"><strong>Binary</strong>: a string in <span class="m">{0, 1}<sup>L</sup></span>; decoded back to evaluate fitness.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Đa giá trị</strong>: gen là số nguyên, số thực hay nhãn rời rạc; hợp với bài toán liên tục.</span><span class="en"><strong>Multi-valued</strong>: genes are integers, reals or discrete labels; good for continuous problems.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Hoán vị</strong>: nhiễm sắc thể là một thứ tự, ví dụ thứ tự thăm thành phố trong TSP; cần toán tử riêng.</span><span class="en"><strong>Permutation</strong>: the chromosome is an order, such as the city order in TSP; needs dedicated operators.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Cây</strong>: mã hóa cạnh, mã đỉnh cha, Prüfer hay NetKeys cho bài toán cây khung.</span><span class="en"><strong>Tree</strong>: edge lists, parent vectors, Prüfer codes or NetKeys for spanning-tree problems.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 270 270" role="img" aria-label="encodings">
+          <g font-family="Be Vietnam Pro, sans-serif" text-anchor="middle" fill="#1c2a2e"><text x="14" y="32" font-size="13" font-weight="600" text-anchor="start" fill="#1f6f78"><tspan class="vi">Nhị phân</tspan><tspan class="en">Binary</tspan></text><rect x="14" y="40" width="30" height="28" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="29" y="59" font-size="14" fill="#fff">1</text><rect x="44" y="40" width="30" height="28" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="59" y="59" font-size="14" fill="#1c2a2e">0</text><rect x="74" y="40" width="30" height="28" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="89" y="59" font-size="14" fill="#1c2a2e">0</text><rect x="104" y="40" width="30" height="28" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="119" y="59" font-size="14" fill="#fff">1</text><rect x="134" y="40" width="30" height="28" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="149" y="59" font-size="14" fill="#1c2a2e">0</text><rect x="164" y="40" width="30" height="28" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="179" y="59" font-size="14" fill="#1c2a2e">0</text><rect x="194" y="40" width="30" height="28" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="209" y="59" font-size="14" fill="#1c2a2e">0</text><rect x="224" y="40" width="30" height="28" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="239" y="59" font-size="14" fill="#fff">1</text><text x="14" y="94" font-size="13" font-weight="600" text-anchor="start" fill="#1f6f78"><tspan class="vi">Số thực</tspan><tspan class="en">Real-valued</tspan></text><rect x="14" y="102" width="52" height="28" fill="#d5e7e6" stroke="#1c2a2e" stroke-width="1"/><text x="40" y="121" font-size="14" fill="#1c2a2e">1.7</text><rect x="66" y="102" width="52" height="28" fill="#d5e7e6" stroke="#1c2a2e" stroke-width="1"/><text x="92" y="121" font-size="14" fill="#1c2a2e">2.3</text><rect x="118" y="102" width="52" height="28" fill="#d5e7e6" stroke="#1c2a2e" stroke-width="1"/><text x="144" y="121" font-size="14" fill="#1c2a2e">5.6</text><rect x="170" y="102" width="52" height="28" fill="#d5e7e6" stroke="#1c2a2e" stroke-width="1"/><text x="196" y="121" font-size="14" fill="#1c2a2e">5.2</text><text x="14" y="156" font-size="13" font-weight="600" text-anchor="start" fill="#1f6f78"><tspan class="vi">Giá trị rời rạc</tspan><tspan class="en">Discrete values</tspan></text><rect x="14" y="164" width="52" height="28" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="40" y="183" font-size="14" fill="#1c2a2e">A</text><rect x="66" y="164" width="52" height="28" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="92" y="183" font-size="14" fill="#1c2a2e">C</text><rect x="118" y="164" width="52" height="28" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="144" y="183" font-size="14" fill="#1c2a2e">B</text><rect x="170" y="164" width="52" height="28" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="196" y="183" font-size="14" fill="#1c2a2e">A</text><text x="14" y="218" font-size="13" font-weight="600" text-anchor="start" fill="#1f6f78"><tspan class="vi">Hoán vị (TSP)</tspan><tspan class="en">Permutation (TSP)</tspan></text><rect x="14" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="28" y="245" font-size="14" fill="#1c2a2e">1</text><rect x="41" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="54" y="245" font-size="14" fill="#1c2a2e">3</text><rect x="68" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="82" y="245" font-size="14" fill="#1c2a2e">6</text><rect x="95" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="108" y="245" font-size="14" fill="#1c2a2e">7</text><rect x="122" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="136" y="245" font-size="14" fill="#1c2a2e">8</text><rect x="149" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="162" y="245" font-size="14" fill="#1c2a2e">2</text><rect x="176" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="190" y="245" font-size="14" fill="#1c2a2e">5</text><rect x="203" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="216" y="245" font-size="14" fill="#1c2a2e">4</text><rect x="230" y="226" width="27" height="28" fill="#f6d8cb" stroke="#1c2a2e" stroke-width="1"/><text x="244" y="245" font-size="14" fill="#1c2a2e">9</text></g>
+        </svg>
+        <figcaption><span class="vi">Các kiểu mã hóa theo bài giảng của Huỳnh Thị Thanh Bình [11]</span><span class="en">Encodings after the lecture by Huỳnh Thị Thanh Bình [11]</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Chọn lọc cha mẹ" data-label-en="Parent selection">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thành phần 4</span><span class="en">Part 4</span></p>
+      <h2 class="reveal d1"><span class="vi">Chọn lọc cha mẹ: cá thể tốt được chọn nhiều hơn</span><span class="en">Parent selection: fitter individuals are picked more often</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d2"><span class="vi"><strong>Roulette</strong>: <span class="m">F = Σ<sub>i</sub> f(ind<sub>i</sub>)</span>, <span class="m">p<sub>i</sub> = f(ind<sub>i</sub>) / F</span>, <span class="m">q<sub>i</sub> = Σ<sub>j≤i</sub> p<sub>j</sub></span>; lấy <span class="m">r ~ U[0, 1]</span>, chọn cá thể <span class="m">i</span> khi <span class="m">q<sub>i−1</sub> ≤ r &lt; q<sub>i</sub></span>.</span><span class="en"><strong>Roulette</strong>: <span class="m">F = Σ<sub>i</sub> f(ind<sub>i</sub>)</span>, <span class="m">p<sub>i</sub> = f(ind<sub>i</sub>) / F</span>, <span class="m">q<sub>i</sub> = Σ<sub>j≤i</sub> p<sub>j</sub></span>; draw <span class="m">r ~ U[0, 1]</span> and pick <span class="m">i</span> when <span class="m">q<sub>i−1</sub> ≤ r &lt; q<sub>i</sub></span>.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Giao đấu</strong>: lấy ngẫu nhiên <span class="m">k</span> cá thể, giữ cá thể tốt nhất; lặp đến đủ cha mẹ.</span><span class="en"><strong>Tournament</strong>: draw <span class="m">k</span> individuals at random and keep the best; repeat until enough parents.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Xếp hạng</strong>: chọn theo thứ hạng, ví dụ 50% tốt nhất; <strong>SUS</strong>: nhiều kim cách đều trong một lần quay.</span><span class="en"><strong>Rank</strong>: select by rank, e.g. the best 50%; <strong>SUS</strong>: equally spaced pointers in one spin.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="-30 0 290 290" role="img" aria-label="roulette wheel">
+          <defs><marker id="ga-ah4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker></defs>
+          <g font-family="Be Vietnam Pro, sans-serif" text-anchor="middle" fill="#1c2a2e"><path d="M130,130 L130.0,25.0 A105,105 0 0 1 212.7,65.4 z" fill="#d5e7e6" stroke="#fff" stroke-width="2"/><text x="159" y="69" font-size="13" font-weight="600" fill="#1c2a2e">01101</text><text x="159" y="85" font-size="12" fill="#1c2a2e">14.4%</text><path d="M130,130 L212.7,65.4 A105,105 0 0 1 50.5,198.6 z" fill="#1f6f78" stroke="#fff" stroke-width="2"/><text x="171" y="178" font-size="13" font-weight="600" fill="#fff">11000</text><text x="171" y="194" font-size="12" fill="#fff">49.2%</text><path d="M130,130 L50.5,198.6 A105,105 0 0 1 32.0,167.8 z" fill="#f6e6b8" stroke="#fff" stroke-width="2"/><text x="20" y="194" font-size="13" font-weight="600" fill="#1c2a2e">01000</text><text x="20" y="210" font-size="12" fill="#1c2a2e">5.5%</text><path d="M130,130 L32.0,167.8 A105,105 0 0 1 130.0,25.0 z" fill="#d9562f" stroke="#fff" stroke-width="2"/><text x="76" y="91" font-size="13" font-weight="600" fill="#fff">10011</text><text x="76" y="107" font-size="12" fill="#fff">30.9%</text><path d="M130,130 L222.3,100.0" stroke="#1c2a2e" stroke-width="3" marker-end="url(#ga-ah4)"/><circle cx="130" cy="130" r="5" fill="#1c2a2e"/>
+            <text x="130" y="262" font-size="12.5" fill="#56676a"><tspan class="vi">kim quay r = 0.20 chọn 11000</tspan><tspan class="en">spin r = 0.20 picks 11000</tspan></text>
+            <text x="130" y="280" font-size="12.5" fill="#56676a"><tspan class="vi">diện tích ô tỉ lệ với f(x)</tspan><tspan class="en">slice area is proportional to f(x)</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Bánh xe roulette của ví dụ tính tay: f(x) = x², bốn cá thể 5 bit</span><span class="en">Roulette wheel of the worked example: f(x) = x², four 5-bit individuals</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lai ghép" data-label-en="Crossover">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thành phần 2</span><span class="en">Part 2</span></p>
+      <h2 class="reveal d1"><span class="vi">Lai ghép: ghép gen của hai cha mẹ</span><span class="en">Crossover: combine the genes of two parents</span></h2>
+    </header>
+    <div class="cols even">
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d2"><span class="vi"><strong>Nhị phân, đa giá trị</strong>: lai một điểm, hai điểm, <span class="m">N</span> điểm cắt; lai đồng bộ theo từng gen.</span><span class="en"><strong>Binary, multi-valued</strong>: one-, two- or <span class="m">N</span>-point crossover; uniform crossover gene by gene.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Hoán vị</strong>: lai thứ tự OX, lai tương hợp bộ phận PMX, lai chu trình CX; con luôn là hoán vị hợp lệ.</span><span class="en"><strong>Permutation</strong>: order crossover OX, partially mapped PMX, cycle crossover CX; children stay valid permutations.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Số thực</strong>: SBX, mô phỏng lai một điểm nhị phân trên biến liên tục [8].</span><span class="en"><strong>Real-valued</strong>: SBX, which mimics binary one-point crossover on continuous variables [8].</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Cây</strong>: trộn tập cạnh của hai cây rồi sinh cây khung ngẫu nhiên bằng PrimRST.</span><span class="en"><strong>Tree</strong>: merge the edge sets of two trees, then grow a random spanning tree with PrimRST.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 610 300" role="img" aria-label="crossover">
+          <defs><marker id="ga-ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#56676a"/></marker></defs>
+          <g font-family="Be Vietnam Pro, sans-serif" text-anchor="middle" fill="#1c2a2e">
+            <text x="96" y="16" font-size="13" fill="#1f6f78" font-weight="600"><tspan class="vi">Cha</tspan><tspan class="en">Parent 1</tspan></text><text x="320" y="16" font-size="13" fill="#d9562f" font-weight="600"><tspan class="vi">Mẹ</tspan><tspan class="en">Parent 2</tspan></text><text x="530" y="16" font-size="13" fill="#1c2a2e" font-weight="600"><tspan class="vi">Con</tspan><tspan class="en">Child</tspan></text>
+            <text x="8" y="40" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">a. Một điểm cắt</tspan><tspan class="en">a. One-point</tspan></text><rect x="8" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="19" y="65" font-size="13" fill="#fff">1</text><rect x="30" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="65" font-size="13" fill="#fff">1</text><rect x="52" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="65" font-size="13" fill="#fff">0</text><rect x="74" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="65" font-size="13" fill="#fff">0</text><rect x="96" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="65" font-size="13" fill="#fff">1</text><rect x="118" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="65" font-size="13" fill="#fff">0</text><rect x="140" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="65" font-size="13" fill="#fff">1</text><rect x="162" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="65" font-size="13" fill="#fff">1</text><text x="198" y="65" font-size="16" fill="#56676a">×</text><rect x="212" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="223" y="65" font-size="13" fill="#fff">1</text><rect x="234" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="245" y="65" font-size="13" fill="#fff">1</text><rect x="256" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="267" y="65" font-size="13" fill="#fff">0</text><rect x="278" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="289" y="65" font-size="13" fill="#fff">1</text><rect x="300" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="311" y="65" font-size="13" fill="#fff">1</text><rect x="322" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="333" y="65" font-size="13" fill="#fff">1</text><rect x="344" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="355" y="65" font-size="13" fill="#fff">1</text><rect x="366" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="377" y="65" font-size="13" fill="#fff">1</text><path d="M396,60 H416" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="422" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="433" y="65" font-size="13" fill="#fff">1</text><rect x="444" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="455" y="65" font-size="13" fill="#fff">1</text><rect x="466" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="477" y="65" font-size="13" fill="#fff">0</text><rect x="488" y="48" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="499" y="65" font-size="13" fill="#fff">0</text><rect x="510" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="521" y="65" font-size="13" fill="#fff">1</text><rect x="532" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="543" y="65" font-size="13" fill="#fff">1</text><rect x="554" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="565" y="65" font-size="13" fill="#fff">1</text><rect x="576" y="48" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="587" y="65" font-size="13" fill="#fff">1</text><line x1="96" y1="44" x2="96" y2="76" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="300" y1="44" x2="300" y2="76" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="510" y1="44" x2="510" y2="76" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/>
+            <text x="8" y="122" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">b. Hai điểm cắt</tspan><tspan class="en">b. Two-point</tspan></text><rect x="8" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="19" y="147" font-size="13" fill="#fff">1</text><rect x="30" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="147" font-size="13" fill="#fff">1</text><rect x="52" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="147" font-size="13" fill="#fff">0</text><rect x="74" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="147" font-size="13" fill="#fff">0</text><rect x="96" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="147" font-size="13" fill="#fff">1</text><rect x="118" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="147" font-size="13" fill="#fff">0</text><rect x="140" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="147" font-size="13" fill="#fff">1</text><rect x="162" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="147" font-size="13" fill="#fff">0</text><text x="198" y="147" font-size="16" fill="#56676a">×</text><rect x="212" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="223" y="147" font-size="13" fill="#fff">1</text><rect x="234" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="245" y="147" font-size="13" fill="#fff">1</text><rect x="256" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="267" y="147" font-size="13" fill="#fff">0</text><rect x="278" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="289" y="147" font-size="13" fill="#fff">1</text><rect x="300" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="311" y="147" font-size="13" fill="#fff">1</text><rect x="322" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="333" y="147" font-size="13" fill="#fff">1</text><rect x="344" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="355" y="147" font-size="13" fill="#fff">1</text><rect x="366" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="377" y="147" font-size="13" fill="#fff">1</text><path d="M396,142 H416" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="422" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="433" y="147" font-size="13" fill="#fff">1</text><rect x="444" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="455" y="147" font-size="13" fill="#fff">1</text><rect x="466" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="477" y="147" font-size="13" fill="#fff">0</text><rect x="488" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="499" y="147" font-size="13" fill="#fff">1</text><rect x="510" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="521" y="147" font-size="13" fill="#fff">1</text><rect x="532" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="543" y="147" font-size="13" fill="#fff">1</text><rect x="554" y="130" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="565" y="147" font-size="13" fill="#fff">1</text><rect x="576" y="130" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="587" y="147" font-size="13" fill="#fff">0</text><line x1="52" y1="126" x2="52" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="256" y1="126" x2="256" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="466" y1="126" x2="466" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="162" y1="126" x2="162" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="366" y1="126" x2="366" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/><line x1="576" y1="126" x2="576" y2="158" stroke="#1c2a2e" stroke-width="2" stroke-dasharray="3 2"/>
+            <text x="8" y="204" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">c. Đồng bộ: u &lt; 0.5 lấy gen cha, ngược lại lấy gen mẹ</tspan><tspan class="en">c. Uniform: u &lt; 0.5 takes the gene of parent 1, else parent 2</tspan></text><rect x="8" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="19" y="229" font-size="13" fill="#fff">1</text><rect x="30" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="41" y="229" font-size="13" fill="#fff">1</text><rect x="52" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="63" y="229" font-size="13" fill="#fff">0</text><rect x="74" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="85" y="229" font-size="13" fill="#fff">0</text><rect x="96" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="107" y="229" font-size="13" fill="#fff">1</text><rect x="118" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="129" y="229" font-size="13" fill="#fff">0</text><rect x="140" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="151" y="229" font-size="13" fill="#fff">1</text><rect x="162" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="173" y="229" font-size="13" fill="#fff">1</text><text x="198" y="229" font-size="16" fill="#56676a">×</text><rect x="212" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="223" y="229" font-size="13" fill="#fff">1</text><rect x="234" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="245" y="229" font-size="13" fill="#fff">1</text><rect x="256" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="267" y="229" font-size="13" fill="#fff">0</text><rect x="278" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="289" y="229" font-size="13" fill="#fff">1</text><rect x="300" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="311" y="229" font-size="13" fill="#fff">1</text><rect x="322" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="333" y="229" font-size="13" fill="#fff">1</text><rect x="344" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="355" y="229" font-size="13" fill="#fff">1</text><rect x="366" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="377" y="229" font-size="13" fill="#fff">1</text><path d="M396,224 H416" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="422" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="433" y="229" font-size="13" fill="#fff">1</text><rect x="444" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="455" y="229" font-size="13" fill="#fff">1</text><rect x="466" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="477" y="229" font-size="13" fill="#fff">0</text><rect x="488" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="499" y="229" font-size="13" fill="#fff">0</text><rect x="510" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="521" y="229" font-size="13" fill="#fff">1</text><rect x="532" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="543" y="229" font-size="13" fill="#fff">1</text><rect x="554" y="212" width="22" height="24" fill="#1f6f78" stroke="#1c2a2e" stroke-width="1"/><text x="565" y="229" font-size="13" fill="#fff">1</text><rect x="576" y="212" width="22" height="24" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="587" y="229" font-size="13" fill="#fff">1</text>
+            <text x="305" y="292" font-size="12.5" fill="#56676a"><tspan class="vi">Màu của gen ở cá thể con cho biết gen đó lấy từ cha hay mẹ</tspan><tspan class="en">Each child gene keeps the colour of the parent it came from</tspan></text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Lai một điểm, hai điểm và đồng bộ; chuỗi bit lấy theo ví dụ trong bài giảng [11]</span><span class="en">One-point, two-point and uniform crossover; bit strings from the lecture examples [11]</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đột biến" data-label-en="Mutation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thành phần 3</span><span class="en">Part 3</span></p>
+      <h2 class="reveal d1"><span class="vi">Đột biến: thay đổi nhỏ để giữ đa dạng</span><span class="en">Mutation: small changes that keep diversity</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li class="reveal d2"><span class="vi"><strong>Đảo bit</strong> cho mã nhị phân; <strong>đổi chỗ</strong> hai gen cho mã nhị phân hay hoán vị.</span><span class="en"><strong>Bit flip</strong> for binary strings; <strong>swap</strong> two genes for binary or permutation strings.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Đảo đoạn</strong>: chọn hai vị trí và đảo ngược đoạn ở giữa; <strong>xáo trộn</strong>: trộn lại đoạn đó.</span><span class="en"><strong>Inversion</strong>: pick two positions and reverse the segment between them; <strong>scramble</strong>: shuffle it.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Đổi giá trị</strong>: cộng hoặc trừ một lượng nhỏ cho gen số; <strong>đột biến đa thức</strong>: con phân bố gần cha mẹ.</span><span class="en"><strong>Value change</strong>: add or subtract a small amount to a numeric gene; <strong>polynomial mutation</strong>: children stay near the parent.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Đột biến cây</strong>: cắt một cây con và gắn vào nút khác.</span><span class="en"><strong>Tree mutation</strong>: cut a subtree and graft it onto another node.</span></li>
+      </ul>
+      <figure class="fig reveal d3">
+        <svg viewBox="0 0 420 300" role="img" aria-label="mutation">
+          <defs><marker id="ga-ah3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#56676a"/></marker></defs>
+          <g font-family="Be Vietnam Pro, sans-serif" text-anchor="middle" fill="#1c2a2e">
+            <text x="8" y="22" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">Đảo bit</tspan><tspan class="en">Bit flip</tspan></text><rect x="8" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="22" y="48" font-size="14" fill="#1c2a2e">1</text><rect x="36" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="50" y="48" font-size="14" fill="#1c2a2e">0</text><rect x="64" y="30" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="78" y="48" font-size="14" fill="#1c2a2e">1</text><rect x="92" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="106" y="48" font-size="14" fill="#1c2a2e">1</text><rect x="120" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="134" y="48" font-size="14" fill="#1c2a2e">0</text><rect x="148" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="162" y="48" font-size="14" fill="#1c2a2e">1</text><path d="M186,43 H212" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="220" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="234" y="48" font-size="14" fill="#1c2a2e">1</text><rect x="248" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="262" y="48" font-size="14" fill="#1c2a2e">0</text><rect x="276" y="30" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="290" y="48" font-size="14" fill="#fff">0</text><rect x="304" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="318" y="48" font-size="14" fill="#1c2a2e">1</text><rect x="332" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="346" y="48" font-size="14" fill="#1c2a2e">0</text><rect x="360" y="30" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="374" y="48" font-size="14" fill="#1c2a2e">1</text>
+            <text x="8" y="92" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">Đổi chỗ</tspan><tspan class="en">Swap</tspan></text><rect x="8" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="22" y="118" font-size="14" fill="#1c2a2e">1</text><rect x="36" y="100" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="50" y="118" font-size="14" fill="#1c2a2e">2</text><rect x="64" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="78" y="118" font-size="14" fill="#1c2a2e">3</text><rect x="92" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="106" y="118" font-size="14" fill="#1c2a2e">4</text><rect x="120" y="100" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="134" y="118" font-size="14" fill="#1c2a2e">5</text><rect x="148" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="162" y="118" font-size="14" fill="#1c2a2e">6</text><path d="M186,113 H212" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="220" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="234" y="118" font-size="14" fill="#1c2a2e">1</text><rect x="248" y="100" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="262" y="118" font-size="14" fill="#fff">5</text><rect x="276" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="290" y="118" font-size="14" fill="#1c2a2e">3</text><rect x="304" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="318" y="118" font-size="14" fill="#1c2a2e">4</text><rect x="332" y="100" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="346" y="118" font-size="14" fill="#fff">2</text><rect x="360" y="100" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="374" y="118" font-size="14" fill="#1c2a2e">6</text>
+            <text x="8" y="162" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">Đảo đoạn</tspan><tspan class="en">Inversion</tspan></text><rect x="8" y="170" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="22" y="188" font-size="14" fill="#1c2a2e">1</text><rect x="36" y="170" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="50" y="188" font-size="14" fill="#1c2a2e">2</text><rect x="64" y="170" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="78" y="188" font-size="14" fill="#1c2a2e">3</text><rect x="92" y="170" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="106" y="188" font-size="14" fill="#1c2a2e">4</text><rect x="120" y="170" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="134" y="188" font-size="14" fill="#1c2a2e">5</text><rect x="148" y="170" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="162" y="188" font-size="14" fill="#1c2a2e">6</text><path d="M186,183 H212" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="220" y="170" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="234" y="188" font-size="14" fill="#1c2a2e">1</text><rect x="248" y="170" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="262" y="188" font-size="14" fill="#fff">5</text><rect x="276" y="170" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="290" y="188" font-size="14" fill="#fff">4</text><rect x="304" y="170" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="318" y="188" font-size="14" fill="#fff">3</text><rect x="332" y="170" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="346" y="188" font-size="14" fill="#fff">2</text><rect x="360" y="170" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="374" y="188" font-size="14" fill="#1c2a2e">6</text>
+            <text x="8" y="232" font-size="13" font-weight="600" text-anchor="start" fill="#1c2a2e"><tspan class="vi">Xáo trộn đoạn</tspan><tspan class="en">Scramble</tspan></text><rect x="8" y="240" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="22" y="258" font-size="14" fill="#1c2a2e">1</text><rect x="36" y="240" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="50" y="258" font-size="14" fill="#1c2a2e">2</text><rect x="64" y="240" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="78" y="258" font-size="14" fill="#1c2a2e">3</text><rect x="92" y="240" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="106" y="258" font-size="14" fill="#1c2a2e">4</text><rect x="120" y="240" width="28" height="26" fill="#f6e6b8" stroke="#1c2a2e" stroke-width="1"/><text x="134" y="258" font-size="14" fill="#1c2a2e">5</text><rect x="148" y="240" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="162" y="258" font-size="14" fill="#1c2a2e">6</text><path d="M186,253 H212" stroke="#56676a" stroke-width="2" marker-end="url(#ga-ah3)"/><rect x="220" y="240" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="234" y="258" font-size="14" fill="#1c2a2e">1</text><rect x="248" y="240" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="262" y="258" font-size="14" fill="#fff">4</text><rect x="276" y="240" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="290" y="258" font-size="14" fill="#fff">2</text><rect x="304" y="240" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="318" y="258" font-size="14" fill="#fff">5</text><rect x="332" y="240" width="28" height="26" fill="#d9562f" stroke="#1c2a2e" stroke-width="1"/><text x="346" y="258" font-size="14" fill="#fff">3</text><rect x="360" y="240" width="28" height="26" fill="#ebe3d2" stroke="#1c2a2e" stroke-width="1"/><text x="374" y="258" font-size="14" fill="#1c2a2e">6</text>
+          </g>
+        </svg>
+        <figcaption><span class="vi">Ô cam là gen bị thay đổi</span><span class="en">Orange cells are the genes that changed</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đấu tranh sinh tồn" data-label-en="Survivor selection">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thành phần 5</span><span class="en">Part 5</span></p>
+      <h2 class="reveal d1"><span class="vi">Đấu tranh sinh tồn: ai ở lại thế hệ sau</span><span class="en">Survivor selection: who stays for the next generation</span></h2>
+    </header>
+    <div class="cols">
+      <ul class="bullets">
+          <li class="reveal d2"><span class="vi"><strong>Nạp lại hoàn toàn</strong>: số con bằng số cha mẹ và thay toàn bộ cha mẹ; ít kẹt cục bộ nhưng có thể mất cá thể tốt.</span><span class="en"><strong>Full replacement</strong>: as many children as parents, all parents replaced; less trapping, but good parents can be lost.</span></li>
+          <li class="reveal d3"><span class="vi"><strong>Nạp lại ngẫu nhiên</strong>: sau khi có <span class="m">k</span> con, thay <span class="m">k</span> cha mẹ chọn ngẫu nhiên.</span><span class="en"><strong>Random replacement</strong>: after <span class="m">k</span> children are made, replace <span class="m">k</span> randomly chosen parents.</span></li>
+          <li class="reveal d4"><span class="vi"><strong>Giữ cá thể ưu tú</strong>: luôn giữ cá thể tốt nhất, nên chất lượng quần thể không bao giờ giảm.</span><span class="en"><strong>Elitism</strong>: always keep the best individual, so population quality never drops.</span></li>
+          <li class="reveal d5"><span class="vi"><strong>Dùng phương pháp chọn lọc</strong>: trộn con vào quần thể rồi chọn cá thể bị đào thải, có thể theo tuổi.</span><span class="en"><strong>Selection-based</strong>: merge children into the population and select whom to discard, possibly by age.</span></li>
+      </ul>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Cài đặt trong giáo trình</span><span class="en">This book's implementation</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Giữ 2 cá thể ưu tú, phần còn lại là con mới.</span><span class="en">Keep 2 elites; the rest are new children.</span></li>
+          <li><span class="vi">Giải đấu kích thước 2, SBX, đột biến đa thức.</span><span class="en">Tournament of size 2, SBX, polynomial mutation.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các bước của thuật toán" data-label-en="Algorithm steps">
+  <div class="slide-content">
+    <div class="cols wide-right">
+      <header class="slide-head">
+        <p class="kicker reveal"><span class="vi">Các bước</span><span class="en">Steps</span></p>
+        <h2 class="reveal d1"><span class="vi">Các bước của GA</span><span class="en">GA step by step</span></h2>
+        <p class="lead reveal d2"><span class="vi">Tám bước theo GeeksforGeeks [12], khớp với sơ đồ GA trong bài giảng [11].</span><span class="en">Eight steps after GeeksforGeeks [12], matching the GA diagram in the lecture [11].</span></p>
+      </header>
+      <div>
+        <ol class="steps">
+          <li class="reveal d1"><span><span class="vi">Khởi tạo quần thể ngẫu nhiên trong miền ràng buộc.</span><span class="en">Initialize a random population within the constraints.</span></span></li>
+          <li class="reveal d2"><span><span class="vi">Đánh giá độ thích nghi của từng nhiễm sắc thể.</span><span class="en">Evaluate the fitness of every chromosome.</span></span></li>
+          <li class="reveal d3 loop-body"><span><span class="vi">Chọn cha mẹ theo độ thích nghi: roulette, giao đấu hay SUS.</span><span class="en">Select parents by fitness: roulette, tournament or SUS.</span></span></li>
+          <li class="reveal d4 loop-body"><span><span class="vi">Lai ghép cha mẹ với xác suất <span class="m">p<sub>c</sub></span> để tạo con.</span><span class="en">Cross parents with probability <span class="m">p<sub>c</sub></span> to make children.</span></span></li>
+          <li class="reveal d5 loop-body"><span><span class="vi">Đột biến con với xác suất <span class="m">p<sub>m</sub></span>.</span><span class="en">Mutate children with probability <span class="m">p<sub>m</sub></span>.</span></span></li>
+          <li class="reveal d6 loop-body"><span><span class="vi">Đánh giá con và tạo thế hệ mới, có giữ cá thể ưu tú.</span><span class="en">Evaluate the children and form the new generation, keeping elites.</span></span></li>
+          <li class="reveal d6 loop-body"><span><span class="vi">Kiểm tra điều kiện dừng; nếu chưa thỏa, quay lại bước 3.</span><span class="en">Check the stopping criterion; if not met, go back to step 3.</span></span></li>
+          <li class="reveal d6"><span><span class="vi">Trả về nhiễm sắc thể tốt nhất.</span><span class="en">Return the best chromosome.</span></span></li>
+        </ol>
+        <p class="loop-note reveal d6"><span class="tag" style="background: var(--sea); color: var(--paper)">3 – 7</span> <span class="vi">vòng lặp chính</span><span class="en">main loop</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
+  <div class="slide-content">
+    <div class="cols fc-cols fc-map">
+    <figure class="fig fc-vert reveal d2">
+      <svg viewBox="0 0 740 968" role="img" aria-label="GA flowchart">
+        <defs>
+          <marker id="ah-ga" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+        </defs>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="18" text-anchor="middle" fill="#1c2a2e">
+          <g>
+          <rect x="180" y="14" width="440" height="40" rx="20" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="40">BẮT ĐẦU</text></g><g class="en"><text x="400" y="40">START</text></g>
+          </g>
+          <g class="fc-node" data-s="1">
+          <rect x="180" y="72" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="103">Thiết lập tham số GA <tspan font-family="STIX Two Text, serif" font-style="italic">N, p<tspan baseline-shift="sub" font-size="12">c</tspan>, p<tspan baseline-shift="sub" font-size="12">m</tspan>, T</tspan></text></g><g class="en"><text x="400" y="103">Set GA parameters <tspan font-family="STIX Two Text, serif" font-style="italic">N, p<tspan baseline-shift="sub" font-size="12">c</tspan>, p<tspan baseline-shift="sub" font-size="12">m</tspan>, T</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="97" r="14"/><text class="fc-badge-t" x="648" y="103">1</text>
+          </g>
+          <g class="fc-node" data-s="2">
+          <rect x="180" y="140" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="171">Khởi tạo quần thể <tspan font-family="STIX Two Text, serif" font-style="italic">P(0)</tspan> ngẫu nhiên, <tspan font-family="STIX Two Text, serif" font-style="italic">t = 0</tspan></text></g><g class="en"><text x="400" y="171">Initialize a random population <tspan font-family="STIX Two Text, serif" font-style="italic">P(0)</tspan>, <tspan font-family="STIX Two Text, serif" font-style="italic">t = 0</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="165" r="14"/><text class="fc-badge-t" x="648" y="171">2</text>
+          </g>
+          <g class="fc-node" data-s="3">
+          <rect x="180" y="208" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="239">Đánh giá độ thích nghi của <tspan font-family="STIX Two Text, serif" font-style="italic">P(0)</tspan></text></g><g class="en"><text x="400" y="239">Evaluate the fitness of <tspan font-family="STIX Two Text, serif" font-style="italic">P(0)</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="233" r="14"/><text class="fc-badge-t" x="648" y="239">3</text>
+          </g>
+          <g class="fc-node" data-s="4">
+          <path d="M400,276 L565,321 L400,366 L235,321 z" fill="#f6e6b8" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="316">Điều kiện dừng</text><text x="400" y="338">chưa thỏa mãn?</text></g><g class="en"><text x="400" y="316">Stopping criterion</text><text x="400" y="338">not met?</text></g>
+          <circle class="fc-badge" cx="518" cy="284" r="14"/><text class="fc-badge-t" x="518" y="290">4</text>
+          </g>
+          <g class="fc-node" data-s="5">
+          <rect x="180" y="384" width="440" height="90" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g font-weight="600"><g class="vi"><text x="400" y="414">Chọn cha mẹ từ <tspan font-family="STIX Two Text, serif" font-style="italic">P(t)</tspan> theo độ thích nghi</text></g><g class="en"><text x="400" y="414">Select parents from <tspan font-family="STIX Two Text, serif" font-style="italic">P(t)</tspan> by fitness</text></g></g>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="16.5"><text x="400" y="436">p<tspan baseline-shift="sub" font-size="12">i</tspan> = f<tspan baseline-shift="sub" font-size="12">i</tspan> / Σ<tspan baseline-shift="sub" font-size="12">j</tspan> f<tspan baseline-shift="sub" font-size="12">j</tspan>  ·  q<tspan baseline-shift="sub" font-size="12">i</tspan> = Σ<tspan baseline-shift="sub" font-size="12">j≤i</tspan> p<tspan baseline-shift="sub" font-size="12">j</tspan></text></g>
+          <g font-size="15"><g class="vi"><text x="400" y="464">roulette, giao đấu hay SUS</text></g><g class="en"><text x="400" y="464">roulette, tournament or SUS</text></g></g>
+          <circle class="fc-badge" cx="648" cy="429" r="14"/><text class="fc-badge-t" x="648" y="435">5</text>
+          </g>
+          <g class="fc-node" data-s="6">
+          <rect x="180" y="492" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="523">Lai ghép với xác suất <tspan font-family="STIX Two Text, serif" font-style="italic">p<tspan baseline-shift="sub" font-size="12">c</tspan></tspan> → con</text></g><g class="en"><text x="400" y="523">Crossover with probability <tspan font-family="STIX Two Text, serif" font-style="italic">p<tspan baseline-shift="sub" font-size="12">c</tspan></tspan> → offspring</text></g>
+          <circle class="fc-badge" cx="648" cy="517" r="14"/><text class="fc-badge-t" x="648" y="523">6</text>
+          </g>
+          <g class="fc-node" data-s="7">
+          <rect x="180" y="560" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="591">Đột biến con với xác suất <tspan font-family="STIX Two Text, serif" font-style="italic">p<tspan baseline-shift="sub" font-size="12">m</tspan></tspan></text></g><g class="en"><text x="400" y="591">Mutate offspring with probability <tspan font-family="STIX Two Text, serif" font-style="italic">p<tspan baseline-shift="sub" font-size="12">m</tspan></tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="585" r="14"/><text class="fc-badge-t" x="648" y="591">7</text>
+          </g>
+          <g class="fc-node" data-s="8">
+          <rect x="180" y="628" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="659">Đánh giá độ thích nghi của con</text></g><g class="en"><text x="400" y="659">Evaluate the offspring fitness</text></g>
+          <circle class="fc-badge" cx="648" cy="653" r="14"/><text class="fc-badge-t" x="648" y="659">8</text>
+          </g>
+          <g class="fc-node" data-s="9">
+          <rect x="180" y="696" width="440" height="50" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="727">Chọn lọc sinh tồn, giữ ưu tú → <tspan font-family="STIX Two Text, serif" font-style="italic">P(t+1)</tspan></text></g><g class="en"><text x="400" y="727">Survivor selection with elitism → <tspan font-family="STIX Two Text, serif" font-style="italic">P(t+1)</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="721" r="14"/><text class="fc-badge-t" x="648" y="727">9</text>
+          </g>
+          <g class="fc-node" data-s="10">
+          <rect x="180" y="764" width="440" height="40" rx="6" fill="#f6d8cb" stroke="#1f6f78" stroke-width="2"/>
+          <g font-size="19"><text x="400" y="790"><tspan font-family="STIX Two Text, serif" font-style="italic">t = t + 1</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="784" r="14"/><text class="fc-badge-t" x="648" y="790">10</text>
+          </g>
+          <g class="fc-node" data-s="11"><rect x="180" y="842" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/><g class="vi"><text x="400" y="873">Trả về cá thể tốt nhất <tspan font-family="STIX Two Text, serif" font-style="italic">x*</tspan></text></g><g class="en"><text x="400" y="873">Return the best individual <tspan font-family="STIX Two Text, serif" font-style="italic">x*</tspan></text></g><circle class="fc-badge" cx="152" cy="867" r="14"/><text class="fc-badge-t" x="152" y="873">11</text></g>
+          <g><rect x="180" y="910" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/><g class="vi"><text x="400" y="938">KẾT THÚC</text></g><g class="en"><text x="400" y="938">END</text></g></g>
+          <g stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-ga)">
+            <path class="draw d2" style="--len:28" d="M400,54 V70"/>
+            <path class="draw d2" style="--len:28" d="M400,122 V138"/>
+            <path class="draw d2" style="--len:28" d="M400,190 V206"/>
+            <path class="draw d3" style="--len:28" d="M400,258 V274"/>
+            <path class="draw d3" style="--len:28" d="M400,366 V382"/>
+            <path class="draw d3" style="--len:28" d="M400,474 V490"/>
+            <path class="draw d4" style="--len:28" d="M400,542 V558"/>
+            <path class="draw d4" style="--len:28" d="M400,610 V626"/>
+            <path class="draw d4" style="--len:28" d="M400,678 V694"/>
+            <path class="draw d5" style="--len:28" d="M400,746 V762"/>
+            <path class="draw d5" style="--len:28" d="M400,892 V908"/>
+            <path class="draw d5" style="--len:1400" d="M180,784 H40 V321 H233"/>
+            <path class="draw d5" style="--len:1400" d="M565,321 H712 V867 H622"/>
+          </g>
+          <text x="412" y="388" text-anchor="start" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có</tspan><tspan class="en">Yes</tspan></text>
+          <text x="638" y="311" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
+        </g>
+      </svg>
+    </figure>
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Thuật toán GA</span><span class="en">The GA algorithm</span></p>
+          <h2 class="reveal d1"><span class="vi">Lưu đồ và mã giả</span><span class="en">Flowchart and pseudocode</span></h2>
+        </header>
+        <figure class="pc-fig reveal d3">
+          <div class="pc-box">
+          <div class="pc-title"><span class="en"><b>Algorithm 1:</b> Genetic algorithm</span><span class="vi"><b>Algorithm 1:</b> Giải thuật di truyền</span></div>
+          <div class="pc-g" data-s="1">
+          <span class="pc-badge">1</span>
+          <div class="pc-l" style="--ind:0"><span class="en">Set parameters <span class="m">N, p<sub>c</sub>, p<sub>m</sub>, T</span>;</span><span class="vi">Thiết lập tham số <span class="m">N, p<sub>c</sub>, p<sub>m</sub>, T</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="2">
+          <span class="pc-badge">2</span>
+          <div class="pc-l" style="--ind:0"><span class="en">Initialize population <span class="m">P(0)</span> at random; <span class="m">t ← 0</span>;</span><span class="vi">Khởi tạo ngẫu nhiên quần thể <span class="m">P(0)</span>; <span class="m">t ← 0</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="3">
+          <span class="pc-badge">3</span>
+          <div class="pc-l" style="--ind:0"><span class="en">Evaluate fitness <span class="m">f(x)</span> of every <span class="m">x ∈ </span><span class="m">P(0)</span>;</span><span class="vi">Đánh giá độ thích nghi <span class="m">f(x)</span> của mọi <span class="m">x ∈ </span><span class="m">P(0)</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="4">
+          <span class="pc-badge">4</span>
+          <div class="pc-l" style="--ind:0"><span class="en"><b>while</b> the stopping criterion is not met <b>do</b></span><span class="vi"><b>while</b> điều kiện dừng chưa thỏa mãn <b>do</b></span></div>
+          </div>
+          <div class="pc-g" data-s="5">
+          <span class="pc-badge">5</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Select parents from <span class="m">P(t)</span> by fitness;</span><span class="vi">Chọn cha mẹ từ <span class="m">P(t)</span> theo độ thích nghi;</span></div>
+          </div>
+          <div class="pc-g" data-s="6">
+          <span class="pc-badge">6</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Cross parents with probability <span class="m">p<sub>c</sub></span> to produce offspring;</span><span class="vi">Lai ghép cha mẹ với xác suất <span class="m">p<sub>c</sub></span> để sinh con;</span></div>
+          </div>
+          <div class="pc-g" data-s="7">
+          <span class="pc-badge">7</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Mutate offspring with probability <span class="m">p<sub>m</sub></span>;</span><span class="vi">Đột biến con với xác suất <span class="m">p<sub>m</sub></span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="8">
+          <span class="pc-badge">8</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Evaluate the fitness of the offspring;</span><span class="vi">Đánh giá độ thích nghi của con;</span></div>
+          </div>
+          <div class="pc-g" data-s="9">
+          <span class="pc-badge">9</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Form <span class="m">P(t+1)</span> by survivor selection, keeping the elites;</span><span class="vi">Tạo <span class="m">P(t+1)</span> bằng chọn lọc sinh tồn, giữ cá thể ưu tú;</span></div>
+          </div>
+          <div class="pc-g" data-s="10">
+          <span class="pc-badge">10</span>
+          <div class="pc-l" style="--ind:1"><span class="en"><span class="m">t ← t + 1</span>;</span><span class="vi"><span class="m">t ← t + 1</span>;</span></div>
+          </div>
+          <div class="pc-g">
+          <div class="pc-l" style="--ind:0"><span class="en"><b>end while</b></span><span class="vi"><b>end while</b></span></div>
+          </div>
+          <div class="pc-g" data-s="11">
+          <span class="pc-badge">11</span>
+          <div class="pc-l" style="--ind:0"><span class="en"><b>return</b> the best individual <span class="m">x*</span></span><span class="vi"><b>return</b> cá thể tốt nhất <span class="m">x*</span></span></div>
+          </div>
+          </div>
+          <figcaption><span class="vi">Mã giả GA tổng hợp từ các bước của GeeksforGeeks [12] và sơ đồ GA trong bài giảng của Huỳnh Thị Thanh Bình [11]. Số trên mỗi khối lưu đồ ứng với nhóm dòng cùng số.</span><span class="en">GA pseudocode synthesized from the GeeksforGeeks steps [12] and the GA diagram in the lecture by Huỳnh Thị Thanh Bình [11]. Each number on a flowchart block marks the pseudocode lines with the same number.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tham số" data-label-en="Parameters">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tham số</span><span class="en">Parameters</span></p>
+      <h2 class="reveal d1"><span class="vi">Tham số chính của GA</span><span class="en">Main GA parameters</span></h2>
+    </header>
+    <table class="mini-table reveal d2">
+      <thead><tr><th><span class="vi">Tham số</span><span class="en">Parameter</span></th><th><span class="vi">Ý nghĩa</span><span class="en">Meaning</span></th><th><span class="vi">Giá trị thường dùng</span><span class="en">Typical value</span></th></tr></thead>
+      <tbody>
+        <tr><td><span class="m">N</span></td><td><span class="vi">Kích thước quần thể</span><span class="en">Population size</span></td><td>20 – 100 <span class="vi">(GfG: 40; giáo trình: 30)</span><span class="en">(GfG: 40; this book: 30)</span></td></tr>
+        <tr><td><span class="m">p<sub>c</sub></span></td><td><span class="vi">Xác suất lai ghép</span><span class="en">Crossover probability</span></td><td>0.6 – 0.95 <span class="vi">(GfG và giáo trình: 0.9)</span><span class="en">(GfG and this book: 0.9)</span></td></tr>
+        <tr><td><span class="m">p<sub>m</sub></span></td><td><span class="vi">Xác suất đột biến mỗi gen</span><span class="en">Per-gene mutation probability</span></td><td><span class="m">1/L</span> <span class="vi">hay</span><span class="en">or</span> 0.001 – 0.2 <span class="vi">(giáo trình: <span class="m">1/D</span>)</span><span class="en">(this book: <span class="m">1/D</span>)</span></td></tr>
+        <tr><td><span class="m">k</span></td><td><span class="vi">Kích thước giải đấu</span><span class="en">Tournament size</span></td><td>2 – 3</td></tr>
+        <tr><td><span class="m">e</span></td><td><span class="vi">Số cá thể ưu tú</span><span class="en">Number of elites</span></td><td>1 – 2</td></tr>
+        <tr><td><span class="m">T</span></td><td><span class="vi">Số thế hệ hoặc ngân sách đánh giá</span><span class="en">Generations or evaluation budget</span></td><td><span class="vi">GfG: 100 thế hệ; giáo trình: 20 000 đánh giá</span><span class="en">GfG: 100 generations; this book: 20,000 evaluations</span></td></tr>
+      </tbody>
+    </table>
+    <p class="note reveal d3"><span class="vi">Đột biến lớn biến GA thành tìm kiếm ngẫu nhiên; đột biến quá nhỏ làm quần thể mất đa dạng và hội tụ sớm.</span><span class="en">Heavy mutation turns GA into random search; too little mutation lets the population lose diversity and converge prematurely.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mô phỏng</span><span class="en">Simulation</span></p>
+      <h2 class="reveal d1"><span class="vi">GA trên cùng địa hình</span><span class="en">GA on the same landscape</span></h2>
+    </header>
+    <div class="demo2 reveal d2">
+      <div class="stack">
+        <p><span class="vi">Mỗi bước là một thế hệ: hai cá thể ưu tú (cam, viền đậm) được giữ lại, phần còn lại là con của giải đấu, lai SBX và đột biến đa thức.</span><span class="en">Each step is one generation: two elites (orange, bold outline) survive; the rest are children of tournament selection, SBX and polynomial mutation.</span></p>
+        <p class="note"><span class="vi">Quan sát: quần thể co về vài vùng tốt; khi mất đa dạng, chỉ đột biến còn tạo được bước nhảy xa.</span><span class="en">Watch the population shrink toward a few good regions; once diversity is lost, only mutation makes long jumps.</span></p>
+        <div class="key">
+          <span><i style="background:#3a7fc1"></i><span class="vi">cá thể</span><span class="en">individuals</span></span>
+          <span><i style="background:#d9562f"></i><span class="vi">ưu tú</span><span class="en">elites</span></span>
+        </div>
+      </div>
+      <div class="field" id="ga-field"><canvas aria-label="GA"></canvas><div class="field-stat"></div><div class="field-ctrl"><button class="btn" type="button" data-act="play"></button><button class="btn" type="button" data-act="step"><span class="vi">Một bước</span><span class="en">Step</span></button><button class="btn" type="button" data-act="reset"><span class="vi">Đặt lại</span><span class="en">Reset</span></button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide worked" aria-label="Ví dụ tính tay" data-label-en="Worked example">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ví dụ tính tay</span><span class="en">Worked example</span></p>
+      <h2 class="reveal d1"><span class="vi">Một thế hệ GA nhị phân với <span class="m">f(x) = x², x ∈ [0, 31]</span></span><span class="en">One binary-GA generation with <span class="m">f(x) = x², x ∈ [0, 31]</span></span></h2>
+    </header>
+    <div class="cols even" style="align-items:start">
+      <div class="stack">
+        <div class="eq-box reveal d2" style="font-size:0.92em">
+          <div class="eq"><span class="m">01101 → 13 · 11000 → 24 · 01000 → 8 · 10011 → 19</span></div>
+          <div class="eq"><span class="m">f = 169, 576, 64, 361; F = 1170</span></div>
+          <div class="eq"><span class="m">p = 0.144, 0.492, 0.055, 0.309</span></div>
+          <div class="eq"><span class="m">q = 0.144, 0.637, 0.691, 1.000</span></div>
+        </div>
+        <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Kim quay <span class="m">r = 0.20, 0.70, 0.55, 0.95</span> chọn <span class="m">11000, 10011, 11000, 10011</span>.</span><span class="en">Spins <span class="m">r = 0.20, 0.70, 0.55, 0.95</span> pick <span class="m">11000, 10011, 11000, 10011</span>.</span></li>
+          <li><span class="vi">Chỉ cá thể 2 và 4 được chọn: hai cá thể có <span class="m">p</span> lớn nhất chiếm 80% bánh xe.</span><span class="en">Only individuals 2 and 4 are picked: the two largest <span class="m">p</span> cover 80% of the wheel.</span></li>
+        </ul>
+      </div>
+      <div class="card sea reveal d4">
+        <h3><span class="vi">Lai ghép và đột biến</span><span class="en">Crossover and mutation</span></h3>
+        <ul class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Lai một điểm sau gen thứ 2: <span class="m">11|000 × 10|011 → 11011, 10000</span>.</span><span class="en">One-point crossover after gene 2: <span class="m">11|000 × 10|011 → 11011, 10000</span>.</span></li>
+          <li><span class="vi">Đột biến bit cuối của <span class="m">10000</span>: <span class="m">10000 → 10001</span>; cặp thứ hai không lai, giữ nguyên.</span><span class="en">Flip the last bit of <span class="m">10000</span>: <span class="m">10000 → 10001</span>; the second pair is not crossed and is copied.</span></li>
+          <li><span class="vi">Thế hệ mới <span class="m">11011, 10001, 11000, 10011</span>: <span class="m">f = 729, 289, 576, 361</span>.</span><span class="en">New generation <span class="m">11011, 10001, 11000, 10011</span>: <span class="m">f = 729, 289, 576, 361</span>.</span></li>
+          <li><span class="vi">Độ thích nghi trung bình tăng từ <span class="m">292.5</span> lên <span class="m">488.75</span>; cá thể tốt nhất <span class="m">11011 = 27</span>, <span class="m">f = 729</span>.</span><span class="en">Mean fitness rises from <span class="m">292.5</span> to <span class="m">488.75</span>; the best is <span class="m">11011 = 27</span>, <span class="m">f = 729</span>.</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="note reveal d5"><span class="vi">Quần thể đầu theo ví dụ kinh điển của Goldberg [3]; các số ngẫu nhiên <span class="m">r</span>, điểm cắt và bit đột biến được chọn để minh họa.</span><span class="en">The initial population follows Goldberg's classic example [3]; the random numbers <span class="m">r</span>, cut point and mutated bit are chosen for illustration.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Thực nghiệm" data-label-en="Experiment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GA</span><span class="en">Experiment · GA</span></p>
+      <h2 class="reveal d1"><span class="vi">Kết quả trên bộ 7 hàm, D = 10, 30 lần chạy</span><span class="en">Results on the 7-function suite, D = 10, 30 runs</span></h2>
+    </header>
+    <div class="cols" style="align-items:start">
+      <table class="mini-table res-table reveal d2">
+        <thead><tr><th><span class="vi">Hàm</span><span class="en">Function</span></th><th><span class="vi">Trung bình</span><span class="en">Mean</span></th><th><span class="vi">Độ lệch</span><span class="en">Std</span></th><th><span class="vi">Trung vị</span><span class="en">Median</span></th><th><span class="vi">so PSO</span><span class="en">vs PSO</span></th></tr></thead>
+        <tbody><tr><td>F1 · Sphere</td><td class="num">2.03e−4</td><td class="num">1.38e−4</td><td class="num">1.79e−4</td><td><span class="sg-minus">−</span></td></tr><tr><td>F2 · Rosenbrock</td><td class="num">9.40e+0</td><td class="num">1.23e+1</td><td class="num">6.99e+0</td><td><span class="sg-minus">−</span></td></tr><tr><td>F3 · Rastrigin</td><td class="num">3.62e−2</td><td class="num">1.81e−1</td><td class="num">7.46e−4</td><td><span class="sg-plus">+</span></td></tr><tr><td>F4 · Ackley</td><td class="num">5.48e−3</td><td class="num">3.46e−3</td><td class="num">5.44e−3</td><td><span class="sg-minus">−</span></td></tr><tr><td>F5 · Griewank</td><td class="num">8.53e−2</td><td class="num">3.86e−2</td><td class="num">8.18e−2</td><td><span class="sg-plus">+</span></td></tr><tr><td>F6 · Shifted Sphere</td><td class="num">2.13e−4</td><td class="num">1.42e−4</td><td class="num">1.90e−4</td><td><span class="sg-minus">−</span></td></tr><tr><td>F7 · Shifted Rastrigin</td><td class="num">4.01e−2</td><td class="num">1.83e−1</td><td class="num">7.89e−4</td><td><span class="sg-plus">+</span></td></tr></tbody>
+      </table>
+      <ul class="bullets reveal d3" style="font-size: calc(var(--body-size) * 0.88)">
+        <li><span class="vi">Sai số <span class="m">f(x<sub>best</sub>) − f*</span> sau 20 000 lần đánh giá; <span class="m">n = 30</span>; giải đấu 2, SBX <span class="m">η<sub>c</sub> = 20, p<sub>c</sub> = 0.9</span>, đột biến đa thức <span class="m">p<sub>m</sub> = 1/D</span>, 2 ưu tú; giá trị &lt; 10<sup>−8</sup> ghi là 0.</span><span class="en">Error <span class="m">f(x<sub>best</sub>) − f*</span> after 20,000 evaluations; <span class="m">n = 30</span>; tournament 2, SBX <span class="m">η<sub>c</sub> = 20, p<sub>c</sub> = 0.9</span>, polynomial mutation <span class="m">p<sub>m</sub> = 1/D</span>, 2 elites; values &lt; 10<sup>−8</sup> shown as 0.</span></li>
+        <li><span class="vi">Cột cuối: Wilcoxon rank-sum với PSO (α = 0.05): <span class="sg-plus">+</span> tốt hơn, <span class="sg-minus">−</span> kém hơn, ≈ không khác biệt.</span><span class="en">Last column: Wilcoxon rank-sum vs PSO (α = 0.05): <span class="sg-plus">+</span> better, <span class="sg-minus">−</span> worse, ≈ no difference.</span></li>
+        <li><span class="vi">Xếp hạng Friedman trung bình: <b>12.00</b>, đứng thứ <b>13/23</b> trong 23 phương pháp của giáo trình: 18 thuật toán bầy đàn cùng GA, QPSO, GA-PSO, tìm kiếm ngẫu nhiên và (1+1)-ES.</span><span class="en">Average Friedman rank: <b>12.00</b>, position <b>13/23</b> among the textbook’s 23 methods: 18 swarm algorithms plus GA, QPSO, GA-PSO, random search and (1+1)-ES.</span></li>
+        <li><span class="vi">GA thắng PSO trên F3, F5, F7 nhiều đỉnh nhưng thua trên F1, F2, F4, F6; trên hàm đơn đỉnh, SBX + đột biến đa thức tinh chỉnh chậm hơn cập nhật vận tốc.</span><span class="en">GA beats PSO on the multimodal F3, F5, F7 but loses on F1, F2, F4, F6; on unimodal functions SBX + polynomial mutation refines more slowly than the velocity update.</span></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đường hội tụ" data-label-en="Convergence">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Thực nghiệm · GA</span><span class="en">Experiment · GA</span></p>
+      <h2 class="reveal d1"><span class="vi">Đường hội tụ (trung vị 30 lần chạy)</span><span class="en">Convergence (median of 30 runs)</span></h2>
+    </header>
+    <figure class="fig reveal d2">
+      <img class="conv-img" src="assets/conv/GA.svg" alt="convergence GA" />
+      <figcaption><span class="vi">Trục tung: sai số trung vị (thang log); trục hoành: số lần đánh giá hàm. F6, F7 là bản dịch tâm của F1, F3.</span><span class="en">Vertical: median error (log scale); horizontal: function evaluations. F6, F7 are shifted versions of F1, F3.</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" aria-label="Mã nguồn" data-label-en="Source code">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Mã nguồn</span><span class="en">Source code</span></p>
+      <h2 class="reveal d1"><span class="vi">Mã nguồn Python</span><span class="en">Python source code</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">Đoạn trích phần cập nhật chính; tệp đầy đủ có chú thích và tham số mặc định theo bài gốc.</span><span class="en">Excerpt of the main update; the full file documents the default parameters of the original paper.</span> <a href="code/si/algorithms/ga.py" class="c-sea">code/si/algorithms/ga.py</a></p>
+    <pre class="codeblock reveal d2">    <span class="k">while</span> <span class="k">not</span> prob.done:
+        o = np.argsort(f)
+        kids = [X[o[k]].copy() <span class="k">for</span> k <span class="k">in</span> range(elite)]
+        <span class="k">while</span> len(kids) &lt; n:
+            i = min(rng.integers(n, size=2), key=lambda q: f[q])
+            j = min(rng.integers(n, size=2), key=lambda q: f[q])
+            a, b = X[i], X[j]
+            <span class="k">if</span> rng.random() &lt; pc:
+                a, b = sbx(rng, a, b, prob.lb, prob.ub)
+            kids += [poly_mutation(rng, a, prob.lb, prob.ub, pm), poly_mutation(rng, b, prob.lb, prob.ub, pm)]
+        X = np.array(kids[:n])
+        f = np.concatenate([f[o[:elite]], prob(X[elite:])])
+    <span class="k">return</span> prob.best_x, prob.best_f</pre>
+    <p class="note reveal d3"><span class="vi">Chạy lại toàn bộ thực nghiệm: <span class="m">python -m experiments.run_continuous</span> trong thư mục code/ (xem PROTOCOL.md).</span><span class="en">Reproduce all experiments: <span class="m">python -m experiments.run_continuous</span> inside code/ (see PROTOCOL.md).</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Các biến thể" data-label-en="Variants">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Các biến thể</span><span class="en">Variants</span></p>
+      <h2 class="reveal d1"><span class="vi">Các biến thể của GA</span><span class="en">GA variants</span></h2>
+    </header>
+    <div class="variants">
+      <div class="card reveal d2"><span class="num">01</span><h3><span class="vi">GA mã hóa thực</span><span class="en">Real-coded GA</span></h3><p><span class="vi">Lai SBX và đột biến đa thức cho biến liên tục (Deb &amp; Agrawal, 1995) [8].</span><span class="en">SBX and polynomial mutation for continuous variables (Deb &amp; Agrawal, 1995) [8].</span></p></div>
+      <div class="card reveal d3"><span class="num">02</span><h3><span class="vi">GA hoán vị</span><span class="en">Permutation GA</span></h3><p><span class="vi">OX, PMX, CX và đột biến đảo đoạn cho TSP, lập lịch [3].</span><span class="en">OX, PMX, CX and inversion mutation for TSP and scheduling [3].</span></p></div>
+      <div class="card reveal d4"><span class="num">03</span><h3><span class="vi">GA thích nghi</span><span class="en">Adaptive GA</span></h3><p><span class="vi"><span class="m">p<sub>c</sub></span>, <span class="m">p<sub>m</sub></span> thay đổi theo độ thích nghi của từng cá thể (Srinivas &amp; Patnaik, 1994) [5].</span><span class="en"><span class="m">p<sub>c</sub></span>, <span class="m">p<sub>m</sub></span> adapt to each individual's fitness (Srinivas &amp; Patnaik, 1994) [5].</span></p></div>
+      <div class="card reveal d5"><span class="num">04</span><h3><span class="vi">NSGA-II</span><span class="en">NSGA-II</span></h3><p><span class="vi">GA đa mục tiêu: sắp xếp không trội và khoảng cách đông đúc (Deb và cs., 2002) [9]; xem chương 14.</span><span class="en">Multi-objective GA: non-dominated sorting and crowding distance (Deb et al., 2002) [9]; see chapter 14.</span></p></div>
+    </div>
+    <p class="note reveal d6"><span class="vi">Lai GA với PSO (GA-PSO) và biến thể lượng tử QPSO được trình bày ở mục 16.2–16.3.</span><span class="en">Hybrid GA-PSO and the quantum-inspired QPSO are covered in sections 16.2–16.3.</span></p>
+  </div>
+</section>
+
+<section class="slide" aria-label="Ứng dụng" data-label-en="Applications">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Ứng dụng</span><span class="en">Applications</span></p>
+      <h2 class="reveal d1"><span class="vi">GA dùng ở đâu</span><span class="en">Where GA is used</span></h2>
+    </header>
+    <p class="lead reveal d1"><span class="vi">GA hợp nhất khi lời giải mã hóa được thành chuỗi gen và chỉ có thể đánh giá, không có đạo hàm.</span><span class="en">GA fits best when a solution can be encoded as a gene string and only evaluated, with no gradient.</span></p>
+    <div class="variants">
+      <div class="card reveal d2"><h3><span class="vi">Tối ưu hàm</span><span class="en">Function optimization</span></h3><p><span class="vi">Hàm phi tuyến, nhiều cực trị; ví dụ GfG cực đại <span class="m">x sin(10πx) + 1</span> trên <span class="m">[−1, 2]</span>.</span><span class="en">Non-linear, multimodal functions; the GfG example maximizes <span class="m">x sin(10πx) + 1</span> on <span class="m">[−1, 2]</span>.</span></p></div>
+      <div class="card reveal d3"><h3><span class="vi">Lập lịch</span><span class="en">Scheduling</span></h3><p><span class="vi">Lập lịch công việc, thời khóa biểu, phân bổ tài nguyên.</span><span class="en">Job scheduling, timetabling, resource allocation.</span></p></div>
+      <div class="card reveal d4"><h3><span class="vi">Người du lịch (TSP)</span><span class="en">Travelling salesman</span></h3><p><span class="vi">Mã hóa hoán vị với lai OX/PMX tìm hành trình ngắn nhất.</span><span class="en">Permutation encoding with OX/PMX crossover finds short tours.</span></p></div>
+      <div class="card reveal d5"><h3><span class="vi">Chọn đặc trưng</span><span class="en">Feature selection</span></h3><p><span class="vi">Mỗi bit bật hoặc tắt một đặc trưng của mô hình học máy.</span><span class="en">Each bit switches one feature of a machine-learning model on or off.</span></p></div>
+      <div class="card reveal d6"><h3><span class="vi">Mạng nơ-ron</span><span class="en">Neural networks</span></h3><p><span class="vi">Tìm trọng số, kiến trúc và siêu tham số.</span><span class="en">Search weights, architectures and hyper-parameters.</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Đánh giá" data-label-en="Assessment">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Đánh giá</span><span class="en">Assessment</span></p>
+      <h2 class="reveal d1"><span class="vi">Linh hoạt nhưng không nhanh</span><span class="en">Flexible, but not fast</span></h2>
+    </header>
+    <div class="pros-cons">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Điểm mạnh</span><span class="en">Strengths</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Không cần đạo hàm; làm việc được với hàm hộp đen, rời rạc, nhiều cực trị.</span><span class="en">No gradient needed; works on black-box, discrete and multimodal functions.</span></li>
+          <li><span class="vi">Mã hóa và toán tử linh hoạt cho nhiều loại bài toán: nhị phân, hoán vị, cây, số thực.</span><span class="en">Flexible encodings and operators for many problem types: binary, permutation, tree, real.</span></li>
+          <li><span class="vi">Trong thực nghiệm, GA thắng PSO trên F3, F5, F7 nhiều đỉnh.</span><span class="en">In the experiment GA beats PSO on the multimodal F3, F5, F7.</span></li>
+        </ul>
+      </div>
+      <div class="card ember reveal d3">
+        <h3><span class="vi">Hạn chế và biến thể</span><span class="en">Limitations and variants</span></h3>
+        <ul class="bullets">
+          <li><span class="vi">Không quá nhanh: thua PSO trên các hàm đơn đỉnh F1, F2, F4, F6 với cùng ngân sách.</span><span class="en">Not fast: loses to PSO on the unimodal F1, F2, F4, F6 under the same budget.</span></li>
+          <li><span class="vi">Nhiều tham số (<span class="m">N, p<sub>c</sub>, p<sub>m</sub>, k</span>, số ưu tú) và nhiều lựa chọn toán tử cần hiệu chỉnh.</span><span class="en">Many parameters (<span class="m">N, p<sub>c</sub>, p<sub>m</sub>, k</span>, elites) and operator choices to tune.</span></li>
+          <li><span class="vi">Dễ hội tụ sớm khi chọn lọc quá mạnh hoặc đột biến quá yếu.</span><span class="en">Prone to premature convergence when selection is too strong or mutation too weak.</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Bài tập và thực hành" data-label-en="Exercises and labs">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Bài tập và thực hành</span><span class="en">Exercises and labs</span></p>
+      <h2 class="reveal d1"><span class="vi">Luyện tập: tính tay rồi lập trình</span><span class="en">Practice: by hand, then in code</span></h2>
+    </header>
+    <div class="cols even" style="align-items: stretch">
+      <div class="card sea reveal d2">
+        <h3><span class="vi">Bài tập lý thuyết</span><span class="en">Theory exercises</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Với <span class="m">f = 10, 30, 20, 40</span>, tính <span class="m">p<sub>i</sub>, q<sub>i</sub></span> và cá thể được chọn khi <span class="m">r = 0.15, 0.45, 0.62, 0.99</span>.</span><span class="en">With <span class="m">f = 10, 30, 20, 40</span>, compute <span class="m">p<sub>i</sub>, q<sub>i</sub></span> and the picks for <span class="m">r = 0.15, 0.45, 0.62, 0.99</span>.</span></li>
+          <li><span class="vi">Lai OX cho cha <span class="m">1 2 3 4 5 6 7 8 9</span>, mẹ <span class="m">9 3 7 8 2 6 5 1 4</span>, hai điểm lai sau gen 3 và gen 6.</span><span class="en">Apply OX to parent 1 <span class="m">1 2 3 4 5 6 7 8 9</span>, parent 2 <span class="m">9 3 7 8 2 6 5 1 4</span>, cut points after genes 3 and 6.</span></li>
+          <li><span class="vi">Vì sao giữ cá thể ưu tú làm độ thích nghi tốt nhất không bao giờ giảm?</span><span class="en">Why does elitism guarantee that the best fitness never decreases?</span></li>
+        </ol>
+      </div>
+      <div class="card sand reveal d3">
+        <h3><span class="vi">Thực hành Python / MATLAB</span><span class="en">Python / MATLAB labs</span></h3>
+        <ol class="bullets" style="font-size: calc(var(--body-size) * 0.9)">
+          <li><span class="vi">Cài GA nhị phân cho ví dụ <span class="m">f(x) = x²</span> và chạy 20 thế hệ với <span class="m">N = 4</span> và <span class="m">N = 20</span>.</span><span class="en">Implement a binary GA for <span class="m">f(x) = x²</span> and run 20 generations with <span class="m">N = 4</span> and <span class="m">N = 20</span>.</span></li>
+          <li><span class="vi">So sánh chọn lọc roulette và giao đấu trên F3 Rastrigin, 30 lần chạy.</span><span class="en">Compare roulette and tournament selection on F3 Rastrigin over 30 runs.</span></li>
+          <li><span class="vi">Thử <span class="m">p<sub>m</sub> = 0, 1/D, 0.5</span> và vẽ đường hội tụ.</span><span class="en">Try <span class="m">p<sub>m</sub> = 0, 1/D, 0.5</span> and plot the convergence curves.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (1/2)</span><span class="en">References (1/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: tài liệu gốc và bài giảng</span><span class="en">Further reading: original works and lectures</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="1" style="counter-reset: rf 0">
+        <li>J. H. Holland, <em>Adaptation in Natural and Artificial Systems</em>. Ann Arbor, MI, USA: Univ. Michigan Press, 1975.</li>
+        <li>K. A. De Jong, “An analysis of the behavior of a class of genetic adaptive systems,” Ph.D. dissertation, Univ. Michigan, Ann Arbor, MI, USA, 1975.</li>
+        <li>D. E. Goldberg, <em>Genetic Algorithms in Search, Optimization, and Machine Learning</em>. Reading, MA, USA: Addison-Wesley, 1989.</li>
+        <li>D. E. Goldberg and K. Deb, “A comparative analysis of selection schemes used in genetic algorithms,” in <em>Foundations of Genetic Algorithms</em>, 1991, pp. 69–93, doi: <a href="https://doi.org/10.1016/B978-0-08-050684-5.50008-2">10.1016/B978-0-08-050684-5.50008-2</a>.</li>
+        <li>M. Srinivas and L. M. Patnaik, “Adaptive probabilities of crossover and mutation in genetic algorithms,” <em>IEEE Trans. Syst., Man, Cybern.</em>, vol. 24, no. 4, pp. 656–667, Apr. 1994, doi: <a href="https://doi.org/10.1109/21.286385">10.1109/21.286385</a>.</li>
+        <li>M. Srinivas and L. M. Patnaik, “Genetic algorithms: a survey,” <em>Computer</em>, vol. 27, no. 6, pp. 17–26, Jun. 1994, doi: <a href="https://doi.org/10.1109/2.294849">10.1109/2.294849</a>.</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" aria-label="Tài liệu tham khảo" data-label-en="References">
+  <div class="slide-content">
+    <header class="slide-head">
+      <p class="kicker reveal"><span class="vi">Tài liệu tham khảo (2/2)</span><span class="en">References (2/2)</span></p>
+      <h2 class="reveal d1"><span class="vi">Đọc thêm: tài liệu gốc và bài giảng</span><span class="en">Further reading: original works and lectures</span></h2>
+    </header>
+    <ol class="refs reveal d2" start="7" style="counter-reset: rf 6">
+        <li>D. Whitley, “A genetic algorithm tutorial,” <em>Statistics and Computing</em>, vol. 4, no. 2, pp. 65–85, Jun. 1994, doi: <a href="https://doi.org/10.1007/BF00175354">10.1007/BF00175354</a>.</li>
+        <li>K. Deb and R. B. Agrawal, “Simulated binary crossover for continuous search space,” <em>Complex Syst.</em>, vol. 9, no. 2, pp. 115–148, 1995.</li>
+        <li>K. Deb, A. Pratap, S. Agarwal, and T. Meyarivan, “A fast and elitist multiobjective genetic algorithm: NSGA-II,” <em>IEEE Trans. Evol. Comput.</em>, vol. 6, no. 2, pp. 182–197, Apr. 2002, doi: <a href="https://doi.org/10.1109/4235.996017">10.1109/4235.996017</a>.</li>
+        <li>S. Katoch, S. S. Chauhan, and V. Kumar, “A review on genetic algorithm: past, present, and future,” <em>Multimedia Tools and Applications</em>, vol. 80, no. 5, pp. 8091–8126, 2021, doi: <a href="https://doi.org/10.1007/s11042-020-10139-6">10.1007/s11042-020-10139-6</a>.</li>
+        <li>T. T. B. Huỳnh, “Genetic Algorithm (GA),” lecture slides, School of Information and Communication Technology, Hanoi University of Science and Technology, Hanoi, Vietnam.</li>
+        <li>GeeksforGeeks, “Genetic Algorithms.” [Online]. Available: <a href="https://www.geeksforgeeks.org/dsa/genetic-algorithms/">https://www.geeksforgeeks.org/dsa/genetic-algorithms/</a> (accessed Oct. 22, 2026).</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide title-slide" aria-label="Kết thúc" data-label-en="Closing">
+  <canvas class="swarm-canvas" data-swarm="end" aria-hidden="true"></canvas>
+  <div class="slide-content">
+    <p class="kicker reveal"><span class="vi">Tóm lại</span><span class="en">In short</span></p>
+    <div class="recap reveal d1">
+      <span><span class="vi">Gen · nhiễm sắc thể · quần thể · độ thích nghi</span><span class="en">Gene · chromosome · population · fitness</span></span>
+      <span><span class="vi">Chọn lọc → lai ghép → đột biến</span><span class="en">Selection → crossover → mutation</span></span>
+      <span><span class="vi">Giữ ưu tú để không mất lời giải tốt</span><span class="en">Keep elites so good solutions are never lost</span></span>
+    </div>
+    <h1 class="reveal d2" style="max-width: 16em"><span class="vi">Cảm ơn các bạn đã theo dõi</span><span class="en">Thank you for your attention</span></h1>
+    <p class="credit reveal d3">Châu Văn Vân · PTITHCM · <span class="vi">Tài liệu gốc: Holland, <em>Adaptation in Natural and Artificial Systems</em>, 1975</span><span class="en">Original paper: Holland, <em>Adaptation in Natural and Artificial Systems</em>, 1975</span></p>
+  </div>
+</section>
+
+</main>
+
+<script src="assets/si-deck.js"></script>
+<script>
+
+/* GA mã hóa thực trên địa hình chung: giải đấu 2, SBX eta = 20, đột biến đa thức, giữ 2 ưu tú (như code/si/algorithms/ga.py) */
+new SI.Field2D(document.getElementById('ga-field'), {
+  n: 16, T: 60, seed: 9,
+  init(S) { for (let i = 0; i < this.n; i++) S.pop.push({ x: SI.randPos(S.rnd) }); },
+  step(S) {
+    const rnd = S.rnd, eta = 20, P = S.pop.slice().sort((a, b) => SI.f(a.x) - SI.f(b.x));
+    const tour = () => { const a = P[Math.floor(rnd() * P.length)], b = P[Math.floor(rnd() * P.length)]; return SI.f(a.x) < SI.f(b.x) ? a : b; };
+    const sbx = (a, b) => { const c1 = [], c2 = []; for (let d = 0; d < 2; d++) { const u = rnd(), be = u <= 0.5 ? Math.pow(2 * u, 1 / (eta + 1)) : Math.pow(1 / (2 * (1 - u)), 1 / (eta + 1)); c1.push(0.5 * ((1 + be) * a[d] + (1 - be) * b[d])); c2.push(0.5 * ((1 - be) * a[d] + (1 + be) * b[d])); } return [c1, c2]; };
+    const mut = (x) => x.map((v) => { if (rnd() >= 0.5) return SI.clamp(v); const u = rnd(), dl = u < 0.5 ? Math.pow(2 * u, 1 / 21) - 1 : 1 - Math.pow(2 * (1 - u), 1 / 21); return SI.clamp(v + dl * 12); });
+    const kids = [{ x: P[0].x.slice(), elite: true, hist: P[0].hist }, { x: P[1].x.slice(), elite: true, hist: P[1].hist }];
+    while (kids.length < this.n) { let a = tour().x, b = tour().x; if (rnd() < 0.9) [a, b] = sbx(a, b); kids.push({ x: mut(a) }); if (kids.length < this.n) kids.push({ x: mut(b) }); }
+    S.pop.length = 0; kids.forEach((k) => S.pop.push(k));
+  },
+  draw(g, S, P) {
+    for (const p of S.pop) { const [x, y] = P.at(p); SI.dot(g, x, y, p.elite ? 6 : 4.5, p.elite ? '#d9562f' : '#3a7fc1', p.elite ? '#1c2a2e' : undefined); }
+    const [bx, by] = P.pt(S.best); g.strokeStyle = '#d9562f'; g.lineWidth = 2; g.strokeRect(bx - 7, by - 7, 14, 14);
+  },
+  status(S) { return `<span><b>N</b> = ${this.n}</span>`; },
+});
+
+SI.boot();
+</script>
+</body>
+</html>
