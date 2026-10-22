@@ -8,6 +8,29 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600&family=Lora:ital,wght@0,500;0,600;0,700;1,500&family=STIX+Two+Text:ital,wght@0,400;1,400&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="assets/si-deck.css" />
+<style>
+/* ACO-FC-BEGIN flowchart + pseudocode (slide 9) */
+.fc-cols { grid-template-columns: 1fr 1fr; align-items: center; }
+.fig.fc-vert svg { max-height: calc(100dvh - 2 * var(--slide-padding)); width: auto; max-width: 100%; }
+.fc-badge { fill: #1f6f78; } .fc-badge-t { fill: #fff; font-size: 15px; font-weight: 700; }
+.fc-node rect, .fc-node path, .pc-g { transition: filter .2s, background-color .2s, outline-color .2s; }
+.pc-fig { display: flex; flex-direction: column; gap: 0.5em; max-width: 46em; }
+.pc-fig figcaption { font-size: var(--small-size); color: var(--ink-soft); }
+.pc-box { background: #fff; border: 1px solid #1c2a2e; box-shadow: -7px 7px 0 #c9c9c9; padding: 0.6em 0.9em 0.7em 0.5em;
+  font-family: var(--font-math); font-size: clamp(0.7rem, 1.0vw, 1.02rem); line-height: 1.45; color: var(--ink); }
+.pc-title { border-bottom: 1px solid #1c2a2e; margin: 0 0 0.35em 0.5em; padding-bottom: 0.2em; }
+.pc-g { position: relative; padding-left: 2.1em; border-radius: 6px; outline: 2px solid transparent; }
+.pc-badge { position: absolute; left: 0.25em; top: 0.16em; width: 1.45em; height: 1.45em; border-radius: 50%; background: #1f6f78; color: #fff;
+  font: 700 0.78em/1.45em var(--font-body); font-style: normal; text-align: center; }
+.pc-l { padding-left: calc(var(--ind) * 1.3em); text-indent: -1em; margin-left: 1em; }
+.pc-l * { text-indent: 0; } .pc-l .m { font-style: italic; }
+.fc-map:has([data-s="1"]:hover) [data-s="1"], .fc-map:has([data-s="2"]:hover) [data-s="2"], .fc-map:has([data-s="3"]:hover) [data-s="3"], .fc-map:has([data-s="4"]:hover) [data-s="4"], .fc-map:has([data-s="5"]:hover) [data-s="5"], .fc-map:has([data-s="6"]:hover) [data-s="6"], .fc-map:has([data-s="7"]:hover) [data-s="7"], .fc-map:has([data-s="8"]:hover) [data-s="8"], .fc-map:has([data-s="9"]:hover) [data-s="9"] { background: #d5e7e6; outline-color: #1f6f78; filter: drop-shadow(0 0 4px rgba(31,111,120,.55)); }
+@media (max-width: 760px) and (orientation: portrait) {
+  .fc-cols { grid-template-columns: 1fr; gap: 0.5rem; } .fc-map > .stack { order: -1; }
+  .fig.fc-vert svg { max-height: 40dvh; } .pc-box { font-size: 0.58rem; line-height: 1.3; } .pc-fig figcaption { display: none; }
+}
+/* ACO-FC-END */
+</style>
 </head>
 <body>
 <div class="progress" aria-hidden="true"></div>
@@ -175,49 +198,141 @@
 
 <section class="slide" aria-label="Lưu đồ thuật toán" data-label-en="Flowchart">
   <div class="slide-content">
-    <header class="slide-head">
-      <p class="kicker reveal"><span class="vi">Thuật toán</span><span class="en">Algorithm</span></p>
-      <h2 class="reveal d1"><span class="vi">Lưu đồ</span><span class="en">Flowchart</span></h2>
-    </header>
-    <figure class="fig reveal d2">
-      <svg viewBox="0 0 1000 410" role="img" aria-label="Flowchart">
+    <div class="cols fc-cols fc-map">
+    <figure class="fig fc-vert reveal d2">
+      <svg viewBox="0 0 740 986" role="img" aria-label="ACO flowchart">
         <defs>
-          <marker id="fc-ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1c2a2e"/></marker>
-          <marker id="fc-sea" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
+          <marker id="ah-aco" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#1f6f78"/></marker>
         </defs>
-        <g font-family="Be Vietnam Pro, sans-serif" font-size="16" text-anchor="middle" fill="#1c2a2e">
-          <rect x="20" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="125" y="67">Khởi tạo</text><text x="125" y="89">pheromone τ₀</text></g><g class="en"><text x="125" y="67">Initialize</text><text x="125" y="89">pheromone τ₀</text></g><rect x="770" y="30" width="210" height="84" rx="12" fill="#ebe3d2"/><g class="vi"><text x="875" y="78">η = 1/d</text></g><g class="en"><text x="875" y="78">η = 1/d</text></g><rect x="770" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="875" y="237">Kiến xây</text><text x="875" y="259">chu trình</text></g><g class="en"><text x="875" y="237">Ants build</text><text x="875" y="259">tours</text></g><rect x="520" y="200" width="210" height="84" rx="12" fill="#d5e7e6"/><g class="vi"><text x="625" y="237">Bay hơi;</text><text x="625" y="259">rải 1/L</text></g><g class="en"><text x="625" y="237">Evaporate;</text><text x="625" y="259">deposit 1/L</text></g><path d="M385,192 L480,242 L385,292 L290,242 z" fill="#f6e6b8"/><g class="vi"><text x="385" y="248" font-size="15">còn ngân sách?</text></g><g class="en"><text x="385" y="248" font-size="15">budget left?</text></g><rect x="20" y="200" width="210" height="84" rx="12" fill="#f6d8cb"/><g class="vi"><text x="125" y="248">Trả về chu trình tốt nhất</text></g><g class="en"><text x="125" y="248">Return best tour</text></g>
-          <g stroke="#1c2a2e" stroke-width="2" fill="none" marker-end="url(#fc-ah)"><path class="draw d1" style="--len:60" d="M230,72 H768"/><path class="draw d4" style="--len:90" d="M875,114 V198"/><path class="draw d5" style="--len:50" d="M770,242 H732"/><path class="draw d5" style="--len:50" d="M520,242 H482"/><path class="draw d5" style="--len:60" d="M290,242 H232"/></g>
-          <path class="draw d5" style="--len:900" d="M385,292 V360 H875 V286" stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#fc-sea)"/>
-          <text x="265" y="232" font-size="14" fill="#56676a"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
-          <text x="630" y="388" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có · t ← t + 1</tspan><tspan class="en">Yes · t ← t + 1</tspan></text>
+        <g font-family="Be Vietnam Pro, sans-serif" font-size="18" text-anchor="middle" fill="#1c2a2e">
+          <g>
+          <rect x="180" y="14" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="42">BẮT ĐẦU</text></g><g class="en"><text x="400" y="42">START</text></g>
+          </g>
+          <g class="fc-node" data-s="1">
+          <rect x="180" y="80" width="440" height="66" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="108">Nhập đồ thị <tspan font-family="STIX Two Text, serif" font-style="italic">G(V, E, w)</tspan>, đỉnh <tspan font-family="STIX Two Text, serif" font-style="italic">s, t</tspan></text><text x="400" y="130">và tham số <tspan font-family="STIX Two Text, serif" font-style="italic">α, β, ρ, Q</tspan></text></g><g class="en"><text x="400" y="108">Input graph <tspan font-family="STIX Two Text, serif" font-style="italic">G(V, E, w)</tspan>, nodes <tspan font-family="STIX Two Text, serif" font-style="italic">s, t</tspan></text><text x="400" y="130">and parameters <tspan font-family="STIX Two Text, serif" font-style="italic">α, β, ρ, Q</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="113" r="14"/><text class="fc-badge-t" x="648" y="119">1</text>
+          </g>
+          <g class="fc-node" data-s="3">
+          <rect x="180" y="168" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="199">Khởi tạo pheromone <tspan font-family="STIX Two Text, serif" font-style="italic">τ<tspan baseline-shift="sub" font-size="12">ij</tspan></tspan> trên mọi cạnh</text></g><g class="en"><text x="400" y="199">Initialize pheromone <tspan font-family="STIX Two Text, serif" font-style="italic">τ<tspan baseline-shift="sub" font-size="12">ij</tspan></tspan> on every edge</text></g>
+          <circle class="fc-badge" cx="648" cy="193" r="14"/><text class="fc-badge-t" x="648" y="199">3</text>
+          </g>
+          <g class="fc-node" data-s="4">
+          <rect x="180" y="240" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="271">Đặt <tspan font-family="STIX Two Text, serif" font-style="italic">t = 1</tspan>, số lượng kiến <tspan font-family="STIX Two Text, serif" font-style="italic">N</tspan></text></g><g class="en"><text x="400" y="271">Set <tspan font-family="STIX Two Text, serif" font-style="italic">t = 1</tspan>, number of ants <tspan font-family="STIX Two Text, serif" font-style="italic">N</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="265" r="14"/><text class="fc-badge-t" x="648" y="271">4</text>
+          </g>
+          <g class="fc-node" data-s="5">
+          <path d="M400,312 L570,360 L400,408 L230,360 z" fill="#f6e6b8" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="355">Điều kiện dừng</text><text x="400" y="377">chưa thỏa mãn?</text></g><g class="en"><text x="400" y="355">Stopping criterion</text><text x="400" y="377">not met?</text></g>
+          <circle class="fc-badge" cx="518" cy="320" r="14"/><text class="fc-badge-t" x="518" y="326">5</text>
+          </g>
+          <g class="fc-node" data-s="6">
+          <rect x="180" y="430" width="440" height="112" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g font-weight="600"><g class="vi"><text x="400" y="460">Với <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1 … N</tspan>: xây dựng đường đi cho kiến <tspan font-family="STIX Two Text, serif" font-style="italic">k</tspan></text></g><g class="en"><text x="400" y="460">For <tspan font-family="STIX Two Text, serif" font-style="italic">k = 1 … N</tspan>: build the path of ant <tspan font-family="STIX Two Text, serif" font-style="italic">k</tspan></text></g></g>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="17"><text x="400" y="490">p<tspan baseline-shift="super" font-size="12">k</tspan>(u, v) ∝ τ<tspan baseline-shift="sub" font-size="12">uv</tspan><tspan baseline-shift="super" font-size="12">α</tspan> · η<tspan baseline-shift="sub" font-size="12">uv</tspan><tspan baseline-shift="super" font-size="12">β</tspan>,  v ∈ adj<tspan baseline-shift="super" font-size="12">k</tspan>(u)</text></g>
+          <g font-size="16"><g class="vi"><text x="400" y="526">chọn <tspan font-family="STIX Two Text, serif" font-style="italic">v</tspan> bằng bánh xe Roulette</text></g><g class="en"><text x="400" y="526">pick <tspan font-family="STIX Two Text, serif" font-style="italic">v</tspan> by roulette wheel</text></g></g>
+          <circle class="fc-badge" cx="648" cy="486" r="14"/><text class="fc-badge-t" x="648" y="492">6</text>
+          </g>
+          <g class="fc-node" data-s="7">
+          <rect x="180" y="564" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/>
+          <g class="vi"><text x="400" y="595">Cập nhật lời giải tốt nhất</text></g><g class="en"><text x="400" y="595">Update the best solution</text></g>
+          <circle class="fc-badge" cx="648" cy="589" r="14"/><text class="fc-badge-t" x="648" y="595">7</text>
+          </g>
+          <g class="fc-node" data-s="8">
+          <rect x="180" y="636" width="440" height="112" rx="6" fill="#d5e7e6" stroke="#1f6f78" stroke-width="2"/>
+          <g font-weight="600"><g class="vi"><text x="400" y="666">Cập nhật pheromone</text></g><g class="en"><text x="400" y="666">Update pheromone</text></g></g>
+          <g font-family="STIX Two Text, serif" font-style="italic" font-size="16"><text x="400" y="696">τ<tspan baseline-shift="sub" font-size="12">ij</tspan> ← (1 − ρ) · τ<tspan baseline-shift="sub" font-size="12">ij</tspan> + δ<tspan baseline-shift="sub" font-size="12">ij</tspan>,   δ<tspan baseline-shift="sub" font-size="12">ij</tspan> = Σ<tspan baseline-shift="sub" font-size="12">k</tspan> δ<tspan baseline-shift="sub" font-size="12">ij</tspan><tspan baseline-shift="super" font-size="12">k</tspan></text><text class="vi" x="400" y="726">δ<tspan baseline-shift="sub" font-size="12">ij</tspan><tspan baseline-shift="super" font-size="12">k</tspan> = Q / L<tspan baseline-shift="sub" font-size="12">k</tspan>  nếu (i, j) ∈ T<tspan baseline-shift="sub" font-size="12">k</tspan>,  0 ngược lại</text><text class="en" x="400" y="726">δ<tspan baseline-shift="sub" font-size="12">ij</tspan><tspan baseline-shift="super" font-size="12">k</tspan> = Q / L<tspan baseline-shift="sub" font-size="12">k</tspan>  if (i, j) ∈ T<tspan baseline-shift="sub" font-size="12">k</tspan>,  0 otherwise</text></g>
+          <circle class="fc-badge" cx="648" cy="692" r="14"/><text class="fc-badge-t" x="648" y="698">8</text>
+          </g>
+          <g class="fc-node" data-s="9">
+          <rect x="180" y="770" width="440" height="44" rx="6" fill="#f6d8cb" stroke="#1f6f78" stroke-width="2"/>
+          <g font-size="19"><text x="400" y="798"><tspan font-family="STIX Two Text, serif" font-style="italic">t = t + 1</tspan></text></g>
+          <circle class="fc-badge" cx="648" cy="792" r="14"/><text class="fc-badge-t" x="648" y="798">9</text>
+          </g>
+          <g class="fc-node" data-s="2"><rect x="180" y="856" width="440" height="50" rx="6" fill="#fbf8f1" stroke="#1f6f78" stroke-width="2"/><g class="vi"><text x="400" y="887">Trả về đường đi ngắn nhất từ <tspan font-family="STIX Two Text, serif" font-style="italic">s</tspan> đến <tspan font-family="STIX Two Text, serif" font-style="italic">t</tspan></text></g><g class="en"><text x="400" y="887">Return the shortest path from <tspan font-family="STIX Two Text, serif" font-style="italic">s</tspan> to <tspan font-family="STIX Two Text, serif" font-style="italic">t</tspan></text></g><circle class="fc-badge" cx="152" cy="881" r="14"/><text class="fc-badge-t" x="152" y="887">2</text></g>
+          <g><rect x="180" y="928" width="440" height="44" rx="22" fill="#ebe3d2" stroke="#1f6f78" stroke-width="2"/><g class="vi"><text x="400" y="956">KẾT THÚC</text></g><g class="en"><text x="400" y="956">END</text></g></g>
+          <g stroke="#1f6f78" stroke-width="2" fill="none" marker-end="url(#ah-aco)">
+            <path class="draw d2" style="--len:32" d="M400,58 V78"/>
+            <path class="draw d2" style="--len:32" d="M400,146 V166"/>
+            <path class="draw d2" style="--len:32" d="M400,218 V238"/>
+            <path class="draw d3" style="--len:32" d="M400,290 V310"/>
+            <path class="draw d3" style="--len:32" d="M400,408 V428"/>
+            <path class="draw d3" style="--len:32" d="M400,542 V562"/>
+            <path class="draw d4" style="--len:32" d="M400,614 V634"/>
+            <path class="draw d4" style="--len:32" d="M400,748 V768"/>
+            <path class="draw d4" style="--len:32" d="M400,906 V926"/>
+            <path class="draw d5" style="--len:1400" d="M180,792 H40 V360 H228"/>
+            <path class="draw d5" style="--len:1400" d="M570,360 H712 V881 H622"/>
+          </g>
+          <text x="412" y="424" text-anchor="start" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Có</tspan><tspan class="en">Yes</tspan></text>
+          <text x="641" y="350" font-size="15" fill="#1f6f78" font-weight="600"><tspan class="vi">Không</tspan><tspan class="en">No</tspan></text>
         </g>
       </svg>
     </figure>
-  </div>
-</section>
-<section class="slide" aria-label="Mã giả" data-label-en="Pseudocode">
-  <div class="slide-content">
-    <div class="cols wide-right">
-      <header class="slide-head">
-        <p class="kicker reveal"><span class="vi">Thuật toán Ant System</span><span class="en">The Ant System algorithm</span></p>
-        <h2 class="reveal d1"><span class="vi">Mã giả cho TSP</span><span class="en">Pseudocode for TSP</span></h2>
-        <p class="lead reveal d2"><span class="vi">Khác với các chương sau, ACO dựng lời giải trên một đồ thị, nên rất hợp với bài toán tổ hợp.</span><span class="en">Unlike later chapters, ACO builds solutions on a graph, so it fits combinatorial problems naturally.</span></p>
-      </header>
-      <ol class="pseudo reveal d2">
-        <li><span class="vi">Đặt <span class="m">τ<sub>ij</sub> = τ<sub>0</sub></span> cho mọi cạnh</span><span class="en">Set <span class="m">τ<sub>ij</sub> = τ<sub>0</sub></span> on every edge</span></li>
-        <li><span><span class="kw">for</span> <span class="m">t = 1 … T</span></span></li>
-        <li style="--ind:1"><span><span class="kw">for</span> <span class="vi">mỗi kiến</span><span class="en">each ant</span> <span class="m">k</span>:</span> <span class="vi">đặt ở một thành phố ngẫu nhiên</span><span class="en">place it at a random city</span></li>
-        <li style="--ind:2"><span class="vi">Lặp <span class="m">n − 1</span> lần: chọn thành phố tiếp theo theo <span class="m">p<span class="ss"><i>k</i><i>ij</i></span></span></span><span class="en">Repeat <span class="m">n − 1</span> times: pick the next city by <span class="m">p<span class="ss"><i>k</i><i>ij</i></span></span></span></li>
-        <li style="--ind:2"><span class="vi">Quay về thành phố đầu, tính <span class="m">L<sub>k</sub></span></span><span class="en">Return to the start, compute <span class="m">L<sub>k</sub></span></span></li>
-        <li style="--ind:1"><span class="vi">Bay hơi mọi cạnh, rồi mỗi kiến rải <span class="m">Q / L<sub>k</sub></span></span><span class="en">Evaporate all edges, then each ant deposits <span class="m">Q / L<sub>k</sub></span></span></li>
-        <li style="--ind:1"><span class="vi">Ghi nhớ hành trình ngắn nhất</span><span class="en">Remember the shortest tour</span></li>
-        <li><span><span class="kw">return</span> <span class="vi">hành trình ngắn nhất</span><span class="en">the shortest tour</span></span></li>
-      </ol>
+      <div class="stack">
+        <header class="slide-head">
+          <p class="kicker reveal"><span class="vi">Thuật toán ACO</span><span class="en">The ACO algorithm</span></p>
+          <h2 class="reveal d1"><span class="vi">Lưu đồ và mã giả</span><span class="en">Flowchart and pseudocode</span></h2>
+        </header>
+        <figure class="pc-fig reveal d3">
+          <div class="pc-box">
+          <div class="pc-title"><span class="en"><b>Algorithm 1:</b> Ant colony optimization</span><span class="vi"><b>Algorithm 1:</b> Giải thuật tối ưu hóa đàn kiến</span></div>
+          <div class="pc-g" data-s="1">
+          <span class="pc-badge">1</span>
+          <div class="pc-l" style="--ind:0"><span class="en"><b>Input:</b></span><span class="vi"><b>Input:</b></span></div>
+          <div class="pc-l" style="--ind:1"><span class="en">• Graph <span class="m">G(V, E, w)</span>, source node <span class="m">s</span>, target node <span class="m">t</span>;</span><span class="vi">• Đồ thị <span class="m">G(V, E, w)</span>, đỉnh nguồn <span class="m">s</span>, đỉnh kết thúc <span class="m">t</span>;</span></div>
+          <div class="pc-l" style="--ind:1"><span class="en">• Algorithm parameters</span><span class="vi">• Tham số thuật toán</span></div>
+          </div>
+          <div class="pc-g" data-s="2">
+          <span class="pc-badge">2</span>
+          <div class="pc-l" style="--ind:0"><span class="en"><b>Output:</b> the shortest path between <span class="m">s</span> and <span class="m">t</span></span><span class="vi"><b>Output:</b> đường đi ngắn nhất giữa hai điểm <span class="m">s</span> và <span class="m">t</span></span></div>
+          </div>
+          <div class="pc-g">
+          <div class="pc-l" style="--ind:0"><span class="en"><b>begin</b></span><span class="vi"><b>begin</b></span></div>
+          </div>
+          <div class="pc-g" data-s="3">
+          <span class="pc-badge">3</span>
+          <div class="pc-l" style="--ind:1"><span class="en">Initialize pheromone <span class="m">τ<sub>ij</sub></span> for each edge <span class="m">(i, j)</span> in <span class="m">E</span>;</span><span class="vi">Khởi tạo pheromone <span class="m">τ<sub>ij</sub></span> cho mỗi cạnh <span class="m">(i, j)</span> trong <span class="m">E</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="4">
+          <span class="pc-badge">4</span>
+          <div class="pc-l" style="--ind:1"><span class="en"><span class="m">t ← 1</span>;</span><span class="vi"><span class="m">t ← 1</span>;</span></div>
+          <div class="pc-l" style="--ind:1"><span class="en">The number of ants in the colony is <span class="m">N</span>;</span><span class="vi">Số lượng kiến trong bầy là <span class="m">N</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="5">
+          <span class="pc-badge">5</span>
+          <div class="pc-l" style="--ind:1"><span class="en"><b>while</b> the stopping criterion is not met <b>do</b></span><span class="vi"><b>while</b> điều kiện dừng chưa thỏa mãn <b>do</b></span></div>
+          </div>
+          <div class="pc-g" data-s="6">
+          <span class="pc-badge">6</span>
+          <div class="pc-l" style="--ind:2"><span class="en"><b>for</b> <span class="m">k ← 1</span> <b>to</b> <span class="m">N</span> <b>do</b></span><span class="vi"><b>for</b> <span class="m">k ← 1</span> <b>to</b> <span class="m">N</span> <b>do</b></span></div>
+          <div class="pc-l" style="--ind:3"><span class="en">Build the path of ant <span class="m">k</span>;</span><span class="vi">Xây dựng đường đi cho cá thể kiến <span class="m">k</span>;</span></div>
+          </div>
+          <div class="pc-g" data-s="7">
+          <span class="pc-badge">7</span>
+          <div class="pc-l" style="--ind:2"><span class="en">Update the best solution;</span><span class="vi">Cập nhật lời giải tốt nhất;</span></div>
+          </div>
+          <div class="pc-g" data-s="8">
+          <span class="pc-badge">8</span>
+          <div class="pc-l" style="--ind:2"><span class="en">Update pheromone;</span><span class="vi">Cập nhật pheromone;</span></div>
+          </div>
+          <div class="pc-g" data-s="9">
+          <span class="pc-badge">9</span>
+          <div class="pc-l" style="--ind:2"><span class="en"><span class="m">t ← t + 1</span>;</span><span class="vi"><span class="m">t ← t + 1</span>;</span></div>
+          </div>
+          <div class="pc-g">
+          <div class="pc-l" style="--ind:0"><span class="en"><b>end</b></span><span class="vi"><b>end</b></span></div>
+          </div>
+          </div>
+          <figcaption><span class="vi">Mã giả ACO theo bài giảng của Huỳnh Thị Thanh Bình [9]. Số trên mỗi khối lưu đồ ứng với nhóm dòng cùng số.</span><span class="en">ACO pseudocode after the lecture by Huỳnh Thị Thanh Bình [9]. Each number on a flowchart block marks the pseudocode lines with the same number.</span></figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 </section>
-
 <!-- 8. DEMO -->
 <section class="slide" aria-label="Mô phỏng tương tác" data-label-en="Interactive simulation">
   <div class="slide-content">
@@ -466,6 +581,7 @@
     </header>
     <ol class="refs reveal d2" start="8" style="counter-reset: rf 7">
         <li>M. O. Okwu and L. K. Tartibu, <em>Metaheuristic Optimization: Nature-Inspired Algorithms Swarm and Computational Intelligence, Theory and Applications</em>. Springer International Publishing, 2021, doi: <a href="https://doi.org/10.1007/978-3-030-61111-8">10.1007/978-3-030-61111-8</a>.</li>
+        <li>T. T. B. Huỳnh, “Ant Colony Optimization (ACO),” lecture slides, School of Information and Communication Technology, Hanoi University of Science and Technology, Hanoi, Vietnam.</li>
     </ol>
   </div>
 </section>
