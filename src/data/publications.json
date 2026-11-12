@@ -499,6 +499,35 @@
     "link": "https://doi.org/10.1007/978-3-032-23396-7_18"
   },
   {
+    "id": "J04",
+    "year": 2026,
+    "type": "Journal",
+    "authors": "Chau Van Van; Phayung Meesad; Minh Tuan Nguyen",
+    "authorLinks": [
+      {
+        "name": "Chau Van Van",
+        "url": "https://orcid.org/0009-0008-0325-6809"
+      },
+      {
+        "name": "Phayung Meesad",
+        "url": "https://scholar.google.com/scholar?q=author%3A%22Phayung%20Meesad%22"
+      },
+      {
+        "name": "Minh Tuan Nguyen",
+        "url": "https://scholar.google.com/scholar?q=author%3A%22Minh%20Tuan%20Nguyen%22"
+      }
+    ],
+    "title": "Harris Hawks Optimization–Optimized Explainable Quality Index for Tomato Grading",
+    "venue": "Journal of Data Science and Intelligent Systems, 2026.",
+    "index": null,
+    "publisher": "Bon",
+    "doi": "10.47852/bonviewjdsis620211565",
+    "landing": "https://ojs.bonviewpress.com/index.php/jdsis/article/view/11565",
+    "pdf": "https://ojs.bonviewpress.com/index.php/jdsis/article/view/11565",
+    "bibtex": "@article{Van_Chau_2026, title={Harris Hawks Optimization–Optimized Explainable Quality Index for Tomato Grading}, ISSN={2972-3841}, url={http://dx.doi.org/10.47852/bonviewjdsis620211565}, DOI={10.47852/bonviewjdsis620211565}, journal={Journal of Data Science and Intelligent Systems}, publisher={Bon View Publishing Pte}, author={Van Chau, Van and Meesad, Phayung and Nguyen, Minh Tuan}, year={2026}, month=Nov }",
+    "link": "https://doi.org/10.47852/bonviewjdsis620211565"
+  },
+  {
     "id": "J03",
     "year": 2026,
     "type": "Journal",
