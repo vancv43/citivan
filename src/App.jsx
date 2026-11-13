@@ -220,7 +220,13 @@ function PubStats({ pubs, type }) {
           <tr>
             <th>Year</th>
             {cols.map(([label]) => (
-              <th key={label}>{label}</th>
+              <th key={label}>
+                {quartiles.includes(label) ? (
+                  <span className={`rank-badge rank-${label.toLowerCase()}`} aria-label={`SJR ${label}`}>{label}</span>
+                ) : (
+                  label
+                )}
+              </th>
             ))}
           </tr>
         </thead>
