@@ -558,13 +558,15 @@
     ],
     "title": "Metaheuristic-Optimized Quantum Convolutional Autoencoder for Image Noise Reduction",
     "venue": "SN Computer Science, vol. 7, no. 8, 2026.",
-    "index": null,
+    "index": "Scopus · ESCI",
     "publisher": "Springer",
     "doi": "10.1007/s42979-026-05427-1",
     "landing": "https://link.springer.com/article/10.1007/s42979-026-05427-1?error=cookies_not_supported&code=93c9179d-5382-4be0-92e2-f3768e312bcb",
     "pdf": "https://link.springer.com/content/pdf/10.1007/s42979-026-05427-1.pdf",
     "bibtex": "@article{Chau_2026, title={Metaheuristic-Optimized Quantum Convolutional Autoencoder for Image Noise Reduction}, volume={7}, ISSN={2661-8907}, url={http://dx.doi.org/10.1007/s42979-026-05427-1}, DOI={10.1007/s42979-026-05427-1}, number={8}, journal={SN Computer Science}, publisher={Springer Science and Business Media LLC}, author={Chau, Van Van and Nguyen, Hao Anh and Nguyen, Tuan Minh and Thorn, Chinda and Meesad, Phayung}, year={2026}, month=Nov }",
-    "link": "https://doi.org/10.1007/s42979-026-05427-1"
+    "link": "https://doi.org/10.1007/s42979-026-05427-1",
+    "rank": "Q2",
+    "rankNote": "SCImago SJR 2025 = 0.445; Q2"
   },
   {
     "id": "J02",
