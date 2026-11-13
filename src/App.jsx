@@ -271,8 +271,13 @@ function PubLinks({ item }) {
         <span className={item.index.startsWith('Scopus') ? 'index-badge' : 'index-badge muted'}>{item.index}</span>
       )}
       {item.rank && (
-        <span className={`rank-badge rank-${item.rank.toLowerCase()}`} title={item.rankNote}>
-          SJR {item.rank}
+        <span className={`rank-badge rank-${item.rank.toLowerCase()}`} title={item.rankNote} aria-label={`SJR ${item.rank}`}>
+          {item.rank}
+        </span>
+      )}
+      {item.type === 'Conference' && (
+        <span className="rank-badge rank-c" title="Conference paper" aria-label="Conference paper">
+          C
         </span>
       )}
       {item.pdf && (
