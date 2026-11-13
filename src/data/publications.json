@@ -519,13 +519,15 @@
     ],
     "title": "Harris Hawks Optimization–Optimized Explainable Quality Index for Tomato Grading",
     "venue": "Journal of Data Science and Intelligent Systems, 2026.",
-    "index": null,
-    "publisher": "Bon",
+    "index": "Scopus",
+    "publisher": "Bon View",
     "doi": "10.47852/bonviewjdsis620211565",
     "landing": "https://ojs.bonviewpress.com/index.php/jdsis/article/view/11565",
-    "pdf": "https://ojs.bonviewpress.com/index.php/jdsis/article/view/11565",
+    "pdf": "https://ojs.bonviewpress.com/index.php/jdsis/article/download/11565/2307",
     "bibtex": "@article{Van_Chau_2026, title={Harris Hawks Optimization–Optimized Explainable Quality Index for Tomato Grading}, ISSN={2972-3841}, url={http://dx.doi.org/10.47852/bonviewjdsis620211565}, DOI={10.47852/bonviewjdsis620211565}, journal={Journal of Data Science and Intelligent Systems}, publisher={Bon View Publishing Pte}, author={Van Chau, Van and Meesad, Phayung and Nguyen, Minh Tuan}, year={2026}, month=Nov }",
-    "link": "https://doi.org/10.47852/bonviewjdsis620211565"
+    "link": "https://doi.org/10.47852/bonviewjdsis620211565",
+    "rank": "Q1",
+    "rankNote": "SCImago SJR 2025 = 1.035; Q1"
   },
   {
     "id": "J03",

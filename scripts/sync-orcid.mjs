@@ -24,6 +24,7 @@ const PUBLISHERS = {
   '10.1145': 'ACM',
   '10.37394': 'WSEAS',
   '10.36922': 'AccScience',
+  '10.47852': 'Bon View',
   '10.1016': 'Elsevier',
   '10.1002': 'Wiley',
   '10.3390': 'MDPI',
