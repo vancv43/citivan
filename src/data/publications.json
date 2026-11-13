@@ -904,6 +904,8 @@
     "landing": "https://link.springer.com/10.1007/978-981-19-8069-5_38",
     "pdf": "https://link.springer.com/content/pdf/10.1007/978-981-19-8069-5_38.pdf",
     "bibtex": "@inbook{Nguyen_2022, title={Face Recognition Based on Deep Learning and Data Augmentation}, ISBN={9789811980695}, ISSN={1865-0937}, url={http://dx.doi.org/10.1007/978-981-19-8069-5_38}, DOI={10.1007/978-981-19-8069-5_38}, booktitle={Future Data and Security Engineering. Big Data, Security and Privacy, Smart City and Industry 4.0 Applications}, publisher={Springer Nature Singapore}, author={Nguyen, Lam Duc Vu and Van Chau, Van and Van Nguyen, Sinh}, year={2022}, pages={560–573} }",
-    "link": "https://doi.org/10.1007/978-981-19-8069-5_38"
+    "link": "https://doi.org/10.1007/978-981-19-8069-5_38",
+    "rank": "Q4",
+    "rankNote": "Communications in Computer and Information Science (CCIS) book series, SCImago SJR 2022 Q4"
   }
 ]
