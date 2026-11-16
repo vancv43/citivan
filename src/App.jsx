@@ -9,7 +9,7 @@ const siteData = {
     logoText: 'CV',
   },
   home: {
-    name: 'Chau Van Van, Ph.D. Candidate',
+    name: 'Chau Van Van, Lecturer',
     roles: [
       'Lecturer, Posts and Telecommunications Institute of Technology (PTIT), Vietnam',
       'PhD Researcher, King Mongkut’s University of Technology North Bangkok (KMUTNB), Thailand',
