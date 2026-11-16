@@ -623,6 +623,40 @@ select {
   font-weight: 600;
 }
 
+.stats-table thead th.logo-th {
+  background: #fff;
+  border-bottom: 3px solid #1e3a8a;
+  padding: 6px 10px;
+  width: 16%;
+  vertical-align: middle;
+}
+
+.publisher-logo {
+  display: block;
+  width: 84px;
+  height: 26px;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+.publisher-logo.logo-acm {
+  width: 32px;
+  height: 32px;
+}
+
+@media (max-width: 600px) {
+  .stats-table { font-size: 14px; }
+  .stats-table th,
+  .stats-table td { padding: 6px 6px; }
+  .stats-table thead th.logo-th { padding: 4px 4px; }
+  .stats-table { font-size: 13px; }
+  .stats-table th,
+  .stats-table td { padding: 5px 2px; }
+  .stats-table thead th { font-size: 11px; }
+  .publisher-logo { width: 42px; height: 16px; }
+  .publisher-logo.logo-acm { width: 22px; height: 22px; }
+}
+
 .stats-table tbody tr:nth-child(even) { background: #f9fafb; }
 .stats-table tfoot td { background: #eff6ff; font-weight: 700; }
 .stats-table td:first-child { font-weight: 600; }

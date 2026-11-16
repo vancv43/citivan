@@ -229,7 +229,13 @@ function PubStats({ pubs, type }) {
     type === 'All'
       ? [['Conferences', isC], ['Journals', isJ], ['Total', () => true]]
       : type === 'Conference'
-        ? [['Conferences', isC]]
+        ? [
+            ['Conferences', isC],
+            ['Springer', (p) => isC(p) && p.publisher === 'Springer', 'springer'],
+            ['IEEE', (p) => isC(p) && p.publisher === 'IEEE', 'ieee'],
+            ['ACM', (p) => isC(p) && p.publisher === 'ACM', 'acm'],
+            ['Other', (p) => isC(p) && !['Springer', 'IEEE', 'ACM'].includes(p.publisher)],
+          ]
         : [['Journals', isJ], ...quartiles.map((q) => [q, (p) => isJ(p) && p.rank === q])];
   return (
     <div className="stats-wrap">
@@ -237,9 +243,16 @@ function PubStats({ pubs, type }) {
         <thead>
           <tr>
             <th>Year</th>
-            {cols.map(([label]) => (
-              <th key={label}>
-                {quartiles.includes(label) ? (
+            {cols.map(([label, , logo]) => (
+              <th key={label} className={logo ? 'logo-th' : undefined}>
+                {logo ? (
+                  <img
+                    className={`publisher-logo logo-${logo}`}
+                    src={`${import.meta.env.BASE_URL}images/logo-${logo}.png`}
+                    alt={label}
+                    title={`${label} conference papers`}
+                  />
+                ) : quartiles.includes(label) ? (
                   <span className={`rank-badge rank-${label.toLowerCase()}`} aria-label={`SJR ${label}`}>{label}</span>
                 ) : (
                   label
