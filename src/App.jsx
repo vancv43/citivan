@@ -424,8 +424,9 @@ export default function App() {
             <div className="home-left">
               <h1>{siteData.home.name}</h1>
 
-              <div className="home-links">
-                {siteData.home.links.map((link) => (
+              {[siteData.home.links.filter((l) => l.logo), siteData.home.links.filter((l) => !l.logo)].map((group, gi) => (
+              <div className="home-links" key={gi}>
+                {group.map((link) => (
                   <a
                     key={link.label}
                     href={link.href}
@@ -441,6 +442,7 @@ export default function App() {
                   </a>
                 ))}
               </div>
+              ))}
 
               <p className="email-line">{siteData.home.emailDisplay}</p>
 
