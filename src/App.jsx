@@ -78,16 +78,21 @@ const siteData = {
         year: '2025',
         title: 'Best Paper Award',
         detail:
-          '"BERT-Driven Deep Learning for Enhanced Spam Email Classification with Browser Extension Integration", International Conference on Real-Time Intelligent Systems (RTIS 2025), Vietnam',
-        link: 'https://www.socio.org.uk/rtis/best_paper_award.php',
+          '"BERT-Driven Deep Learning for Enhanced Spam Email Classification with Browser Extension Integration", The Seventh Conference on Real-time Intelligent Systems (RTIS 2025), Ho Chi Minh City, Vietnam',
+        links: [
+          { label: 'certificate', href: `${import.meta.env.BASE_URL}certificates/rtis2025-best-paper.jpg` },
+          { label: 'announcement', href: 'https://www.socio.org.uk/rtis/best_paper_award.php' },
+        ],
       },
       {
         year: '2025',
-        title: 'Best Paper Award',
+        title: 'Best Presentation Award',
         detail:
-          '"Optimizing Detection Tasks with PySwarms: Applications of Paging Algorithms", 10th International Conference on Cloud Computing and Internet of Things (CCIOT 2025), Ho Chi Minh City, Vietnam',
-        link: 'https://dl.acm.org/doi/10.1145/3785520.3785530',
-        linkLabel: 'ACM DL',
+          '"Optimizing Detection Tasks with PySwarms: Applications of Paging Algorithms", Session 1, 10th International Conference on Cloud Computing and Internet of Things (CCIOT 2025), Ho Chi Minh City, Vietnam',
+        links: [
+          { label: 'certificate', href: `${import.meta.env.BASE_URL}certificates/cciot2025-best-presentation.jpg` },
+          { label: 'ACM DL', href: 'https://dl.acm.org/doi/10.1145/3785520.3785530' },
+        ],
       },
     ],
   },
@@ -491,12 +496,12 @@ export default function App() {
                     <div className="timeline-content">
                       <p>
                         <b>{item.title}</b>, {item.detail}
-                        {item.link && (
-                          <>
+                        {item.links?.map((l) => (
+                          <span key={l.href}>
                             {' '}
-                            (<a href={item.link} target="_blank" rel="noreferrer">{item.linkLabel || 'announcement'}</a>)
-                          </>
-                        )}
+                            (<a href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)
+                          </span>
+                        ))}
                       </p>
                     </div>
                   </div>
