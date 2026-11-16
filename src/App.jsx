@@ -12,9 +12,8 @@ const siteData = {
     name: 'Chau Van Van, Lecturer',
     roles: [
       'Lecturer, Posts and Telecommunications Institute of Technology (PTIT), Vietnam',
-      'PhD Researcher, King Mongkut’s University of Technology North Bangkok (KMUTNB), Thailand',
     ],
-    emailDisplay: 'chauvanvan [at] example [dot] edu',
+    emailDisplay: 'vancv@ptit.edu.vn · vancv@ptithcm.edu.vn',
     intro:
       'My name is Chau Van Van. I work in the areas of artificial intelligence, data science, computer vision, software engineering, and applied research. This website is designed as a long-term academic portfolio that can be updated continuously with new publications, supervised students, projects, and professional activities.',
     links: [
@@ -160,8 +159,8 @@ const siteData = {
     organization: 'Posts and Telecommunications Institute of Technology (PTIT)',
     office: 'Faculty / Department information here',
     address: 'Update office address, city, country',
-    personalEmail: 'yourname@gmail.com',
-    institutionalEmail: 'yourname@ptit.edu.vn',
+    personalEmail: 'vancv@ptit.edu.vn',
+    institutionalEmail: 'vancv@ptithcm.edu.vn',
     mapEmbed:
       'https://www.google.com/maps?q=Posts%20and%20Telecommunications%20Institute%20of%20Technology&output=embed',
   },
@@ -619,12 +618,12 @@ export default function App() {
                 <div className="email-box">
                   <h4>Email:</h4>
                   <div className="email-item">
-                    <span>- Personal:</span>
+                    <span>- PTIT:</span>
                     <a href={`mailto:${siteData.contact.personalEmail}`}>{siteData.contact.personalEmail}</a>
                     <Copy size={18} />
                   </div>
                   <div className="email-item">
-                    <span>- Institutional:</span>
+                    <span>- PTIT HCMC:</span>
                     <a href={`mailto:${siteData.contact.institutionalEmail}`}>{siteData.contact.institutionalEmail}</a>
                     <Copy size={18} />
                   </div>
