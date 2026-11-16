@@ -176,12 +176,12 @@ const siteData = {
   ],
   contact: {
     organization: 'Posts and Telecommunications Institute of Technology (PTIT)',
-    office: 'Faculty / Department information here',
-    address: 'Update office address, city, country',
+    office: 'Faculty of Information Technology',
+    address: '11 Nguyen Dinh Chieu Street, Sai Gon Ward, Ho Chi Minh City, 700000, Vietnam',
     personalEmail: 'vancv@ptit.edu.vn',
     institutionalEmail: 'vancv@ptithcm.edu.vn',
     mapEmbed:
-      'https://www.google.com/maps?q=Posts%20and%20Telecommunications%20Institute%20of%20Technology&output=embed',
+      'https://www.google.com/maps?q=Posts%20and%20Telecommunications%20Institute%20of%20Technology%2C%2011%20Nguyen%20Dinh%20Chieu%2C%20Ho%20Chi%20Minh%20City&output=embed',
   },
 };
 
