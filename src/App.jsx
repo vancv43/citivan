@@ -18,11 +18,11 @@ const siteData = {
       'Van Van Chau (Mr.) is a Lecturer at the Posts and Telecommunications Institute of Technology (PTIT), Ho Chi Minh City, Vietnam. He has extensive experience in the software industry and research, with expertise in Artificial Intelligence, Data Science, Computer Science, Cybersecurity, and Information Management Systems, including ERP, CRM, and SCADA. His research interests include Artificial Intelligence, Computer Vision, Data Science, and Metaheuristic Optimization, particularly hybrid frameworks integrating deep learning and swarm intelligence for scalable image analysis and intelligent decision-making systems.',
     orcid: '0009-0008-0325-6809',
     links: [
-      { label: 'Scholar', href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
-      { label: 'Scopus', href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
-      { label: 'ORCID', href: 'https://orcid.org/0009-0008-0325-6809' },
-      { label: 'GitHub', href: 'https://github.com/vancv43' },
-      { label: 'LinkedIn', href: 'https://www.linkedin.com/in/citi-van-2a7251353/' },
+      { label: 'Scholar', logo: `${import.meta.env.BASE_URL}images/logo-scholar.svg`, href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
+      { label: 'Scopus', logo: `${import.meta.env.BASE_URL}images/logo-scopus.png`, wordmark: true, href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
+      { label: 'ORCID', logo: `${import.meta.env.BASE_URL}images/orcid.svg`, href: 'https://orcid.org/0009-0008-0325-6809' },
+      { label: 'GitHub', logo: `${import.meta.env.BASE_URL}images/logo-github.png`, href: 'https://github.com/vancv43' },
+      { label: 'LinkedIn', logo: `${import.meta.env.BASE_URL}images/logo-linkedin.png`, href: 'https://www.linkedin.com/in/citi-van-2a7251353/' },
       { label: 'Swarm Intelligence Textbook', href: '/citivan/swarm-intelligence/' },
       { label: 'Reviewer Strategy', href: '/citivan/reviewer-strategy/' },
     ],
@@ -426,8 +426,18 @@ export default function App() {
 
               <div className="home-links">
                 {siteData.home.links.map((link) => (
-                  <a key={link.label} href={link.href} className="pill-link">
-                    {link.label}
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    className={link.logo ? 'pill-link logo-pill' : 'pill-link'}
+                    title={link.logo ? link.label : undefined}
+                    aria-label={link.logo ? link.label : undefined}
+                  >
+                    {link.logo ? (
+                      <img src={link.logo} alt={link.label} className={link.wordmark ? 'wordmark' : undefined} />
+                    ) : (
+                      link.label
+                    )}
                   </a>
                 ))}
               </div>
