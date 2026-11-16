@@ -15,7 +15,8 @@ const siteData = {
     ],
     emailDisplay: 'vancv@ptit.edu.vn · vancv@ptithcm.edu.vn',
     intro:
-      'My name is Chau Van Van. I work in the areas of artificial intelligence, data science, computer vision, software engineering, and applied research. This website is designed as a long-term academic portfolio that can be updated continuously with new publications, supervised students, projects, and professional activities.',
+      'Van Van Chau (Mr.) is a Lecturer at the Posts and Telecommunications Institute of Technology (PTIT), Ho Chi Minh City, Vietnam. He has extensive experience in the software industry and research, with expertise in Artificial Intelligence, Data Science, Computer Science, Cybersecurity, and Information Management Systems, including ERP, CRM, and SCADA. His research interests include Artificial Intelligence, Computer Vision, Data Science, and Metaheuristic Optimization, particularly hybrid frameworks integrating deep learning and swarm intelligence for scalable image analysis and intelligent decision-making systems.',
+    orcid: '0009-0008-0325-6809',
     links: [
       { label: 'Scholar', href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
       { label: 'Scopus', href: 'https://scholar.google.com/citations?user=hu0CIzAAAAAJ&hl=en' },
@@ -406,6 +407,12 @@ export default function App() {
                   <p key={role}>{role}</p>
                 ))}
                 <p>{siteData.home.intro}</p>
+                <p>
+                  ORCID:{' '}
+                  <a href={`https://orcid.org/${siteData.home.orcid}`} target="_blank" rel="noreferrer">
+                    {siteData.home.orcid}
+                  </a>
+                </p>
               </div>
 
               <a href={siteData.home.cvLink} className="cv-btn">
