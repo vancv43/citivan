@@ -81,7 +81,14 @@ const siteData = {
           '"BERT-Driven Deep Learning for Enhanced Spam Email Classification with Browser Extension Integration", International Conference on Real-Time Intelligent Systems (RTIS 2025), Vietnam',
         link: 'https://www.socio.org.uk/rtis/best_paper_award.php',
       },
-      { year: '2024', title: 'Best Paper Award', detail: 'Update conference or journal detail' },
+      {
+        year: '2025',
+        title: 'Best Paper Award',
+        detail:
+          '"Optimizing Detection Tasks with PySwarms: Applications of Paging Algorithms", 10th International Conference on Cloud Computing and Internet of Things (CCIOT 2025), Ho Chi Minh City, Vietnam',
+        link: 'https://dl.acm.org/doi/10.1145/3785520.3785530',
+        linkLabel: 'ACM DL',
+      },
     ],
   },
   publications,
@@ -487,7 +494,7 @@ export default function App() {
                         {item.link && (
                           <>
                             {' '}
-                            (<a href={item.link} target="_blank" rel="noreferrer">announcement</a>)
+                            (<a href={item.link} target="_blank" rel="noreferrer">{item.linkLabel || 'announcement'}</a>)
                           </>
                         )}
                       </p>
