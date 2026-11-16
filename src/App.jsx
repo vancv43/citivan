@@ -27,7 +27,7 @@ const siteData = {
       { label: 'Reviewer Strategy', href: '/citivan/reviewer-strategy/' },
     ],
     cvLink: '#',
-    heroImage: `${import.meta.env.BASE_URL}images/profile-photo-20261116b.jpg`,
+    heroImage: `${import.meta.env.BASE_URL}images/profile-photo-20261116c.jpg`,
   },
   profile: {
     bannerImage: `${import.meta.env.BASE_URL}images/profile-baner.jpg`,
