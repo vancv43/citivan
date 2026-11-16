@@ -426,8 +426,19 @@ export default function App() {
                 ))}
                 <p>{siteData.home.intro}</p>
                 <p>
-                  ORCID:{' '}
-                  <a href={`https://orcid.org/${siteData.home.orcid}`} target="_blank" rel="noreferrer">
+                  <a
+                    href={`https://orcid.org/${siteData.home.orcid}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <img
+                      src={`${import.meta.env.BASE_URL}images/orcid.svg`}
+                      alt="ORCID"
+                      width="20"
+                      height="20"
+                      style={{ display: 'inline-block' }}
+                    />
                     {siteData.home.orcid}
                   </a>
                 </p>
