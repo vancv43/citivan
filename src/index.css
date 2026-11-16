@@ -605,6 +605,19 @@ select {
 }
 
 .pub-btn:hover { border-color: #2563eb; color: #2563eb; }
+
+.award-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.award-btn { color: #1d4ed8; border-color: #bfdbfe; background: #eff6ff; font-size: 15px; padding: 4px 12px; gap: 6px; border-radius: 6px; }
+.award-btn svg { width: 16px; height: 16px; }
+.award-btn:hover { background: #dbeafe; border-color: #2563eb; }
+.award-btn.cert { color: #b45309; border-color: #fcd34d; background: #fffbeb; }
+.award-btn.cert:hover { background: #fef3c7; border-color: #d97706; color: #92400e; }
 .pub-btn.pdf { color: #b91c1c; border-color: #fca5a5; }
 .pub-btn.pdf:hover { background: #fef2f2; }
 

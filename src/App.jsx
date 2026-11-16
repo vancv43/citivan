@@ -533,13 +533,33 @@ export default function App() {
                     <div className="timeline-content">
                       <p>
                         <b>{item.title}</b>, {item.detail}
-                        {item.links?.map((l) => (
-                          <span key={l.href}>
-                            {' '}
-                            (<a href={l.href} target="_blank" rel="noreferrer">{l.label}</a>)
-                          </span>
-                        ))}
                       </p>
+                      {item.links?.length > 0 && (
+                        <div className="award-links">
+                          {item.links.map((l) => {
+                            const cert = l.label === 'certificate';
+                            return (
+                              <a
+                                key={l.href}
+                                className={cert ? 'pub-btn award-btn cert' : 'pub-btn award-btn'}
+                                href={l.href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                title={cert ? 'View the award certificate' : `Open ${l.label}`}
+                              >
+                                <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+                                  {cert ? (
+                                    <path fill="currentColor" d="M12 2a6 6 0 0 1 3.6 10.8l1.3 8.2-4.9-2.6L7.1 21l1.3-8.2A6 6 0 0 1 12 2zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z" />
+                                  ) : (
+                                    <path fill="currentColor" d="M14 3h7v7h-2V6.4l-9.3 9.3-1.4-1.4L17.6 5H14V3zM5 5h6v2H7v10h10v-4h2v6H5V5z" />
+                                  )}
+                                </svg>
+                                {cert ? 'Certificate' : l.label === 'announcement' ? 'Announcement' : l.label}
+                              </a>
+                            );
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}
