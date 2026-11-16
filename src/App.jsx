@@ -74,7 +74,13 @@ const siteData = {
       },
     ],
     awards: [
-      { year: '2025', title: 'Best Paper Award', detail: 'Update conference or journal detail' },
+      {
+        year: '2025',
+        title: 'Best Paper Award',
+        detail:
+          '"BERT-Driven Deep Learning for Enhanced Spam Email Classification with Browser Extension Integration", International Conference on Real-Time Intelligent Systems (RTIS 2025), Vietnam',
+        link: 'https://www.socio.org.uk/rtis/best_paper_award.php',
+      },
       { year: '2024', title: 'Best Paper Award', detail: 'Update conference or journal detail' },
     ],
   },
@@ -476,7 +482,15 @@ export default function App() {
                   <div key={index} className="timeline-row small">
                     <div className="timeline-year">{item.year}</div>
                     <div className="timeline-content">
-                      <p><b>{item.title}</b>, {item.detail}</p>
+                      <p>
+                        <b>{item.title}</b>, {item.detail}
+                        {item.link && (
+                          <>
+                            {' '}
+                            (<a href={item.link} target="_blank" rel="noreferrer">announcement</a>)
+                          </>
+                        )}
+                      </p>
                     </div>
                   </div>
                 ))}
