@@ -246,12 +246,13 @@ function PubStats({ pubs, type }) {
             {cols.map(([label, , logo]) => (
               <th key={label} className={logo ? 'logo-th' : undefined}>
                 {logo ? (
-                  <img
-                    className={`publisher-logo logo-${logo}`}
-                    src={`${import.meta.env.BASE_URL}images/logo-${logo}.png`}
-                    alt={label}
-                    title={`${label} conference papers`}
-                  />
+                  <span className="logo-chip" title={`${label} conference papers`}>
+                    <img
+                      className={`publisher-logo logo-${logo}`}
+                      src={`${import.meta.env.BASE_URL}images/logo-${logo}.png`}
+                      alt={label}
+                    />
+                  </span>
                 ) : quartiles.includes(label) ? (
                   <span className={`rank-badge rank-${label.toLowerCase()}`} aria-label={`SJR ${label}`}>{label}</span>
                 ) : (
